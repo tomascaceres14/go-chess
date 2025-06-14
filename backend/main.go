@@ -15,15 +15,28 @@ func main() {
 
 	fmt.Println(game.board)
 
-	pawn, err := game.GetPiece(Position{Row: 6, Col: 2}, p2)
+	getPos, err := Pos(2, "E")
 	if err != nil {
 		PrintError(err)
 	}
 
+	pawn, err := game.GetPiece(getPos, p1)
+	if err != nil {
+		PrintError(err)
+		return
+	}
+
 	fmt.Println(pawn)
 
-	if err := game.MovePiece(pawn, Position{Row: 7, Col: 2}, p2); err != nil {
+	movePos, err := Pos(4, "e")
+	if err != nil {
 		PrintError(err)
+		return
+	}
+
+	if err := game.MovePiece(pawn, movePos, p1); err != nil {
+		PrintError(err)
+		return
 	}
 
 	fmt.Println(game.board)
