@@ -1,25 +1,44 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Player struct {
-	name   string
-	white  bool
-	points int
+	Name   string
+	White  bool
+	Points int
+}
+
+func NewPlayer(name string, isWhite bool) *Player {
+	return &Player{
+		Name:   name,
+		White:  isWhite,
+		Points: 0,
+	}
 }
 
 func main() {
 
-	g := NewGame()
+	//p1 := NewPlayer("P1", randomBool())
+	//p2 := NewPlayer("P2", randomBool())
+	p1 := NewPlayer("White", true)
+	p2 := NewPlayer("Black", false)
 
-	fmt.Println(g.board)
+	game := NewGame(p1, p2)
 
-	pawn := g.board.GetPiece(Position{Row: 1, Col: 2})
-	fmt.Println(pawn)
+	fmt.Println(game.board)
 
-	if err := g.board.MovePiece(pawn, Position{Row: 3, Col: 2}); err != nil {
-		fmt.Printf("--- ERROR: %v\n", err)
+	pawn, err := game.GetPiece(Position{Row: 6, Col: 2}, p2)
+	if err != nil {
+		PrintError(err)
 	}
 
-	fmt.Println(g.board)
+	fmt.Println(pawn)
+
+	if err := game.MovePiece(pawn, Position{Row: 7, Col: 2}, p2); err != nil {
+		PrintError(err)
+	}
+
+	fmt.Println(game.board)
 }

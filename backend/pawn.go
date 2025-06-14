@@ -16,7 +16,7 @@ func NewPawn(white bool, pos Position) *Pawn {
 
 	return &Pawn{
 		BasePiece: &BasePiece{
-			white: white,
+			White: white,
 			Value: 1,
 			Pos:   pos,
 		},
@@ -52,10 +52,14 @@ func (p *Pawn) GetPosition() Position {
 	return p.Pos
 }
 
+func (p *Pawn) IsWhite() bool {
+	return p.White
+}
+
 func (p *Pawn) String() string {
 	color := "w"
 
-	if !p.white {
+	if !p.White {
 		color = "b"
 	}
 
