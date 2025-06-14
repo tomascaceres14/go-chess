@@ -4,20 +4,6 @@ import (
 	"fmt"
 )
 
-type Player struct {
-	Name   string
-	White  bool
-	Points int
-}
-
-func NewPlayer(name string, isWhite bool) *Player {
-	return &Player{
-		Name:   name,
-		White:  isWhite,
-		Points: 0,
-	}
-}
-
 func main() {
 
 	//p1 := NewPlayer("P1", randomBool())
