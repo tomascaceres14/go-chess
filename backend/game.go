@@ -16,26 +16,31 @@ func NewGame(p1, p2 *Player) *Game {
 
 	board := [8][8]Movable{}
 
-	// Pawns
-	for i := range 8 {
-		blackRookPos := Position{Row: 6, Col: i}
-		whiteRookPos := Position{Row: 1, Col: i}
-		board[6][i] = NewPawn(false, blackRookPos) // black
-		board[1][i] = NewPawn(true, whiteRookPos)  // white
-	}
-
-	// Rooks
-	board[7][0] = NewRook(false, Position{Row: 7, Col: 0}) // black
-	board[7][7] = NewRook(false, Position{Row: 7, Col: 7}) // black
-
-	board[0][0] = NewRook(true, Position{Row: 0, Col: 0}) // white
-	board[0][7] = NewRook(true, Position{Row: 0, Col: 7}) // white
-
-	return &Game{
+	game := &Game{
 		board: &Board{grid: &board},
 		p1:    p1,
 		p2:    p2,
 	}
+
+	// Pawns
+	for i := range 8 {
+		game.board.InsertPiece(NewPawn(false, Position{Row: 6, Col: i})) // black
+		game.board.InsertPiece(NewPawn(true, Position{Row: 1, Col: i}))  // white
+	}
+
+	// Rooks
+	game.board.InsertPiece(NewRook(false, Position{Row: 7, Col: 0})) // black
+	game.board.InsertPiece(NewRook(false, Position{Row: 7, Col: 7})) // black
+	game.board.InsertPiece(NewRook(true, Position{Row: 0, Col: 0}))  // white
+	game.board.InsertPiece(NewRook(true, Position{Row: 0, Col: 7}))  // white
+
+	// Bishops
+	game.board.InsertPiece(NewBishop(false, Position{Row: 7, Col: 2})) // black
+	game.board.InsertPiece(NewBishop(false, Position{Row: 7, Col: 5})) // black
+	game.board.InsertPiece(NewBishop(true, Position{Row: 0, Col: 2}))  // white
+	game.board.InsertPiece(NewBishop(true, Position{Row: 0, Col: 5}))  // white
+
+	return game
 }
 
 func (g *Game) GetPiece(pos Position, player *Player) (Movable, error) {

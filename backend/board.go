@@ -9,6 +9,10 @@ type Board struct {
 	grid *[8][8]Movable
 }
 
+func (b *Board) InsertPiece(piece Movable) {
+	b.grid[piece.GetPosition().Row][piece.GetPosition().Col] = piece
+}
+
 func (b *Board) MovePiece(piece Movable, pos Position) error {
 	// asegurar que pos este dentro del tablero
 	if pos.Col < 0 || pos.Col > 7 || pos.Row < 0 || pos.Row > 7 {

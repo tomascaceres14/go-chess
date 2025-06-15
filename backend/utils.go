@@ -15,6 +15,7 @@ func PrintError(err error) {
 }
 
 func CheckRayRecursive(pos Position, dx, dy int, b *Board, white bool, positions *[]Position) {
+
 	if !pos.InBounds() {
 		return
 	}

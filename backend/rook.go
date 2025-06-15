@@ -5,6 +5,13 @@ type Rook struct {
 	HasMoved bool
 }
 
+var rookDirs = []struct{ dx, dy int }{
+	{0, 1},
+	{0, -1},
+	{-1, 0},
+	{1, 0},
+}
+
 func NewRook(white bool, pos Position) *Rook {
 	return &Rook{
 		BasePiece: &BasePiece{
@@ -19,15 +26,10 @@ func NewRook(white bool, pos Position) *Rook {
 func (r *Rook) PossibleMoves(b *Board) []Position {
 	positions := []Position{}
 
-	top := Position{Row: r.Pos.Row, Col: r.Pos.Col + 1}
-	bottom := Position{Row: r.Pos.Row, Col: r.Pos.Col - 1}
-	left := Position{Row: r.Pos.Row - 1, Col: r.Pos.Col}
-	right := Position{Row: r.Pos.Row + 1, Col: r.Pos.Col}
-
-	CheckRayRecursive(top, 0, 1, b, r.White, &positions)
-	CheckRayRecursive(bottom, 0, -1, b, r.White, &positions)
-	CheckRayRecursive(left, -1, 0, b, r.White, &positions)
-	CheckRayRecursive(right, 1, 0, b, r.White, &positions)
+	for _, v := range rookDirs {
+		dir := Position{Row: r.Pos.Row + v.dx, Col: r.Pos.Col + v.dy}
+		CheckRayRecursive(dir, v.dx, v.dy, b, r.White, &positions)
+	}
 
 	return positions
 }

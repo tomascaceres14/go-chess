@@ -16,14 +16,13 @@ func main() {
 
 	fmt.Println(game.board)
 
-	WRookPos, err := Pos(8, "A")
+	WRookPos, err := Pos(1, "C")
 	if err != nil {
 		PrintError(err)
 	}
 
-	WRook := game.board.GetPiece(WRookPos)
+	WBishop := game.board.GetPiece(WRookPos)
 
 	fmt.Println(game.board)
-
-	fmt.Println(WRook.PossibleMoves(game.board))
+	fmt.Println(WBishop.PossibleMoves(game.board))
 }
