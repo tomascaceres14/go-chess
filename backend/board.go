@@ -9,8 +9,13 @@ type Board struct {
 	grid *[8][8]Movable
 }
 
-func (b *Board) InsertPiece(piece Movable) {
+func (b *Board) InsertPiece(piece Movable) bool {
+	if b.isOccupied(piece.GetPosition()) {
+		return false
+	}
+
 	b.grid[piece.GetPosition().Row][piece.GetPosition().Col] = piece
+	return true
 }
 
 func (b *Board) MovePiece(piece Movable, pos Position) error {
