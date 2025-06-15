@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Rook struct {
 	*BasePiece
 	HasMoved bool
@@ -32,29 +30,6 @@ func (r *Rook) PossibleMoves(b *Board) []Position {
 	CheckRayRecursive(right, 1, 0, b, r.White, &positions)
 
 	return positions
-}
-
-func CheckRayRecursive(pos Position, dx, dy int, b *Board, white bool, positions *[]Position) {
-	fmt.Printf("checking %v dir x=%v y=%v\n", pos, dx, dy)
-
-	if !pos.InBounds() {
-		fmt.Println("oob:", pos)
-		return
-	}
-
-	if b.isOccupied(pos) {
-		fmt.Println("occupied:", pos)
-		if b.GetPiece(pos).IsWhite() != white {
-			fmt.Println("can eat enemy:", pos)
-			*positions = append(*positions, pos)
-		}
-		return
-	}
-
-	fmt.Println("valid pos:", pos)
-	*positions = append(*positions, pos)
-	next := Position{Row: pos.Row + dx, Col: pos.Col + dy}
-	CheckRayRecursive(next, dx, dy, b, white, positions)
 }
 
 func (r *Rook) GetPosition() Position {
