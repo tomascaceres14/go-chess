@@ -16,21 +16,14 @@ func main() {
 
 	fmt.Println(game.board)
 
-	if err := game.MovePiece(Pos(7, "G"), Pos(5, "G"), p2); err != nil {
-		PrintError(err)
-	}
+	// if err := game.MovePiece(Pos(1, "B"), Pos(3, "A"), p1); err != nil {
+	// 	PrintError(err)
+	// }
 
-	if err := game.MovePiece(Pos(5, "G"), Pos(6, "G"), p2); err != nil {
-		PrintError(err)
-	}
-
-	if err := game.MovePiece(Pos(2, "D"), Pos(3, "D"), p1); err != nil {
+	if err := game.MovePiece(Pos(1, "B"), Pos(4, "C"), p1); err != nil {
 		PrintError(err)
 	}
 
 	fmt.Println(game.board)
 
-	game.MovePiece(Pos(1, "C"), Pos(5, "G"), p1)
-	game.MovePiece(Pos(5, "G"), Pos(4, "G"), p2)
-	fmt.Println(game.board)
 }

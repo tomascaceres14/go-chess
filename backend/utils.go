@@ -31,3 +31,11 @@ func CheckRayRecursive(pos Position, dx, dy int, b *Board, white bool, positions
 	next := Position{Row: pos.Row + dx, Col: pos.Col + dy}
 	CheckRayRecursive(next, dx, dy, b, white, positions)
 }
+
+func GetCol(col int) string {
+	return string(cols[col])
+}
+
+func GetRow(row int) int {
+	return row + 1
+}

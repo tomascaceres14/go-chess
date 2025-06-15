@@ -34,6 +34,12 @@ func NewGame(p1, p2 *Player) *Game {
 	game.board.InsertPiece(NewRook(true, Position{Row: 0, Col: 0}))  // white
 	game.board.InsertPiece(NewRook(true, Position{Row: 0, Col: 7}))  // white
 
+	// Knights
+	game.board.InsertPiece(NewKnight(false, Position{Row: 7, Col: 1})) // black
+	game.board.InsertPiece(NewKnight(false, Position{Row: 7, Col: 6})) // black
+	game.board.InsertPiece(NewKnight(true, Position{Row: 0, Col: 1}))  // white
+	game.board.InsertPiece(NewKnight(true, Position{Row: 0, Col: 6}))  // white
+
 	// Bishops
 	game.board.InsertPiece(NewBishop(false, Position{Row: 7, Col: 2})) // black
 	game.board.InsertPiece(NewBishop(false, Position{Row: 7, Col: 5})) // black
@@ -46,6 +52,9 @@ func NewGame(p1, p2 *Player) *Game {
 func (g *Game) getPiece(pos Position, player *Player) (Movable, error) {
 
 	piece := g.board.GetPiece(pos)
+	if piece == nil {
+		return nil, fmt.Errorf("Position %v%v is empty.", GetRow(pos.Row+1), GetCol(pos.Col))
+	}
 
 	if piece.IsWhite() != player.White {
 		return nil, fmt.Errorf("Not your piece, %s.", player.Name)
@@ -67,7 +76,7 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	// verificar si pieza puede moverse a pos
 	if !ContainsPosition(piece.PossibleMoves(g.board), to) {
-		return fmt.Errorf("%s cant move to row=%d col=%d.", piece.String(), to.Row, to.Col)
+		return fmt.Errorf("%s cant move from %d%s to %d%s.", piece.String(), GetRow(from.Row), GetCol(from.Col), to.Row, GetCol(to.Col))
 	}
 
 	if piece.GetPosition() == to {
