@@ -17,13 +17,13 @@ func NewBishop(white bool, pos Position) *Bishop {
 	}
 }
 
-func (bp *Bishop) PossibleMoves(b *Board) []Position {
-	positions := []Position{}
+func (bp *Bishop) PossibleMoves(b *Board) map[Position]bool {
+	positions := map[Position]bool{}
 
 	for _, v := range bishopDirs {
 
 		dir := Position{Row: bp.Pos.Row + v.dx, Col: bp.Pos.Col + v.dy}
-		CastRay(dir, v.dx, v.dy, b, bp.White, &positions)
+		CastRay(dir, v.dx, v.dy, b, bp.White, positions)
 	}
 
 	return positions

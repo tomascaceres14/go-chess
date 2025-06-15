@@ -14,19 +14,21 @@ func PrintError(err error) {
 	fmt.Printf("--- ERROR: %v\n", err)
 }
 
-func CastRay(pos Position, dx, dy int, b *Board, white bool, positions *[]Position) {
+func CastRay(pos Position, dx, dy int, b *Board, white bool, positions map[Position]bool) {
 
 	if !pos.InBounds() {
 		return
 	}
 
-	piece, ok := b.GetPiece(pos)
-	if ok && piece.IsWhite() != white {
-		*positions = append(*positions, pos)
+	piece, occupied := b.GetPiece(pos)
+	if occupied {
+		if piece.IsWhite() != white {
+			positions[pos] = true
+		}
 		return
 	}
 
-	*positions = append(*positions, pos)
+	positions[pos] = true
 	next := Position{Row: pos.Row + dx, Col: pos.Col + dy}
 	CastRay(next, dx, dy, b, white, positions)
 }

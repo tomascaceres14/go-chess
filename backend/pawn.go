@@ -21,9 +21,9 @@ func NewPawn(white bool, pos Position) *Pawn {
 	}
 }
 
-func (p *Pawn) PossibleMoves(b *Board) []Position {
+func (p *Pawn) PossibleMoves(b *Board) map[Position]bool {
 
-	positions := []Position{}
+	positions := map[Position]bool{}
 
 	pos := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col}
 
@@ -31,11 +31,11 @@ func (p *Pawn) PossibleMoves(b *Board) []Position {
 		return positions
 	}
 
-	positions = append(positions, pos)
+	positions[pos] = true
 
 	if !p.hasMoved {
 		pos.Row += 1 * p.direction
-		positions = append(positions, pos)
+		positions[pos] = true
 	}
 
 	return positions

@@ -1,7 +1,7 @@
 package main
 
 type Movable interface {
-	PossibleMoves(b *Board) []Position
+	PossibleMoves(b *Board) map[Position]bool
 	GetPosition() Position
 	SetPosition(pos Position)
 	IsWhite() bool

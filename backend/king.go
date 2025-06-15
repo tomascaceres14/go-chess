@@ -23,15 +23,15 @@ var kingDirs = []struct{ dx, dy int }{
 	{-1, -1},
 }
 
-func (k *King) PossibleMoves(b *Board) []Position {
-	positions := []Position{}
+func (k *King) PossibleMoves(b *Board) map[Position]bool {
+	positions := map[Position]bool{}
 
 	for _, v := range kingDirs {
 		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
 		piece, occupied := b.GetPiece(pos)
 
 		if !occupied || piece.IsWhite() != k.White {
-			positions = append(positions, pos)
+			positions[pos] = true
 			continue
 		}
 	}

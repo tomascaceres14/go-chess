@@ -21,8 +21,8 @@ func NewKnight(white bool, pos Position) *Knight {
 	}
 }
 
-func (k *Knight) PossibleMoves(b *Board) []Position {
-	positions := []Position{}
+func (k *Knight) PossibleMoves(b *Board) map[Position]bool {
+	positions := map[Position]bool{}
 
 	for _, v := range knightMoves {
 		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
@@ -34,7 +34,7 @@ func (k *Knight) PossibleMoves(b *Board) []Position {
 		pieceAt, occupied := b.GetPiece(pos)
 
 		if !occupied || pieceAt.IsWhite() != k.White {
-			positions = append(positions, pos)
+			positions[pos] = true
 			continue
 		}
 
