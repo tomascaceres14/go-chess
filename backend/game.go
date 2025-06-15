@@ -69,9 +69,7 @@ func (g *Game) MovePiece(piece Movable, pos Position, player *Player) error {
 		return fmt.Errorf("%s cant move to row=%d col=%d.", piece.String(), pos.Row, pos.Col)
 	}
 
-	currPos := piece.GetPosition()
-
-	if pos == currPos {
+	if pos == piece.GetPosition() {
 		return errors.New("Cannot move to the same position.")
 	}
 

@@ -19,16 +19,6 @@ func (b *Board) InsertPiece(piece Movable) bool {
 }
 
 func (b *Board) MovePiece(piece Movable, pos Position) error {
-	// asegurar que pos este dentro del tablero
-	if pos.Col < 0 || pos.Col > 7 || pos.Row < 0 || pos.Row > 7 {
-		return errors.New("Pos out of bounds")
-	}
-
-	// verificar si pieza puede moverse a pos
-	if !ContainsPosition(piece.PossibleMoves(b), pos) {
-		return errors.New("Piece cant move there")
-	}
-
 	currPos := piece.GetPosition()
 
 	if pos == currPos {
@@ -37,6 +27,8 @@ func (b *Board) MovePiece(piece Movable, pos Position) error {
 
 	b.grid[pos.Row][pos.Col] = piece
 	b.grid[currPos.Row][currPos.Col] = nil
+
+	piece.SetPosition(pos)
 
 	return nil
 }

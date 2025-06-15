@@ -16,13 +16,17 @@ func main() {
 
 	fmt.Println(game.board)
 
-	WRookPos, err := Pos(1, "C")
+	G7Pawn, err := game.GetPiece(Pos(7, "G"), p2)
 	if err != nil {
 		PrintError(err)
 	}
 
-	WBishop := game.board.GetPiece(WRookPos)
+	fmt.Println(G7Pawn)
+	game.MovePiece(G7Pawn, Pos(5, "G"), p2)
 
 	fmt.Println(game.board)
-	fmt.Println(WBishop.PossibleMoves(game.board))
+
+	game.MovePiece(G7Pawn, Pos(6, "G"), p2)
+	fmt.Println(game.board)
+	// fmt.Println(WBishop.PossibleMoves(game.board))
 }

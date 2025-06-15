@@ -9,20 +9,21 @@ type Position struct {
 	Row, Col int
 }
 
-func Pos(row int, col string) (Position, error) {
+func Pos(row int, col string) Position {
+
 	if row < 1 || row > 8 {
-		return Position{}, fmt.Errorf("row fuera de rango: %d", row)
+		return Position{-1, -1}
 	}
 
 	col = strings.ToLower(col)
 	if len(col) != 1 || col[0] < 'a' || col[0] > 'h' {
-		return Position{}, fmt.Errorf("columna inválida: %s", col)
+		return Position{-1, -1}
 	}
 
 	return Position{
 		Row: row - 1,
 		Col: int(col[0] - 'a'),
-	}, nil
+	}
 }
 
 func (p Position) Equals(other Position) bool {
