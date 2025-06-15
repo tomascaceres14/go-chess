@@ -6,10 +6,12 @@ import (
 )
 
 type Game struct {
-	board  *Board
-	p1, p2 *Player
+	board    *Board
+	p1, p2   *Player
+	Captures *[]Movable
 }
 
+// Generates a new board with classic chess configuration
 func NewGame(p1, p2 *Player) *Game {
 
 	println("generating new board...")
@@ -17,9 +19,10 @@ func NewGame(p1, p2 *Player) *Game {
 	board := [8][8]Movable{}
 
 	game := &Game{
-		board: &Board{grid: &board},
-		p1:    p1,
-		p2:    p2,
+		board:    &Board{grid: &board},
+		p1:       p1,
+		p2:       p2,
+		Captures: &[]Movable{},
 	}
 
 	// Pawns
@@ -57,10 +60,11 @@ func NewGame(p1, p2 *Player) *Game {
 	return game
 }
 
+// Internal use only. Obtains piece at given position if player is owner of piece
 func (g *Game) getPiece(pos Position, player *Player) (Movable, error) {
 
-	piece := g.board.GetPiece(pos)
-	if piece == nil {
+	piece, ok := g.board.GetPiece(pos)
+	if !ok {
 		return nil, fmt.Errorf("Position %v%v is empty.", GetRow(pos.Row+1), GetCol(pos.Col))
 	}
 
@@ -72,27 +76,38 @@ func (g *Game) getPiece(pos Position, player *Player) (Movable, error) {
 	return piece, nil
 }
 
+// Moves piece in position `from` to position `to` if player is owner of piece
 func (g *Game) MovePiece(from, to Position, player *Player) error {
-	// validar que pos este dentro del tablero
-	if !to.InBounds() {
+	// Check if positions are in bounds
+	if !from.InBounds() || !to.InBounds() {
 		return errors.New("Position out of bounds.")
 	}
 
+	// Obtains piece to move
 	piece, err := g.getPiece(from, player)
 	if err != nil {
 		return err
 	}
 
-	// validar si pieza puede moverse a pos
+	// Check if piece can move to desired position
 	if !ContainsPosition(piece.PossibleMoves(g.board), to) {
 		return fmt.Errorf("%s cant move from %d%s to %d%s.", piece.String(), GetRow(from.Row), GetCol(from.Col), to.Row, GetCol(to.Col))
 	}
 
+	// Check if is trying to move in place
 	if piece.GetPosition() == to {
 		return errors.New("Cannot move to the same position.")
 	}
 
-	g.board.MovePiece(piece, to)
+	capture, err := g.board.MovePiece(piece, to)
+	if err != nil {
+		return err
+	}
 
+	if capture != nil {
+		*g.Captures = append(*g.Captures, capture)
+	}
+
+	fmt.Println(g.Captures)
 	return nil
 }

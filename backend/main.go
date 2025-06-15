@@ -16,4 +16,9 @@ func main() {
 
 	fmt.Println(game.board)
 
+	game.MovePiece(Pos(7, "G"), Pos(5, "G"), p2)
+	game.MovePiece(Pos(2, "D"), Pos(3, "D"), p1)
+	game.MovePiece(Pos(1, "C"), Pos(5, "G"), p1)
+
+	fmt.Println(game.board)
 }

@@ -15,11 +15,7 @@ func NewPawn(white bool, pos Position) *Pawn {
 	}
 
 	return &Pawn{
-		BasePiece: &BasePiece{
-			White: white,
-			Value: 1,
-			Pos:   pos,
-		},
+		BasePiece: NewBasePiece(white, 1, pos),
 		direction: dir,
 		hasMoved:  false,
 	}
@@ -31,7 +27,7 @@ func (p *Pawn) PossibleMoves(b *Board) []Position {
 
 	pos := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col}
 
-	if b.GetPiece(pos) != nil {
+	if b.IsOccupied(pos) {
 		return positions
 	}
 

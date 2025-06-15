@@ -17,11 +17,7 @@ var queenDirs = []struct{ dx, dy int }{
 
 func NewQueen(white bool, pos Position) *Queen {
 	return &Queen{
-		BasePiece: &BasePiece{
-			White: white,
-			Value: 9,
-			Pos:   pos,
-		},
+		BasePiece: NewBasePiece(white, 9, pos),
 	}
 }
 

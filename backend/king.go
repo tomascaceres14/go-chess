@@ -7,12 +7,8 @@ type King struct {
 
 func NewKing(white bool, pos Position) *King {
 	return &King{
-		BasePiece: &BasePiece{
-			White: white,
-			Value: 9,
-			Pos:   pos,
-		},
-		hasMoved: false,
+		BasePiece: NewBasePiece(white, 0, pos),
+		hasMoved:  false,
 	}
 }
 
@@ -32,9 +28,9 @@ func (k *King) PossibleMoves(b *Board) []Position {
 
 	for _, v := range kingDirs {
 		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
-		piece := b.GetPiece(pos)
+		piece, occupied := b.GetPiece(pos)
 
-		if piece == nil || piece.IsWhite() != k.White {
+		if !occupied || piece.IsWhite() != k.White {
 			positions = append(positions, pos)
 			continue
 		}

@@ -20,10 +20,9 @@ func CastRay(pos Position, dx, dy int, b *Board, white bool, positions *[]Positi
 		return
 	}
 
-	if b.isOccupied(pos) {
-		if b.GetPiece(pos).IsWhite() != white {
-			*positions = append(*positions, pos)
-		}
+	piece, ok := b.GetPiece(pos)
+	if ok && piece.IsWhite() != white {
+		*positions = append(*positions, pos)
 		return
 	}
 

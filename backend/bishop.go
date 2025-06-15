@@ -13,11 +13,7 @@ var bishopDirs = []struct{ dx, dy int }{
 
 func NewBishop(white bool, pos Position) *Bishop {
 	return &Bishop{
-		BasePiece: &BasePiece{
-			White: white,
-			Value: 3,
-			Pos:   pos,
-		},
+		BasePiece: NewBasePiece(white, 3, pos),
 	}
 }
 

@@ -14,12 +14,8 @@ var rookDirs = []struct{ dx, dy int }{
 
 func NewRook(white bool, pos Position) *Rook {
 	return &Rook{
-		BasePiece: &BasePiece{
-			White: white,
-			Value: 5,
-			Pos:   pos,
-		},
-		hasMoved: false,
+		BasePiece: NewBasePiece(white, 5, pos),
+		hasMoved:  false,
 	}
 }
 

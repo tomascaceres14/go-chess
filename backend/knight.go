@@ -17,11 +17,7 @@ var knightMoves = []struct{ dx, dy int }{
 
 func NewKnight(white bool, pos Position) *Knight {
 	return &Knight{
-		BasePiece: &BasePiece{
-			White: white,
-			Value: 3,
-			Pos:   pos,
-		},
+		BasePiece: NewBasePiece(white, 3, pos),
 	}
 }
 
@@ -35,9 +31,9 @@ func (k *Knight) PossibleMoves(b *Board) []Position {
 			continue
 		}
 
-		pieceAt := b.GetPiece(pos)
+		pieceAt, occupied := b.GetPiece(pos)
 
-		if pieceAt == nil || pieceAt.IsWhite() != k.White {
+		if !occupied || pieceAt.IsWhite() != k.White {
 			positions = append(positions, pos)
 			continue
 		}

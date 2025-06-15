@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -9,8 +8,9 @@ type Board struct {
 	grid *[8][8]Movable
 }
 
+// Inserts piece in piece.Pos
 func (b *Board) InsertPiece(piece Movable) bool {
-	if b.isOccupied(piece.GetPosition()) {
+	if b.IsOccupied(piece.GetPosition()) {
 		return false
 	}
 
@@ -18,26 +18,27 @@ func (b *Board) InsertPiece(piece Movable) bool {
 	return true
 }
 
-func (b *Board) MovePiece(piece Movable, pos Position) error {
+// Moves piece from piece.Pos to pos
+func (b *Board) MovePiece(piece Movable, pos Position) (Movable, error) {
 	currPos := piece.GetPosition()
 
-	if pos == currPos {
-		return errors.New("Cannot move to the same position")
-	}
+	capture, _ := b.GetPiece(pos)
 
 	b.grid[pos.Row][pos.Col] = piece
 	b.grid[currPos.Row][currPos.Col] = nil
 
 	piece.SetPosition(pos)
 
-	return nil
+	return capture, nil
 }
 
-func (b *Board) GetPiece(pos Position) Movable {
-	return b.grid[pos.Row][pos.Col]
+// Returns piece in given pos and wether it's occupied or not.
+func (b *Board) GetPiece(pos Position) (Movable, bool) {
+	piece := b.grid[pos.Row][pos.Col]
+	return piece, b.IsOccupied(pos)
 }
 
-func (b *Board) isOccupied(pos Position) bool {
+func (b *Board) IsOccupied(pos Position) bool {
 	return b.grid[pos.Row][pos.Col] != nil
 }
 
