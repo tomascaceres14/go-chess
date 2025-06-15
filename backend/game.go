@@ -43,7 +43,7 @@ func NewGame(p1, p2 *Player) *Game {
 	return game
 }
 
-func (g *Game) GetPiece(pos Position, player *Player) (Movable, error) {
+func (g *Game) getPiece(pos Position, player *Player) (Movable, error) {
 
 	piece := g.board.GetPiece(pos)
 
@@ -54,26 +54,27 @@ func (g *Game) GetPiece(pos Position, player *Player) (Movable, error) {
 	return piece, nil
 }
 
-func (g *Game) MovePiece(piece Movable, pos Position, player *Player) error {
+func (g *Game) MovePiece(from, to Position, player *Player) error {
 	// asegurar que pos este dentro del tablero
-	if !pos.InBounds() {
+	if !to.InBounds() {
 		return errors.New("Position out of bounds.")
 	}
 
-	if player.White != piece.IsWhite() {
-		return fmt.Errorf("Not your piece, %s.", player.Name)
+	piece, err := g.getPiece(from, player)
+	if err != nil {
+		return err
 	}
 
 	// verificar si pieza puede moverse a pos
-	if !ContainsPosition(piece.PossibleMoves(g.board), pos) {
-		return fmt.Errorf("%s cant move to row=%d col=%d.", piece.String(), pos.Row, pos.Col)
+	if !ContainsPosition(piece.PossibleMoves(g.board), to) {
+		return fmt.Errorf("%s cant move to row=%d col=%d.", piece.String(), to.Row, to.Col)
 	}
 
-	if pos == piece.GetPosition() {
+	if piece.GetPosition() == to {
 		return errors.New("Cannot move to the same position.")
 	}
 
-	g.board.MovePiece(piece, pos)
+	g.board.MovePiece(piece, to)
 
 	return nil
 }
