@@ -8,7 +8,7 @@ import (
 type Game struct {
 	board    *Board
 	p1, p2   *Player
-	Captures *[]Movable
+	Captures []Movable
 }
 
 // Generates a new board with classic chess configuration
@@ -22,7 +22,7 @@ func NewGame(p1, p2 *Player) *Game {
 		board:    &Board{grid: &board},
 		p1:       p1,
 		p2:       p2,
-		Captures: &[]Movable{},
+		Captures: []Movable{},
 	}
 
 	// Pawns
@@ -89,27 +89,24 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		return err
 	}
 
-	possibleMoves := piece.PossibleMoves(g.board)
-
 	// Check if piece can move to desired position
+	possibleMoves := piece.PossibleMoves(g.board)
 	if !possibleMoves[to] {
 		return fmt.Errorf("%s cant move from %d%s to %d%s.", piece.String(), GetRow(from.Row), GetCol(from.Col), to.Row, GetCol(to.Col))
 	}
 
-	// Check if is trying to move in place
+	// Check if it's trying to move in place
 	if piece.GetPosition() == to {
 		return errors.New("Cannot move to the same position.")
 	}
 
-	capture, err := g.board.MovePiece(piece, to)
-	if err != nil {
-		return err
-	}
+	capture := g.board.MovePiece(piece, to)
+
+	// Update threats map of opponent
 
 	if capture != nil {
-		*g.Captures = append(*g.Captures, capture)
+		g.Captures = append(g.Captures, capture)
 	}
 
-	fmt.Println(g.Captures)
 	return nil
 }
