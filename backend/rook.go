@@ -2,7 +2,7 @@ package main
 
 type Rook struct {
 	*BasePiece
-	HasMoved bool
+	hasMoved bool
 }
 
 var rookDirs = []struct{ dx, dy int }{
@@ -19,7 +19,7 @@ func NewRook(white bool, pos Position) *Rook {
 			Value: 5,
 			Pos:   pos,
 		},
-		HasMoved: false,
+		hasMoved: false,
 	}
 }
 
@@ -36,6 +36,11 @@ func (r *Rook) PossibleMoves(b *Board) []Position {
 
 func (r *Rook) GetPosition() Position {
 	return r.Pos
+}
+
+func (r *Rook) SetPosition(pos Position) {
+	r.hasMoved = true
+	r.Pos = pos
 }
 
 func (r *Rook) IsWhite() bool {

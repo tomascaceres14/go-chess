@@ -15,4 +15,5 @@ func main() {
 	game := NewGame(p1, p2)
 
 	fmt.Println(game.board)
+
 }

@@ -1,0 +1,67 @@
+package main
+
+type King struct {
+	*BasePiece
+	hasMoved bool
+}
+
+func NewKing(white bool, pos Position) *King {
+	return &King{
+		BasePiece: &BasePiece{
+			White: white,
+			Value: 9,
+			Pos:   pos,
+		},
+		hasMoved: false,
+	}
+}
+
+var kingDirs = []struct{ dx, dy int }{
+	{0, 1},
+	{0, -1},
+	{-1, 0},
+	{1, 0},
+	{1, 1},
+	{1, -1},
+	{-1, 1},
+	{-1, -1},
+}
+
+func (k *King) PossibleMoves(b *Board) []Position {
+	positions := []Position{}
+
+	for _, v := range kingDirs {
+		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
+		piece := b.GetPiece(pos)
+
+		if piece == nil || piece.IsWhite() != k.White {
+			positions = append(positions, pos)
+			continue
+		}
+	}
+
+	return positions
+}
+
+func (r *King) GetPosition() Position {
+	return r.Pos
+}
+
+func (k *King) SetPosition(pos Position) {
+	k.hasMoved = true
+	k.Pos = pos
+}
+
+func (r *King) IsWhite() bool {
+	return r.White
+}
+
+func (r *King) String() string {
+	color := "w"
+
+	if !r.White {
+		color = "b"
+	}
+
+	return "K" + color
+}

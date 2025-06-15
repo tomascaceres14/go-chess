@@ -46,6 +46,14 @@ func NewGame(p1, p2 *Player) *Game {
 	game.board.InsertPiece(NewBishop(true, Position{Row: 0, Col: 2}))  // white
 	game.board.InsertPiece(NewBishop(true, Position{Row: 0, Col: 5}))  // white
 
+	// Queens
+	game.board.InsertPiece(NewQueen(false, Position{Row: 7, Col: 3})) // black
+	game.board.InsertPiece(NewQueen(true, Position{Row: 0, Col: 3}))  // white
+
+	// Kings
+	game.board.InsertPiece(NewKing(false, Position{Row: 7, Col: 4})) // black
+	game.board.InsertPiece(NewKing(true, Position{Row: 0, Col: 4}))  // white
+
 	return game
 }
 

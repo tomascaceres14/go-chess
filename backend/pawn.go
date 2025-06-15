@@ -3,7 +3,7 @@ package main
 type Pawn struct {
 	*BasePiece
 	direction int
-	HasMoved  bool
+	hasMoved  bool
 }
 
 func NewPawn(white bool, pos Position) *Pawn {
@@ -21,7 +21,7 @@ func NewPawn(white bool, pos Position) *Pawn {
 			Pos:   pos,
 		},
 		direction: dir,
-		HasMoved:  false,
+		hasMoved:  false,
 	}
 }
 
@@ -29,27 +29,29 @@ func (p *Pawn) PossibleMoves(b *Board) []Position {
 
 	positions := []Position{}
 
-	forward := p.Pos.Row + 1*p.direction
+	pos := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col}
 
-	if b.grid[forward][p.Pos.Col] != nil {
+	if b.GetPiece(pos) != nil {
 		return positions
 	}
 
-	positions = append(positions, Position{Row: forward, Col: p.Pos.Col})
+	positions = append(positions, pos)
 
-	if !p.HasMoved {
-		positions = append(positions, Position{Row: forward + 1*p.direction, Col: p.Pos.Col})
+	if !p.hasMoved {
+		pos.Row += 1 * p.direction
+		positions = append(positions, pos)
 	}
 
 	return positions
 }
 
-func (p *Pawn) Move(pos Position) error {
-	return nil
-}
-
 func (p *Pawn) GetPosition() Position {
 	return p.Pos
+}
+
+func (p *Pawn) SetPosition(pos Position) {
+	p.hasMoved = true
+	p.Pos = pos
 }
 
 func (p *Pawn) IsWhite() bool {

@@ -14,6 +14,6 @@ type BasePiece struct {
 	Pos   Position
 }
 
-func (p *BasePiece) SetPosition(pos Position) {
-	p.Pos = pos
+func (bp *BasePiece) SetPosition(pos Position) {
+	bp.Pos = pos
 }

@@ -19,7 +19,7 @@ func NewKnight(white bool, pos Position) *Knight {
 	return &Knight{
 		BasePiece: &BasePiece{
 			White: white,
-			Value: 5,
+			Value: 3,
 			Pos:   pos,
 		},
 	}
@@ -62,5 +62,5 @@ func (r *Knight) String() string {
 		color = "b"
 	}
 
-	return "K" + color
+	return "N" + color
 }
