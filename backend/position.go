@@ -29,8 +29,12 @@ func (p Position) Equals(other Position) bool {
 	return p.Row == other.Row && p.Col == other.Col
 }
 
-func (pos Position) InBounds() bool {
-	return (0 <= pos.Col && pos.Col <= 7) && (0 <= pos.Row && pos.Row <= 7)
+func (p Position) InBounds() bool {
+	return (0 <= p.Col && p.Col <= 7) && (0 <= p.Row && p.Row <= 7)
+}
+
+func (p Position) String() string {
+	return fmt.Sprintf("{row=%v col=%v}", p.Row+1, string(cols[p.Col]))
 }
 
 func ContainsPosition(list []Position, pos Position) bool {

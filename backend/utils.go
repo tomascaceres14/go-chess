@@ -8,6 +8,8 @@ import (
 // 	return rand.Intn(2) == 0
 // }
 
+const cols = "ABCDEFGH"
+
 func PrintError(err error) {
 	fmt.Printf("--- ERROR: %v\n", err)
 }
