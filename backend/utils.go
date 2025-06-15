@@ -14,7 +14,7 @@ func PrintError(err error) {
 	fmt.Printf("--- ERROR: %v\n", err)
 }
 
-func CheckRayRecursive(pos Position, dx, dy int, b *Board, white bool, positions *[]Position) {
+func CastRay(pos Position, dx, dy int, b *Board, white bool, positions *[]Position) {
 
 	if !pos.InBounds() {
 		return
@@ -29,7 +29,7 @@ func CheckRayRecursive(pos Position, dx, dy int, b *Board, white bool, positions
 
 	*positions = append(*positions, pos)
 	next := Position{Row: pos.Row + dx, Col: pos.Col + dy}
-	CheckRayRecursive(next, dx, dy, b, white, positions)
+	CastRay(next, dx, dy, b, white, positions)
 }
 
 func GetCol(col int) string {

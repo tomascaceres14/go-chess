@@ -1,19 +1,23 @@
 package main
 
-type Rook struct {
+type Queen struct {
 	*BasePiece
 	HasMoved bool
 }
 
-var rookDirs = []struct{ dx, dy int }{
+var queenDirs = []struct{ dx, dy int }{
 	{0, 1},
 	{0, -1},
 	{-1, 0},
 	{1, 0},
+	{1, 1},
+	{1, -1},
+	{-1, 1},
+	{-1, -1},
 }
 
-func NewRook(white bool, pos Position) *Rook {
-	return &Rook{
+func NewQueen(white bool, pos Position) *Queen {
+	return &Queen{
 		BasePiece: &BasePiece{
 			White: white,
 			Value: 5,
@@ -23,10 +27,10 @@ func NewRook(white bool, pos Position) *Rook {
 	}
 }
 
-func (r *Rook) PossibleMoves(b *Board) []Position {
+func (r *Queen) PossibleMoves(b *Board) []Position {
 	positions := []Position{}
 
-	for _, v := range rookDirs {
+	for _, v := range queenDirs {
 		dir := Position{Row: r.Pos.Row + v.dx, Col: r.Pos.Col + v.dy}
 		CastRay(dir, v.dx, v.dy, b, r.White, &positions)
 	}
@@ -34,15 +38,15 @@ func (r *Rook) PossibleMoves(b *Board) []Position {
 	return positions
 }
 
-func (r *Rook) GetPosition() Position {
+func (r *Queen) GetPosition() Position {
 	return r.Pos
 }
 
-func (r *Rook) IsWhite() bool {
+func (r *Queen) IsWhite() bool {
 	return r.White
 }
 
-func (r *Rook) String() string {
+func (r *Queen) String() string {
 	color := "w"
 
 	if !r.White {

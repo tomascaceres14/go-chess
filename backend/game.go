@@ -56,6 +56,7 @@ func (g *Game) getPiece(pos Position, player *Player) (Movable, error) {
 		return nil, fmt.Errorf("Position %v%v is empty.", GetRow(pos.Row+1), GetCol(pos.Col))
 	}
 
+	// validar que pieza pertenezca a player
 	if piece.IsWhite() != player.White {
 		return nil, fmt.Errorf("Not your piece, %s.", player.Name)
 	}
@@ -64,7 +65,7 @@ func (g *Game) getPiece(pos Position, player *Player) (Movable, error) {
 }
 
 func (g *Game) MovePiece(from, to Position, player *Player) error {
-	// asegurar que pos este dentro del tablero
+	// validar que pos este dentro del tablero
 	if !to.InBounds() {
 		return errors.New("Position out of bounds.")
 	}
@@ -74,7 +75,7 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		return err
 	}
 
-	// verificar si pieza puede moverse a pos
+	// validar si pieza puede moverse a pos
 	if !ContainsPosition(piece.PossibleMoves(g.board), to) {
 		return fmt.Errorf("%s cant move from %d%s to %d%s.", piece.String(), GetRow(from.Row), GetCol(from.Col), to.Row, GetCol(to.Col))
 	}

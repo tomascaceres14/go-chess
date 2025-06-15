@@ -27,7 +27,7 @@ func (bp *Bishop) PossibleMoves(b *Board) []Position {
 	for _, v := range bishopDirs {
 
 		dir := Position{Row: bp.Pos.Row + v.dx, Col: bp.Pos.Col + v.dy}
-		CheckRayRecursive(dir, v.dx, v.dy, b, bp.White, &positions)
+		CastRay(dir, v.dx, v.dy, b, bp.White, &positions)
 	}
 
 	return positions
