@@ -6,7 +6,7 @@ import (
 )
 
 type Board struct {
-	grid [8][8]Movable
+	grid *[8][8]Movable
 }
 
 func (b *Board) MovePiece(piece Movable, pos Position) error {
@@ -34,6 +34,10 @@ func (b *Board) MovePiece(piece Movable, pos Position) error {
 
 func (b *Board) GetPiece(pos Position) Movable {
 	return b.grid[pos.Row][pos.Col]
+}
+
+func (b *Board) isOccupied(pos Position) bool {
+	return b.grid[pos.Row][pos.Col] != nil
 }
 
 func (b *Board) String() string {

@@ -6,38 +6,25 @@ import (
 
 func main() {
 
-	//p1 := NewPlayer("P1", randomBool())
-	//p2 := NewPlayer("P2", randomBool())
+	//color := randomBool()
+	//p1 := NewPlayer("P1", color)
+	//p2 := NewPlayer("P2", !color)
 	p1 := NewPlayer("White", true)
 	p2 := NewPlayer("Black", false)
 
 	game := NewGame(p1, p2)
 
 	fmt.Println(game.board)
-
-	getPos, err := Pos(2, "E")
+	WRookPos, err := Pos(1, "A")
 	if err != nil {
 		PrintError(err)
 	}
+	WRook := game.board.GetPiece(WRookPos)
 
-	pawn, err := game.GetPiece(getPos, p1)
-	if err != nil {
-		PrintError(err)
-		return
-	}
+	game.board.grid[1][0] = nil
 
-	fmt.Println(pawn)
-
-	movePos, err := Pos(4, "e")
-	if err != nil {
-		PrintError(err)
-		return
-	}
-
-	if err := game.MovePiece(pawn, movePos, p1); err != nil {
-		PrintError(err)
-		return
-	}
-
+	fmt.Println(WRook)
 	fmt.Println(game.board)
+	fmt.Println(WRook.PossibleMoves(game.board))
+
 }

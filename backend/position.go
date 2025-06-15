@@ -29,6 +29,10 @@ func (p Position) Equals(other Position) bool {
 	return p.Row == other.Row && p.Col == other.Col
 }
 
+func (pos Position) InBounds() bool {
+	return (0 <= pos.Col && pos.Col <= 7) && (0 <= pos.Row && pos.Row <= 7)
+}
+
 func ContainsPosition(list []Position, pos Position) bool {
 	for _, p := range list {
 		if p.Equals(pos) {
