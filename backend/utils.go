@@ -4,16 +4,15 @@ import (
 	"fmt"
 )
 
-// func randomBool() bool {
-// 	return rand.Intn(2) == 0
-// }
-
 const cols = "ABCDEFGH"
 
+// Error printing for debugging
 func PrintError(err error) {
 	fmt.Printf("--- ERROR: %v\n", err)
 }
 
+// Recursive function to cast a ray and check for collisions in direction vector {dx, dy}.
+// Returns map of possible positions
 func CastRay(pos Position, dx, dy int, b *Board, white bool, positions map[Position]bool) {
 
 	if !pos.InBounds() {
@@ -33,14 +32,17 @@ func CastRay(pos Position, dx, dy int, b *Board, white bool, positions map[Posit
 	CastRay(next, dx, dy, b, white, positions)
 }
 
+// Parse col from matrix index to board column letter
 func GetCol(col int) string {
 	return string(cols[col])
 }
 
+// Parse col from matrix index to board column letter
 func GetRow(row int) int {
 	return row + 1
 }
 
+// Removes a piece from a list of pieces
 func DeletePiece(list []Movable, piece Movable) []Movable {
 	for i, v := range list {
 		if v == piece {
@@ -50,3 +52,7 @@ func DeletePiece(list []Movable, piece Movable) []Movable {
 
 	return list
 }
+
+// func randomBool() bool {
+// 	return rand.Intn(2) == 0
+// }
