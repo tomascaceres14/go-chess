@@ -5,11 +5,17 @@ type King struct {
 	hasMoved bool
 }
 
-func NewKing(white bool, pos Position) *King {
-	return &King{
+func NewKing(pos Position, p *Player) *King {
+	white := p.White
+
+	king := &King{
 		BasePiece: NewBasePiece(white, 0, pos),
 		hasMoved:  false,
 	}
+
+	p.Pieces = append(p.Pieces, king)
+
+	return king
 }
 
 var kingDirs = []struct{ dx, dy int }{

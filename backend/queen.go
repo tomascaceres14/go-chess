@@ -15,10 +15,16 @@ var queenDirs = []struct{ dx, dy int }{
 	{-1, -1},
 }
 
-func NewQueen(white bool, pos Position) *Queen {
-	return &Queen{
+func NewQueen(pos Position, p *Player) *Queen {
+	white := p.White
+
+	queen := &Queen{
 		BasePiece: NewBasePiece(white, 9, pos),
 	}
+
+	p.Pieces = append(p.Pieces, queen)
+
+	return queen
 }
 
 func (r *Queen) PossibleMoves(b *Board) map[Position]bool {

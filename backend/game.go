@@ -6,13 +6,13 @@ import (
 )
 
 type Game struct {
-	board    *Board
-	p1, p2   *Player
-	Captures []Movable
+	board          *Board
+	PWhite, PBlack *Player
+	Captures       []Movable
 }
 
 // Generates a new board with classic chess configuration
-func NewGame(p1, p2 *Player) *Game {
+func NewGame(whites, blacks *Player) *Game {
 
 	println("generating new board...")
 
@@ -20,42 +20,42 @@ func NewGame(p1, p2 *Player) *Game {
 
 	game := &Game{
 		board:    &Board{grid: &board},
-		p1:       p1,
-		p2:       p2,
+		PWhite:   whites,
+		PBlack:   blacks,
 		Captures: []Movable{},
 	}
 
 	// Pawns
 	for i := range 8 {
-		game.board.InsertPiece(NewPawn(false, Position{Row: 6, Col: i})) // black
-		game.board.InsertPiece(NewPawn(true, Position{Row: 1, Col: i}))  // white
+		game.board.InsertPiece(NewPawn(Pos(GetCol(i), 7), blacks)) // black
+		game.board.InsertPiece(NewPawn(Pos(GetCol(i), 2), whites)) // white
 	}
 
 	// Rooks
-	game.board.InsertPiece(NewRook(false, Position{Row: 7, Col: 0})) // black
-	game.board.InsertPiece(NewRook(false, Position{Row: 7, Col: 7})) // black
-	game.board.InsertPiece(NewRook(true, Position{Row: 0, Col: 0}))  // white
-	game.board.InsertPiece(NewRook(true, Position{Row: 0, Col: 7}))  // white
+	game.board.InsertPiece(NewRook(Pos("A", 8), blacks)) // black
+	game.board.InsertPiece(NewRook(Pos("H", 8), blacks)) // black
+	game.board.InsertPiece(NewRook(Pos("A", 1), whites)) // white
+	game.board.InsertPiece(NewRook(Pos("H", 1), whites)) // white
 
 	// Knights
-	game.board.InsertPiece(NewKnight(false, Position{Row: 7, Col: 1})) // black
-	game.board.InsertPiece(NewKnight(false, Position{Row: 7, Col: 6})) // black
-	game.board.InsertPiece(NewKnight(true, Position{Row: 0, Col: 1}))  // white
-	game.board.InsertPiece(NewKnight(true, Position{Row: 0, Col: 6}))  // white
+	game.board.InsertPiece(NewKnight(Pos("B", 8), blacks)) // black
+	game.board.InsertPiece(NewKnight(Pos("G", 8), blacks)) // black
+	game.board.InsertPiece(NewKnight(Pos("B", 1), whites)) // white
+	game.board.InsertPiece(NewKnight(Pos("G", 1), whites)) // white
 
 	// Bishops
-	game.board.InsertPiece(NewBishop(false, Position{Row: 7, Col: 2})) // black
-	game.board.InsertPiece(NewBishop(false, Position{Row: 7, Col: 5})) // black
-	game.board.InsertPiece(NewBishop(true, Position{Row: 0, Col: 2}))  // white
-	game.board.InsertPiece(NewBishop(true, Position{Row: 0, Col: 5}))  // white
+	game.board.InsertPiece(NewBishop(Pos("C", 8), blacks)) // black
+	game.board.InsertPiece(NewBishop(Pos("F", 8), blacks)) // black
+	game.board.InsertPiece(NewBishop(Pos("C", 1), whites)) // white
+	game.board.InsertPiece(NewBishop(Pos("F", 1), whites)) // white
 
 	// Queens
-	game.board.InsertPiece(NewQueen(false, Position{Row: 7, Col: 3})) // black
-	game.board.InsertPiece(NewQueen(true, Position{Row: 0, Col: 3}))  // white
+	game.board.InsertPiece(NewQueen(Pos("D", 8), blacks)) // black
+	game.board.InsertPiece(NewQueen(Pos("D", 1), whites)) // white
 
 	// Kings
-	game.board.InsertPiece(NewKing(false, Position{Row: 7, Col: 4})) // black
-	game.board.InsertPiece(NewKing(true, Position{Row: 0, Col: 4}))  // white
+	game.board.InsertPiece(NewKing(Pos("E", 5), blacks)) // black
+	game.board.InsertPiece(NewKing(Pos("E", 1), whites)) // white
 
 	return game
 }
@@ -102,11 +102,10 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	capture := g.board.MovePiece(piece, to)
 
-	// Update threats map of opponent
-
 	if capture != nil {
 		g.Captures = append(g.Captures, capture)
 	}
+	// Update threats map of opponent
 
 	return nil
 }

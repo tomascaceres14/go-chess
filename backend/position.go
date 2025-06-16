@@ -9,7 +9,7 @@ type Position struct {
 	Row, Col int
 }
 
-func Pos(row int, col string) Position {
+func Pos(col string, row int) Position {
 
 	if row < 1 || row > 8 {
 		return Position{-1, -1}

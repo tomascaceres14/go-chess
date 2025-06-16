@@ -9,18 +9,16 @@ type Movable interface {
 }
 
 type BasePiece struct {
-	White    bool
-	Value    int
-	Pos      Position
-	Captured bool
+	White bool
+	Value int
+	Pos   Position
 }
 
 func NewBasePiece(white bool, value int, pos Position) *BasePiece {
 	return &BasePiece{
-		White:    white,
-		Value:    value,
-		Pos:      pos,
-		Captured: false,
+		White: white,
+		Value: value,
+		Pos:   pos,
 	}
 }
 

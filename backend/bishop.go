@@ -11,10 +11,16 @@ var bishopDirs = []struct{ dx, dy int }{
 	{-1, -1},
 }
 
-func NewBishop(white bool, pos Position) *Bishop {
-	return &Bishop{
+func NewBishop(pos Position, p *Player) *Bishop {
+	white := p.White
+
+	bishop := &Bishop{
 		BasePiece: NewBasePiece(white, 3, pos),
 	}
+
+	p.Pieces = append(p.Pieces, bishop)
+
+	return bishop
 }
 
 func (bp *Bishop) PossibleMoves(b *Board) map[Position]bool {

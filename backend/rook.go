@@ -12,11 +12,16 @@ var rookDirs = []struct{ dx, dy int }{
 	{1, 0},
 }
 
-func NewRook(white bool, pos Position) *Rook {
-	return &Rook{
+func NewRook(pos Position, p *Player) *Rook {
+	white := p.White
+
+	rook := &Rook{
 		BasePiece: NewBasePiece(white, 5, pos),
 		hasMoved:  false,
 	}
+
+	p.Pieces = append(p.Pieces, rook)
+	return rook
 }
 
 func (r *Rook) PossibleMoves(b *Board) map[Position]bool {

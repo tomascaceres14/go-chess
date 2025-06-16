@@ -6,19 +6,23 @@ type Pawn struct {
 	hasMoved  bool
 }
 
-func NewPawn(white bool, pos Position) *Pawn {
+func NewPawn(pos Position, p *Player) *Pawn {
+	white := p.White
 
 	dir := 1
-
 	if !white {
 		dir = -1
 	}
 
-	return &Pawn{
+	pawn := &Pawn{
 		BasePiece: NewBasePiece(white, 1, pos),
 		direction: dir,
 		hasMoved:  false,
 	}
+
+	p.Pieces = append(p.Pieces, pawn)
+
+	return pawn
 }
 
 func (p *Pawn) PossibleMoves(b *Board) map[Position]bool {

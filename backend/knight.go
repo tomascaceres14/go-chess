@@ -15,10 +15,16 @@ var knightMoves = []struct{ dx, dy int }{
 	{-1, -2},
 }
 
-func NewKnight(white bool, pos Position) *Knight {
-	return &Knight{
+func NewKnight(pos Position, p *Player) *Knight {
+	white := p.White
+
+	knight := &Knight{
 		BasePiece: NewBasePiece(white, 3, pos),
 	}
+
+	p.Pieces = append(p.Pieces, knight)
+
+	return knight
 }
 
 func (k *Knight) PossibleMoves(b *Board) map[Position]bool {

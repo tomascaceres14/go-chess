@@ -30,7 +30,7 @@ func (b *Board) InsertPieces(pieces []Movable) {
 	}
 }
 
-// Moves piece from piece.Pos to pos
+// Moves piece from piece.Pos to pos and returns captured piece
 func (b *Board) MovePiece(piece Movable, pos Position) Movable {
 	currPos := piece.GetPosition()
 
