@@ -40,3 +40,13 @@ func GetCol(col int) string {
 func GetRow(row int) int {
 	return row + 1
 }
+
+func DeletePiece(list []Movable, piece Movable) []Movable {
+	for i, v := range list {
+		if v == piece {
+			return append(list[0:i], list[i+1:]...)
+		}
+	}
+
+	return list
+}

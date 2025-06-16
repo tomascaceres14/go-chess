@@ -32,12 +32,12 @@ func (b *Board) InsertPieces(pieces []Movable) {
 
 // Moves piece from piece.Pos to pos and returns captured piece
 func (b *Board) MovePiece(piece Movable, pos Position) Movable {
-	currPos := piece.GetPosition()
+	prevPos := piece.GetPosition()
 
 	capture, _ := b.GetPiece(pos)
 
 	b.grid[pos.Row][pos.Col] = piece
-	b.grid[currPos.Row][currPos.Col] = nil
+	b.grid[prevPos.Row][prevPos.Col] = nil
 
 	piece.SetPosition(pos)
 

@@ -103,8 +103,16 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 	capture := g.board.MovePiece(piece, to)
 
 	if capture != nil {
-		g.Captures = append(g.Captures, capture)
+
+		p := g.PWhite
+
+		if !capture.IsWhite() {
+			p = g.PBlack
+		}
+
+		p.Pieces = DeletePiece(p.Pieces, capture)
 	}
+
 	// Update threats map of opponent
 
 	return nil
