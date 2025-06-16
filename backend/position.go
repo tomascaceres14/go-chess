@@ -35,7 +35,7 @@ func (p Position) InBounds() bool {
 }
 
 func (p Position) String() string {
-	return fmt.Sprintf("{row=%v col=%v}", p.Row+1, string(cols[p.Col]))
+	return fmt.Sprintf("{%v%v}", string(cols[p.Col]), p.Row+1)
 }
 
 func ContainsPosition(list []Position, pos Position) bool {

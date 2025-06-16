@@ -17,10 +17,8 @@ func main() {
 	fmt.Println(game.board)
 
 	game.MovePiece(Pos("D", 2), Pos("D", 4), p1)
-	game.MovePiece(Pos("E", 5), Pos("D", 4), p2)
 
 	fmt.Println(game.board)
 
-	fmt.Println("White Pieces:", game.PWhite.Pieces)
-	fmt.Println("Black Pieces:", game.PBlack.Pieces)
+	fmt.Println(game.PBlack.Threats)
 }

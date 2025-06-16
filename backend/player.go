@@ -17,14 +17,15 @@ func NewPlayer(name string, isWhite bool) *Player {
 	}
 }
 
-// func (p *Player) UpdateThreats(b *Board) {
-// 	threats := make(map[Position]bool)
-// 	for i := range b.grid {
-// 		for j := range b.grid[i] {
-// 			piece, ok := b.GetPiece(Position{Row: i, Col: j})
-// 			if ok && piece.IsWhite() != p.White {
+func (p *Player) CalculateThreats(b *Board) *map[Position]bool {
+	threats := make(map[Position]bool)
 
-// 			}
-// 		}
-// 	}
-// }
+	pieces := p.Pieces
+	for _, v := range pieces {
+		for k := range v.PossibleMoves(b) {
+			threats[k] = true
+		}
+	}
+
+	return &threats
+}

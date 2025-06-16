@@ -54,7 +54,7 @@ func NewGame(whites, blacks *Player) *Game {
 	game.board.InsertPiece(NewQueen(Pos("D", 1), whites)) // white
 
 	// Kings
-	game.board.InsertPiece(NewKing(Pos("E", 5), blacks)) // black
+	game.board.InsertPiece(NewKing(Pos("E", 8), blacks)) // black
 	game.board.InsertPiece(NewKing(Pos("E", 1), whites)) // white
 
 	return game
@@ -102,18 +102,18 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	capture := g.board.MovePiece(piece, to)
 
+	opponent := g.PBlack
+
+	if opponent.White == player.White {
+		opponent = g.PWhite
+	}
+
 	if capture != nil {
-
-		p := g.PWhite
-
-		if !capture.IsWhite() {
-			p = g.PBlack
-		}
-
-		p.Pieces = DeletePiece(p.Pieces, capture)
+		opponent.Pieces = DeletePiece(opponent.Pieces, capture)
 	}
 
 	// Update threats map of opponent
+	opponent.Threats = player.CalculateThreats(g.board)
 
 	return nil
 }

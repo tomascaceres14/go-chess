@@ -34,6 +34,11 @@ func (k *King) PossibleMoves(b *Board) map[Position]bool {
 
 	for _, v := range kingDirs {
 		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
+
+		if !pos.InBounds() {
+			continue
+		}
+
 		piece, occupied := b.GetPiece(pos)
 
 		if !occupied || piece.IsWhite() != k.White {
