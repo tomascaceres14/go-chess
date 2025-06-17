@@ -22,7 +22,7 @@ func (p *Player) CalculateThreats(b *Board) map[Position]bool {
 
 	pieces := p.Pieces
 	for _, v := range pieces {
-		for k := range v.PossibleMoves(b) {
+		for k := range v.PossibleThreats(b) {
 			threats[k] = true
 		}
 	}

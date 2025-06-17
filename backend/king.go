@@ -28,7 +28,7 @@ func NewKing(pos Position, p *Player) *King {
 	return king
 }
 
-func (k *King) PossibleMoves(b *Board) map[Position]bool {
+func (k *King) PossibleThreats(b *Board) map[Position]bool {
 	positions := map[Position]bool{}
 
 	for _, v := range k.Directions {

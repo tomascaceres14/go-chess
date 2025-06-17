@@ -16,11 +16,10 @@ func main() {
 
 	fmt.Println(game.board)
 
-	if err := game.MovePiece(Pos("D", 6), Pos("D", 5), p1); err != nil {
+	if err := game.MovePiece(Pos("E", 2), Pos("E", 4), p1); err != nil {
 		PrintError(err)
 	}
 
 	fmt.Println(game.board)
-
 	fmt.Println(game.PBlack.Threats)
 }
