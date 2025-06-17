@@ -5,7 +5,7 @@ type Player struct {
 	White   bool
 	Points  int
 	Pieces  []Movable
-	Threats *map[Position]bool
+	Threats map[Position]bool
 }
 
 func NewPlayer(name string, isWhite bool) *Player {
@@ -13,11 +13,11 @@ func NewPlayer(name string, isWhite bool) *Player {
 		Name:    name,
 		White:   isWhite,
 		Points:  0,
-		Threats: &map[Position]bool{},
+		Threats: map[Position]bool{},
 	}
 }
 
-func (p *Player) CalculateThreats(b *Board) *map[Position]bool {
+func (p *Player) CalculateThreats(b *Board) map[Position]bool {
 	threats := make(map[Position]bool)
 
 	pieces := p.Pieces
@@ -27,5 +27,5 @@ func (p *Player) CalculateThreats(b *Board) *map[Position]bool {
 		}
 	}
 
-	return &threats
+	return threats
 }
