@@ -7,9 +7,19 @@ type King struct {
 
 func NewKing(pos Position, p *Player) *King {
 	white := p.White
+	directions := []Direction{
+		{0, 1},
+		{0, -1},
+		{-1, 0},
+		{1, 0},
+		{1, 1},
+		{1, -1},
+		{-1, 1},
+		{-1, -1},
+	}
 
 	king := &King{
-		BasePiece: NewBasePiece(white, 0, pos),
+		BasePiece: NewBasePiece(white, 0, pos, directions),
 		hasMoved:  false,
 	}
 
@@ -18,30 +28,19 @@ func NewKing(pos Position, p *Player) *King {
 	return king
 }
 
-var kingDirs = []struct{ dx, dy int }{
-	{0, 1},
-	{0, -1},
-	{-1, 0},
-	{1, 0},
-	{1, 1},
-	{1, -1},
-	{-1, 1},
-	{-1, -1},
-}
-
 func (k *King) PossibleMoves(b *Board) map[Position]bool {
 	positions := map[Position]bool{}
 
-	for _, v := range kingDirs {
+	for _, v := range k.Directions {
 		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
 
 		if !pos.InBounds() {
 			continue
 		}
 
-		piece, occupied := b.GetPiece(pos)
+		pieceAt, occupied := b.GetPiece(pos)
 
-		if !occupied || piece.IsWhite() != k.White {
+		if !occupied || pieceAt.IsWhite() != k.White {
 			positions[pos] = true
 			continue
 		}

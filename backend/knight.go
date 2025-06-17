@@ -4,22 +4,20 @@ type Knight struct {
 	*BasePiece
 }
 
-var knightMoves = []struct{ dx, dy int }{
-	{2, 1},
-	{1, 2},
-	{2, -1},
-	{1, -2},
-	{-2, 1},
-	{-1, 2},
-	{-2, -1},
-	{-1, -2},
-}
-
 func NewKnight(pos Position, p *Player) *Knight {
 	white := p.White
-
+	directions := []Direction{
+		{2, 1},
+		{1, 2},
+		{2, -1},
+		{1, -2},
+		{-2, 1},
+		{-1, 2},
+		{-2, -1},
+		{-1, -2},
+	}
 	knight := &Knight{
-		BasePiece: NewBasePiece(white, 3, pos),
+		BasePiece: NewBasePiece(white, 3, pos, directions),
 	}
 
 	p.Pieces = append(p.Pieces, knight)
@@ -30,7 +28,7 @@ func NewKnight(pos Position, p *Player) *Knight {
 func (k *Knight) PossibleMoves(b *Board) map[Position]bool {
 	positions := map[Position]bool{}
 
-	for _, v := range knightMoves {
+	for _, v := range k.Directions {
 		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
 
 		if !pos.InBounds() {
@@ -43,7 +41,6 @@ func (k *Knight) PossibleMoves(b *Board) map[Position]bool {
 			positions[pos] = true
 			continue
 		}
-
 	}
 
 	return positions

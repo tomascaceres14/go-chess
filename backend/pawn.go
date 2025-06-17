@@ -8,6 +8,11 @@ type Pawn struct {
 
 func NewPawn(pos Position, p *Player) *Pawn {
 	white := p.White
+	directions := []Direction{
+		{0, 1},
+		{1, 1},
+		{-1, 1},
+	}
 
 	dir := 1
 	if !white {
@@ -15,7 +20,7 @@ func NewPawn(pos Position, p *Player) *Pawn {
 	}
 
 	pawn := &Pawn{
-		BasePiece: NewBasePiece(white, 1, pos),
+		BasePiece: NewBasePiece(white, 1, pos, directions),
 		direction: dir,
 		hasMoved:  false,
 	}

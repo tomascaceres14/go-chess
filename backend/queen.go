@@ -4,38 +4,26 @@ type Queen struct {
 	*BasePiece
 }
 
-var queenDirs = []struct{ dx, dy int }{
-	{0, 1},
-	{0, -1},
-	{-1, 0},
-	{1, 0},
-	{1, 1},
-	{1, -1},
-	{-1, 1},
-	{-1, -1},
-}
-
 func NewQueen(pos Position, p *Player) *Queen {
 	white := p.White
+	directions := []Direction{
+		{0, 1},
+		{0, -1},
+		{-1, 0},
+		{1, 0},
+		{1, 1},
+		{1, -1},
+		{-1, 1},
+		{-1, -1},
+	}
 
 	queen := &Queen{
-		BasePiece: NewBasePiece(white, 9, pos),
+		BasePiece: NewBasePiece(white, 9, pos, directions),
 	}
 
 	p.Pieces = append(p.Pieces, queen)
 
 	return queen
-}
-
-func (r *Queen) PossibleMoves(b *Board) map[Position]bool {
-	positions := map[Position]bool{}
-
-	for _, v := range queenDirs {
-		pos := Position{Row: r.Pos.Row + v.dx, Col: r.Pos.Col + v.dy}
-		CastRay(pos, v.dx, v.dy, b, r.White, positions)
-	}
-
-	return positions
 }
 
 func (r *Queen) GetPosition() Position {

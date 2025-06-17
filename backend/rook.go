@@ -5,34 +5,22 @@ type Rook struct {
 	hasMoved bool
 }
 
-var rookDirs = []struct{ dx, dy int }{
-	{0, 1},
-	{0, -1},
-	{-1, 0},
-	{1, 0},
-}
-
 func NewRook(pos Position, p *Player) *Rook {
 	white := p.White
+	directions := []Direction{
+		{0, 1},
+		{0, -1},
+		{-1, 0},
+		{1, 0},
+	}
 
 	rook := &Rook{
-		BasePiece: NewBasePiece(white, 5, pos),
+		BasePiece: NewBasePiece(white, 5, pos, directions),
 		hasMoved:  false,
 	}
 
 	p.Pieces = append(p.Pieces, rook)
 	return rook
-}
-
-func (r *Rook) PossibleMoves(b *Board) map[Position]bool {
-	positions := map[Position]bool{}
-
-	for _, v := range rookDirs {
-		dir := Position{Row: r.Pos.Row + v.dx, Col: r.Pos.Col + v.dy}
-		CastRay(dir, v.dx, v.dy, b, r.White, positions)
-	}
-
-	return positions
 }
 
 func (r *Rook) GetPosition() Position {

@@ -16,7 +16,9 @@ func main() {
 
 	fmt.Println(game.board)
 
-	game.MovePiece(Pos("D", 2), Pos("D", 4), p1)
+	if err := game.MovePiece(Pos("D", 6), Pos("D", 5), p1); err != nil {
+		PrintError(err)
+	}
 
 	fmt.Println(game.board)
 

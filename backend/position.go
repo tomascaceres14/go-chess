@@ -9,6 +9,10 @@ type Position struct {
 	Row, Col int
 }
 
+type Direction struct {
+	dx, dy int
+}
+
 func Pos(col string, row int) Position {
 
 	if row < 1 || row > 8 {
