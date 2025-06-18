@@ -95,12 +95,6 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		return fmt.Errorf("%s cant move from %s to %s.", piece.String(), from, to)
 	}
 
-	if player.Checked {
-		if player.Threats[to] {
-
-		}
-	} 
-
 	capture := g.board.MovePiece(piece, to)
 
 	opponent := g.PBlack
