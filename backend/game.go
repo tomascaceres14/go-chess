@@ -91,14 +91,15 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	// Check if piece can move to desired position
 	possibleMoves := piece.PossibleMoves(g.board)
-	if !possibleMoves[to] {
+	if !possibleMoves[to] || piece.GetPosition() == to {
 		return fmt.Errorf("%s cant move from %s to %s.", piece.String(), from, to)
 	}
 
-	// Check if it's trying to move in place
-	if piece.GetPosition() == to {
-		return errors.New("Cannot move to the same position.")
-	}
+	if player.Checked {
+		if player.Threats[to] {
+
+		}
+	} 
 
 	capture := g.board.MovePiece(piece, to)
 

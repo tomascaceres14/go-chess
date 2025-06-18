@@ -6,6 +6,7 @@ type Player struct {
 	Points  int
 	Pieces  []Movable
 	Threats map[Position]bool
+	Checked bool
 }
 
 func NewPlayer(name string, isWhite bool) *Player {
@@ -14,6 +15,7 @@ func NewPlayer(name string, isWhite bool) *Player {
 		White:   isWhite,
 		Points:  0,
 		Threats: map[Position]bool{},
+		Checked: false,
 	}
 }
 
