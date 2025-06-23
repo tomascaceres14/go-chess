@@ -49,10 +49,12 @@ func (p *Pawn) AttackedSquares(b *Board) map[Position]bool {
 		}
 	}
 
-	positions[front] = true
+	if !b.IsOccupied(front) {
+		positions[front] = true
+	}
 
-	if !p.hasMoved {
-		front.Row += 1 * p.direction
+	front.Row += 1 * p.direction
+	if !p.hasMoved && !b.IsOccupied(front) {
 		positions[front] = true
 	}
 
@@ -64,23 +66,20 @@ func (p *Pawn) LegalMoves(b *Board) map[Position]bool {
 	positions := p.AttackedSquares(b)
 	legalMoves := map[Position]bool{}
 
-	front := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col}
-
 	for k := range positions {
 
-		if k == front {
-			legalMoves[k] = true
+		if k.Col != p.Pos.Col {
 			continue
 		}
 
 		piece, occ := b.GetPiece(k)
 
-		if occ && piece.IsWhite() != p.White {
+		if !occ || piece.IsWhite() != p.White {
 			legalMoves[k] = true
 		}
 	}
 
-	return positions
+	return legalMoves
 }
 
 func (p *Pawn) GetPosition() Position {

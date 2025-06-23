@@ -25,39 +25,49 @@ func NewKnight(pos Position, p *Player) *Knight {
 	return knight
 }
 
-func (k *Knight) AttackedSquares(b *Board) map[Position]bool {
+func (n *Knight) AttackedSquares(b *Board) map[Position]bool {
 	positions := map[Position]bool{}
 
-	for _, v := range k.Directions {
-		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
+	for _, v := range n.Directions {
+		pos := Position{Row: n.Pos.Row + v.dx, Col: n.Pos.Col + v.dy}
 
 		if !pos.InBounds() {
 			continue
 		}
 
-		pieceAt, occupied := b.GetPiece(pos)
-
-		if !occupied || pieceAt.IsWhite() != k.White {
-			positions[pos] = true
-			continue
-		}
+		positions[pos] = true
 	}
 
 	return positions
 }
 
-func (r *Knight) GetPosition() Position {
-	return r.Pos
+func (n *Knight) LegalMoves(b *Board) map[Position]bool {
+	threats := n.AttackedSquares(b)
+	moves := map[Position]bool{}
+
+	for k := range threats {
+		piece, occupied := b.GetPiece(k)
+		if !occupied || piece.IsWhite() != n.White {
+			moves[k] = true
+			continue
+		}
+	}
+
+	return moves
 }
 
-func (r *Knight) IsWhite() bool {
-	return r.White
+func (n *Knight) GetPosition() Position {
+	return n.Pos
 }
 
-func (r *Knight) String() string {
+func (n *Knight) IsWhite() bool {
+	return n.White
+}
+
+func (n *Knight) String() string {
 	color := "w"
 
-	if !r.White {
+	if !n.White {
 		color = "b"
 	}
 

@@ -50,7 +50,7 @@ func NewGame(whites, blacks *Player) *Game {
 	game.board.InsertPiece(NewBishop(Pos("F", 1), whites)) // white
 
 	// Queens
-	game.board.InsertPiece(NewQueen(Pos("D", 8), blacks)) // black
+	game.board.InsertPiece(NewQueen(Pos("C", 3), blacks)) // black
 	game.board.InsertPiece(NewQueen(Pos("D", 1), whites)) // white
 
 	// Kings
@@ -88,11 +88,21 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		return errors.New("Position out of bounds.")
 	}
 
+	// Obtains opponent
+	opponent := g.PBlack
+	if opponent.White == player.White {
+		opponent = g.PWhite
+	}
+
 	// Obtains piece to move
 	piece, err := g.getPiece(from, player)
 	if err != nil {
 		return err
 	}
+
+	// if player.Checked && g.MoveUnchecksPlayer(piece, to, player, opponent) {
+
+	// }
 
 	// Check if piece can move to desired position or if is trying to move in-place
 	legalMoves := piece.LegalMoves(g.board)
@@ -102,23 +112,21 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	capture := g.board.MovePiece(piece, to)
 
-	opponent := g.PBlack
-
-	if opponent.White == player.White {
-		opponent = g.PWhite
-	}
-
 	if capture != nil {
 		opponent.Pieces = DeletePiece(opponent.Pieces, capture)
 	}
 
 	attackedSquares := player.AttackedSquares(g.board)
 
-	// Update threats map of opponent
+	// Update threats map of opponent and flag as checked or not
 	opponent.Threats = attackedSquares
-
-	// Flag opponent as checked or not
 	opponent.Checked = attackedSquares[opponent.King.Pos]
 
 	return nil
+}
+
+func (g *Game) MoveUnchecksPlayer(piece Movable, to Position, player, oppponent *Player) bool {
+	cloneBoard := g.board.Clone()
+	cloneBoard.MovePiece(piece, to)
+	return !oppponent.AttackedSquares(cloneBoard)[player.King.Pos]
 }

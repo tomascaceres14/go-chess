@@ -37,6 +37,19 @@ func (p *Player) AttackedSquares(b *Board) map[Position]bool {
 	return threats
 }
 
+func (p *Player) LegalMoves(b *Board) map[Position]bool {
+	moves := make(map[Position]bool)
+
+	pieces := p.Pieces
+	for _, v := range pieces {
+		for k := range v.LegalMoves(b) {
+			moves[k] = true
+		}
+	}
+
+	return moves
+}
+
 func (p *Player) String() string {
 	col := "WHITE"
 	if !p.White {

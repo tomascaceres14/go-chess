@@ -12,8 +12,8 @@
 | [x]     | Piece position management            | `GetPosition` / `SetPosition`, stored in each piece                        |
 | [x]     | Movement validation (basic)          | Prevents invalid movement directions or occupied-friendly squares          |
 | [x]     | Piece capture                        | Can remove opposing pieces via `DeletePiece` and board interaction         |
-| [ ]     | Board cloning / move simulation      | Needed for legal move filtering and check evaluation                       |
-| [ ]     | Check detection (`IsInCheck`)        | Determine if a king is under threat                                        |
+| [x]     | Board cloning / move simulation      | Needed for legal move filtering and check evaluation                       |
+| [x]     | Check detection (`IsChecked`)        | Determine if a king is under threat                                        |
 | [ ]     | Legal move filtering                 | Only allow moves that do not leave the king in check                       |
 | [ ]     | Checkmate detection                  | Detect if player is in check and has no legal moves                        |
 | [ ]     | Stalemate detection                  | Detect when there are no legal moves but no check                          |

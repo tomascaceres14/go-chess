@@ -36,8 +36,8 @@ func (b *Board) MovePiece(piece Movable, pos Position) Movable {
 
 	capture, _ := b.GetPiece(pos)
 
-	b.grid[pos.Row][pos.Col] = piece
 	b.grid[prevPos.Row][prevPos.Col] = nil
+	b.grid[pos.Row][pos.Col] = piece
 
 	piece.SetPosition(pos)
 
