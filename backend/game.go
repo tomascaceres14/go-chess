@@ -50,7 +50,7 @@ func NewGame(whites, blacks *Player) *Game {
 	game.board.InsertPiece(NewBishop(Pos("F", 1), whites)) // white
 
 	// Queens
-	game.board.InsertPiece(NewQueen(Pos("D", 8), blacks)) // black
+	game.board.InsertPiece(NewQueen(Pos("C", 4), blacks)) // black
 	game.board.InsertPiece(NewQueen(Pos("D", 1), whites)) // white
 
 	// Kings
@@ -58,7 +58,7 @@ func NewGame(whites, blacks *Player) *Game {
 	blacks.King = bKing
 	game.board.InsertPiece(bKing)
 
-	wKing := NewKing(Pos("E", 1), whites)
+	wKing := NewKing(Pos("E", 4), whites)
 	whites.King = wKing
 	game.board.InsertPiece(wKing)
 
@@ -100,14 +100,14 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		return err
 	}
 
-	if !g.IsMoveSafeToKing(piece, to, player, opponent) {
-		return fmt.Errorf("Moving %s leaves king vulnerable.", piece)
-	}
-
 	// Check if piece can move to desired position or if is trying to move in-place
 	legalMoves := piece.LegalMoves(g.board)
 	if !legalMoves[to] || piece.GetPosition() == to {
 		return fmt.Errorf("%s can't move from %s to %s.", piece.String(), from, to)
+	}
+
+	if !g.IsMoveSafeToKing(piece, to, player, opponent) {
+		return fmt.Errorf("%s to %s leaves king checked.", piece, to)
 	}
 
 	capture := g.board.MovePiece(piece, to)
@@ -127,6 +127,12 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 func (g *Game) IsMoveSafeToKing(piece Movable, to Position, player, oppponent *Player) bool {
 	cloneBoard := g.board.Clone()
+
 	cloneBoard.MovePieceSim(piece, to)
+
+	// Temporary solution to a bug
+	if piece == player.King {
+		return !oppponent.AttackedSquares(cloneBoard)[to]
+	}
 	return !oppponent.AttackedSquares(cloneBoard)[player.King.Pos]
 }
