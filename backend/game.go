@@ -54,8 +54,13 @@ func NewGame(whites, blacks *Player) *Game {
 	game.board.InsertPiece(NewQueen(Pos("D", 1), whites)) // white
 
 	// Kings
-	game.board.InsertPiece(NewKing(Pos("E", 8), blacks)) // black
-	game.board.InsertPiece(NewKing(Pos("E", 1), whites)) // white
+	bKing := NewKing(Pos("E", 8), blacks)
+	blacks.King = bKing
+	game.board.InsertPiece(bKing)
+
+	wKing := NewKing(Pos("E", 4), whites)
+	whites.King = wKing
+	game.board.InsertPiece(wKing)
 
 	return game
 }
@@ -89,10 +94,10 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		return err
 	}
 
-	// Check if piece can move to desired position
-	possibleMoves := piece.PossibleMoves(g.board)
-	if !possibleMoves[to] || piece.GetPosition() == to {
-		return fmt.Errorf("%s cant move from %s to %s.", piece.String(), from, to)
+	// Check if piece can move to desired position or if is trying to move in-place
+	legalMoves := piece.LegalMoves(g.board)
+	if !legalMoves[to] || piece.GetPosition() == to {
+		return fmt.Errorf("%s can't move from %s to %s.", piece.String(), from, to)
 	}
 
 	capture := g.board.MovePiece(piece, to)
@@ -107,8 +112,13 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		opponent.Pieces = DeletePiece(opponent.Pieces, capture)
 	}
 
+	attackedSquares := player.AttackedSquares(g.board)
+
 	// Update threats map of opponent
-	opponent.Threats = player.CalculateThreats(g.board)
+	opponent.Threats = attackedSquares
+
+	// Flag opponent as checked or not
+	opponent.Checked = attackedSquares[opponent.King.Pos]
 
 	return nil
 }

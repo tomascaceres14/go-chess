@@ -25,7 +25,7 @@ func NewKnight(pos Position, p *Player) *Knight {
 	return knight
 }
 
-func (k *Knight) PossibleThreats(b *Board) map[Position]bool {
+func (k *Knight) AttackedSquares(b *Board) map[Position]bool {
 	positions := map[Position]bool{}
 
 	for _, v := range k.Directions {

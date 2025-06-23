@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func main() {
 
@@ -14,12 +12,16 @@ func main() {
 
 	game := NewGame(p1, p2)
 
-	fmt.Println(game.board)
+	game.MovePiece(Pos("D", 7), Pos("D", 5), p2)
 
-	if err := game.MovePiece(Pos("E", 2), Pos("E", 4), p1); err != nil {
-		PrintError(err)
-	}
+	// cloneBoard := game.board.Clone()
+	// pieceClone, _ := cloneBoard.GetPiece(Pos("E", 2))
+	// cloneBoard.MovePiece(pieceClone, Pos("E", 4))
 
+	fmt.Println("ORIGINAL")
 	fmt.Println(game.board)
-	fmt.Println(game.PBlack.Threats)
+	// fmt.Println("CLONE")
+	// fmt.Println(cloneBoard)
+
+	fmt.Println(p1)
 }

@@ -1,8 +1,8 @@
 package main
 
 type Movable interface {
-	PossibleThreats(b *Board) map[Position]bool
-	PossibleMoves(b *Board) map[Position]bool
+	AttackedSquares(b *Board) map[Position]bool
+	LegalMoves(b *Board) map[Position]bool
 	GetPosition() Position
 	SetPosition(pos Position)
 	IsWhite() bool
@@ -30,7 +30,7 @@ func (bp *BasePiece) SetPosition(pos Position) {
 	bp.Pos = pos
 }
 
-func (bp *BasePiece) PossibleThreats(b *Board) map[Position]bool {
+func (bp *BasePiece) AttackedSquares(b *Board) map[Position]bool {
 	positions := map[Position]bool{}
 
 	for _, v := range bp.Directions {
@@ -41,8 +41,8 @@ func (bp *BasePiece) PossibleThreats(b *Board) map[Position]bool {
 	return positions
 }
 
-func (bp *BasePiece) PossibleMoves(b *Board) map[Position]bool {
-	threats := bp.PossibleThreats(b)
+func (bp *BasePiece) LegalMoves(b *Board) map[Position]bool {
+	threats := bp.AttackedSquares(b)
 	moves := map[Position]bool{}
 
 	for k := range threats {

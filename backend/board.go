@@ -48,6 +48,15 @@ func (b *Board) IsOccupied(pos Position) bool {
 	return b.grid[pos.Row][pos.Col] != nil
 }
 
+func (b *Board) Clone() *Board {
+	grid := *b.grid
+	return &Board{grid: &grid}
+}
+
+func (b *Board) IsChecked(p *Player) bool {
+	return p.Threats[p.King.Pos]
+}
+
 func (b *Board) String() string {
 	output := ""
 
