@@ -49,8 +49,12 @@ func (k *King) AttackedSquares(b *Board) map[Position]bool {
 	return positions
 }
 
-func (r *King) GetPosition() Position {
-	return r.Pos
+func (k *King) LegalMoves(b *Board) map[Position]bool {
+	return k.LegalMovesDefault(b)
+}
+
+func (k *King) GetPosition() Position {
+	return k.Pos
 }
 
 func (k *King) SetPosition(pos Position) {
@@ -58,14 +62,14 @@ func (k *King) SetPosition(pos Position) {
 	k.Pos = pos
 }
 
-func (r *King) IsWhite() bool {
-	return r.White
+func (k *King) IsWhite() bool {
+	return k.White
 }
 
-func (r *King) String() string {
+func (k *King) String() string {
 	color := "w"
 
-	if !r.White {
+	if !k.White {
 		color = "b"
 	}
 

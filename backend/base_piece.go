@@ -25,7 +25,7 @@ func NewBasePiece(white bool, value int, pos Position, directions []Direction) *
 	}
 }
 
-func (bp *BasePiece) AttackedSquares(b *Board) map[Position]bool {
+func (bp *BasePiece) AttackedSquaresDefault(b *Board) map[Position]bool {
 	positions := map[Position]bool{}
 
 	for _, v := range bp.Directions {
@@ -36,8 +36,8 @@ func (bp *BasePiece) AttackedSquares(b *Board) map[Position]bool {
 	return positions
 }
 
-func (bp *BasePiece) LegalMoves(b *Board) map[Position]bool {
-	threats := bp.AttackedSquares(b)
+func (bp *BasePiece) LegalMovesDefault(b *Board) map[Position]bool {
+	threats := bp.AttackedSquaresDefault(b)
 	moves := map[Position]bool{}
 	for k := range threats {
 		piece, occupied := b.GetPiece(k)

@@ -26,18 +26,26 @@ func NewQueen(pos Position, p *Player) *Queen {
 	return queen
 }
 
-func (r *Queen) GetPosition() Position {
-	return r.Pos
+func (q *Queen) AttackedSquares(b *Board) map[Position]bool {
+	return q.AttackedSquaresDefault(b)
 }
 
-func (r *Queen) IsWhite() bool {
-	return r.White
+func (q *Queen) LegalMoves(b *Board) map[Position]bool {
+	return q.LegalMovesDefault(b)
 }
 
-func (r *Queen) String() string {
+func (q *Queen) GetPosition() Position {
+	return q.Pos
+}
+
+func (q *Queen) IsWhite() bool {
+	return q.White
+}
+
+func (q *Queen) String() string {
 	color := "w"
 
-	if !r.White {
+	if !q.White {
 		color = "b"
 	}
 

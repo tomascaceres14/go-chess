@@ -22,6 +22,14 @@ func NewBishop(pos Position, p *Player) *Bishop {
 	return bishop
 }
 
+func (bp *Bishop) AttackedSquares(b *Board) map[Position]bool {
+	return bp.AttackedSquaresDefault(b)
+}
+
+func (bp *Bishop) LegalMoves(b *Board) map[Position]bool {
+	return bp.LegalMovesDefault(b)
+}
+
 func (b *Bishop) GetPosition() Position {
 	return b.Pos
 }
