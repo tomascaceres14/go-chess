@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type Pawn struct {
 	*BasePiece
 	direction int
@@ -28,8 +30,8 @@ func NewPawn(pos Position, p *Player) *Pawn {
 func (p *Pawn) AttackedSquares(b *Board) map[Position]bool {
 
 	positions := map[Position]bool{}
-
 	front := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col}
+	front2 := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col}
 	diag1 := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col + 1}
 	diag2 := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col - 1}
 
@@ -49,13 +51,10 @@ func (p *Pawn) AttackedSquares(b *Board) map[Position]bool {
 		}
 	}
 
-	if !b.IsOccupied(front) {
-		positions[front] = true
-	}
+	positions[front] = true
 
-	front.Row += 1 * p.direction
-	if !p.hasMoved && !b.IsOccupied(front) {
-		positions[front] = true
+	if !p.hasMoved && !b.IsOccupied(front2) {
+		positions[front2] = true
 	}
 
 	return positions
@@ -64,6 +63,7 @@ func (p *Pawn) AttackedSquares(b *Board) map[Position]bool {
 func (p *Pawn) LegalMoves(b *Board) map[Position]bool {
 
 	positions := p.AttackedSquares(b)
+	fmt.Println("ATTACKING POSITIONS", positions)
 	legalMoves := map[Position]bool{}
 
 	for k := range positions {

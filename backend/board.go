@@ -30,6 +30,13 @@ func (b *Board) InsertPieces(pieces []Movable) {
 	}
 }
 
+// Used for simulating movement when cloning board.
+func (b *Board) MovePieceSim(piece Movable, pos Position) {
+	prevPos := piece.GetPosition()
+	b.grid[prevPos.Row][prevPos.Col] = nil
+	b.grid[pos.Row][pos.Col] = piece
+}
+
 // Moves piece from piece.Pos to pos and returns captured piece
 func (b *Board) MovePiece(piece Movable, pos Position) Movable {
 	prevPos := piece.GetPosition()

@@ -50,18 +50,7 @@ func (bp *BasePiece) LegalMoves(b *Board) map[Position]bool {
 	return moves
 }
 
-func (bp *BasePiece) GetPosition(pos Position) Position {
-	return bp.Pos
-}
-
 // Updates piece position
 func (bp *BasePiece) SetPosition(pos Position) {
 	bp.Pos = pos
-}
-
-func (bp *BasePiece) IsWhite() bool {
-	return bp.White
-}
-func (bp *BasePiece) String() string {
-	return "BP"
 }
