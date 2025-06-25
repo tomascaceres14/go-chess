@@ -37,24 +37,32 @@ func (p *Player) AttackedSquares(b *Board) map[Position]bool {
 	return threats
 }
 
-func (p *Player) LegalMoves(b *Board) map[Position]bool {
+func (p *Player) LegalMoves(g *Game) map[Position]bool {
 	moves := make(map[Position]bool)
 
 	pieces := p.Pieces
-	for _, v := range pieces {
-		for k := range v.LegalMoves(b) {
-			moves[k] = true
+	for _, piece := range pieces {
+		for pos := range piece.LegalMoves(g.board) {
+			if IsMoveSafeToKing(piece, pos, g) {
+				moves[pos] = true
+			}
 		}
 	}
 
 	return moves
 }
 
+func (p *Player) HasLegalMoves(g *Game) bool {
+	return len(p.LegalMoves(g)) > 0
+}
+
 func (p *Player) String() string {
 	col := "WHITE"
+
 	if !p.White {
 		col = "BLACK"
 	}
+
 	result := fmt.Sprintf("%s plays %s:\n\tPoints: %v\n\tChecked: %s\n\tPieces on board: %v",
 		p.Name,
 		col,

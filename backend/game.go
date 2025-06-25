@@ -9,6 +9,7 @@ type Game struct {
 	board          *Board
 	PWhite, PBlack *Player
 	Captures       []Movable
+	WhiteTurn      bool
 }
 
 // Generates a new board with classic chess configuration
@@ -19,10 +20,11 @@ func NewGame(whites, blacks *Player) *Game {
 	board := [8][8]Movable{}
 
 	game := &Game{
-		board:    &Board{grid: &board},
-		PWhite:   whites,
-		PBlack:   blacks,
-		Captures: []Movable{},
+		board:     &Board{grid: &board},
+		PWhite:    whites,
+		PBlack:    blacks,
+		Captures:  []Movable{},
+		WhiteTurn: true,
 	}
 
 	// Pawns
@@ -50,7 +52,7 @@ func NewGame(whites, blacks *Player) *Game {
 	game.board.InsertPiece(NewBishop(Pos("F", 1), whites)) // white
 
 	// Queens
-	game.board.InsertPiece(NewQueen(Pos("C", 4), blacks)) // black
+	game.board.InsertPiece(NewQueen(Pos("D", 8), blacks)) // black
 	game.board.InsertPiece(NewQueen(Pos("D", 1), whites)) // white
 
 	// Kings
@@ -58,7 +60,7 @@ func NewGame(whites, blacks *Player) *Game {
 	blacks.King = bKing
 	game.board.InsertPiece(bKing)
 
-	wKing := NewKing(Pos("E", 4), whites)
+	wKing := NewKing(Pos("E", 1), whites)
 	whites.King = wKing
 	game.board.InsertPiece(wKing)
 
@@ -83,16 +85,18 @@ func (g *Game) getPiece(pos Position, player *Player) (Movable, error) {
 
 // Moves piece in position `from` to position `to` if player is owner of piece
 func (g *Game) MovePiece(from, to Position, player *Player) error {
+
+	if !g.WhiteTurn == player.White {
+		return errors.New("Not your turn.")
+	}
+
 	// Check if positions are in bounds
 	if !from.InBounds() || !to.InBounds() {
 		return errors.New("Position out of bounds.")
 	}
 
 	// Obtains opponent
-	opponent := g.PBlack
-	if opponent.White == player.White {
-		opponent = g.PWhite
-	}
+	opponent := g.GetPlayerOpponent(player)
 
 	// Obtains piece to move
 	piece, err := g.getPiece(from, player)
@@ -106,7 +110,7 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		return fmt.Errorf("%s can't move from %s to %s.", piece.String(), from, to)
 	}
 
-	if !g.IsMoveSafeToKing(piece, to, player, opponent) {
+	if !IsMoveSafeToKing(piece, to, g) {
 		return fmt.Errorf("%s to %s leaves king checked.", piece, to)
 	}
 
@@ -122,17 +126,40 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 	opponent.Threats = attackedSquares
 	opponent.Checked = attackedSquares[opponent.King.Pos]
 
+	// Check winning / draw conditions
+	if !opponent.HasLegalMoves(g) {
+		if opponent.Checked {
+			fmt.Println("CHECKMATE!!!", player.Name, "WINS")
+		} else {
+			fmt.Println("Stalemate pal :(")
+		}
+	} else if len(player.Pieces) == 1 && len(opponent.Pieces) == 1 {
+		fmt.Println("Stalemate pal :(")
+	}
+
+	g.WhiteTurn = !g.WhiteTurn
+
 	return nil
 }
 
-func (g *Game) IsMoveSafeToKing(piece Movable, to Position, player, oppponent *Player) bool {
-	cloneBoard := g.board.Clone()
+// Returns pointer to player based on color
+func (g *Game) GetPlayer(white bool) *Player {
+	player := g.PWhite
 
-	cloneBoard.MovePieceSim(piece, to)
-
-	// Temporary solution to a bug
-	if piece == player.King {
-		return !oppponent.AttackedSquares(cloneBoard)[to]
+	if !white {
+		player = g.PBlack
 	}
-	return !oppponent.AttackedSquares(cloneBoard)[player.King.Pos]
+
+	return player
+}
+
+// Returns pointer to player based on player
+func (g *Game) GetPlayerOpponent(p *Player) *Player {
+	opponent := g.PBlack
+
+	if !p.White {
+		opponent = g.PWhite
+	}
+
+	return opponent
 }

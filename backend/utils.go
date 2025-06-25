@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// Board columns
 const cols = "ABCDEFGH"
 
 // Error printing for debugging
@@ -30,6 +31,23 @@ func CastRay(pos Position, dx, dy int, b *Board, white bool, positions map[Posit
 	positions[pos] = true
 	next := Position{Row: pos.Row + dx, Col: pos.Col + dy}
 	CastRay(next, dx, dy, b, white, positions)
+}
+
+// Helper function to check if a move leaves king vulnerable
+func IsMoveSafeToKing(piece Movable, to Position, g *Game) bool {
+
+	board := g.board.Clone()
+	player := g.GetPlayer(piece.IsWhite())
+	opponent := g.GetPlayerOpponent(player)
+
+	board.MovePieceSim(piece, to)
+
+	// Temporary solution to a bug
+	if piece == player.King {
+		return !opponent.AttackedSquares(board)[to]
+	}
+
+	return !opponent.AttackedSquares(board)[player.King.Pos]
 }
 
 // Parse col from matrix index to board column letter

@@ -14,9 +14,9 @@
 | [x]     | Piece capture                        | Can remove opposing pieces via `DeletePiece` and board interaction         |
 | [x]     | Board cloning / move simulation      | Needed for legal move filtering and check evaluation                       |
 | [x]     | Check detection (`IsChecked`)        | Determine if a king is under threat                                        |
-| [ ]     | Legal move filtering                 | Only allow moves that do not leave the king in check                       |
-| [ ]     | Checkmate detection                  | Detect if player is in check and has no legal moves                        |
-| [ ]     | Stalemate detection                  | Detect when there are no legal moves but no check                          |
+| [x]     | Legal move filtering                 | Only allow moves that do not leave the king in check                       |
+| [x]     | Checkmate detection                  | Detect if player is in check and has no legal moves                        |
+| [x]     | Stalemate detection                  | Detect when there are no legal moves but no check                          |
 | [ ]     | Turn management                      | Enforce turn order based on color                                          |
 | [ ]     | Full game state (`Game`, `Match`)    | Store global game state, turn tracking, move history, etc.                 |
 | [ ]     | En passant                           | Pawn special capture after a double-step move by opponent                  |

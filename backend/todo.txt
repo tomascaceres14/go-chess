@@ -1,2 +1,20 @@
 TODO:
 - Create Clone() for board
+
+NOTES / THOUGHTS
+
+- As of now, pieces don't know their possible moves until they try to move.
+Consider each piece saving their attacked squares and legal moves in a field, and re-calculate after each move.
+
+For example:
+
+... move logic ...
+
+player.Attacks = player.AttackedSquares() -> 
+                 for each piece, piece.AttackedSquares() ->
+                 piece calculates and saves in memory variable.
+
+Same for legal moves and for opponent as well.
+
+This should solve various problems:
+1. Faster to detect checkmates
