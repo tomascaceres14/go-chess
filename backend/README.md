@@ -1,7 +1,7 @@
 # ROADMAP
 
-| Status | Feature                              | Description                                                                 |
-|--------|--------------------------------------|-----------------------------------------------------------------------------|
+| Status  | Feature                              | Description                                                                |
+|---------|--------------------------------------|----------------------------------------------------------------------------|
 | [x]     | Basic board setup                    | Board representation, coordinates, and utility functions                   |
 | [x]     | Piece abstraction (`Movable`)        | Interface-based polymorphism for all pieces                                |
 | [x]     | `BasePiece` composition              | Common logic shared across pieces (movement, threat generation, etc.)      |
@@ -17,7 +17,7 @@
 | [x]     | Legal move filtering                 | Only allow moves that do not leave the king in check                       |
 | [x]     | Checkmate detection                  | Detect if player is in check and has no legal moves                        |
 | [x]     | Stalemate detection                  | Detect when there are no legal moves but no check                          |
-| [ ]     | Turn management                      | Enforce turn order based on color                                          |
+| [x]     | Turn management                      | Enforce turn order based on color                                          |
 | [ ]     | Full game state (`Game`, `Match`)    | Store global game state, turn tracking, move history, etc.                 |
 | [ ]     | En passant                           | Pawn special capture after a double-step move by opponent                  |
 | [ ]     | Castling                             | King-side and queen-side, with rule validation (path, check, etc.)         |

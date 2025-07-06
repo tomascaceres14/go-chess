@@ -12,9 +12,8 @@ For example:
 
 player.Attacks = player.AttackedSquares() -> 
                  for each piece, piece.AttackedSquares() ->
-                 piece calculates and saves in memory variable.
+                 piece calculates and saves moves in attribute.
 
 Same for legal moves and for opponent as well.
 
-This should solve various problems:
-1. Faster to detect checkmates
+pros: Up-to-date game state and pieces legal moves, turn by turn.

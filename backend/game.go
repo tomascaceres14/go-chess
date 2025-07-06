@@ -29,46 +29,46 @@ func NewGame(whites, blacks *Player) *Game {
 
 	// Pawns
 	for i := range 8 {
-		game.board.InsertPiece(NewPawn(Pos(GetCol(i), 7), blacks)) // black
-		game.board.InsertPiece(NewPawn(Pos(GetCol(i), 2), whites)) // white
+		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"7"), blacks)) // black
+		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"2"), whites)) // white
 	}
 
 	// Rooks
-	game.board.InsertPiece(NewRook(Pos("A", 8), blacks)) // black
-	game.board.InsertPiece(NewRook(Pos("H", 8), blacks)) // black
-	game.board.InsertPiece(NewRook(Pos("A", 1), whites)) // white
-	game.board.InsertPiece(NewRook(Pos("H", 1), whites)) // white
+	game.board.InsertPiece(NewRook(Pos("A8"), blacks)) // black
+	game.board.InsertPiece(NewRook(Pos("H8"), blacks)) // black
+	game.board.InsertPiece(NewRook(Pos("A1"), whites)) // white
+	game.board.InsertPiece(NewRook(Pos("H1"), whites)) // white
 
 	// Knights
-	game.board.InsertPiece(NewKnight(Pos("B", 8), blacks)) // black
-	game.board.InsertPiece(NewKnight(Pos("G", 8), blacks)) // black
-	game.board.InsertPiece(NewKnight(Pos("B", 1), whites)) // white
-	game.board.InsertPiece(NewKnight(Pos("G", 1), whites)) // white
+	game.board.InsertPiece(NewKnight(Pos("B8"), blacks)) // black
+	game.board.InsertPiece(NewKnight(Pos("G8"), blacks)) // black
+	game.board.InsertPiece(NewKnight(Pos("B1"), whites)) // white
+	game.board.InsertPiece(NewKnight(Pos("G1"), whites)) // white
 
 	// Bishops
-	game.board.InsertPiece(NewBishop(Pos("C", 8), blacks)) // black
-	game.board.InsertPiece(NewBishop(Pos("F", 8), blacks)) // black
-	game.board.InsertPiece(NewBishop(Pos("C", 1), whites)) // white
-	game.board.InsertPiece(NewBishop(Pos("F", 1), whites)) // white
+	game.board.InsertPiece(NewBishop(Pos("C8"), blacks)) // black
+	game.board.InsertPiece(NewBishop(Pos("F8"), blacks)) // black
+	game.board.InsertPiece(NewBishop(Pos("C1"), whites)) // white
+	game.board.InsertPiece(NewBishop(Pos("F1"), whites)) // white
 
 	// Queens
-	game.board.InsertPiece(NewQueen(Pos("D", 8), blacks)) // black
-	game.board.InsertPiece(NewQueen(Pos("D", 1), whites)) // white
+	game.board.InsertPiece(NewQueen(Pos("D8"), blacks)) // black
+	game.board.InsertPiece(NewQueen(Pos("D1"), whites)) // white
 
 	// Kings
-	bKing := NewKing(Pos("E", 8), blacks)
+	bKing := NewKing(Pos("E8"), blacks)
 	blacks.King = bKing
 	game.board.InsertPiece(bKing)
 
-	wKing := NewKing(Pos("E", 1), whites)
+	wKing := NewKing(Pos("E1"), whites)
 	whites.King = wKing
 	game.board.InsertPiece(wKing)
 
 	return game
 }
 
-// Internal use only. Obtains piece at given position if player is owner of piece
-func (g *Game) getPiece(pos Position, player *Player) (Movable, error) {
+// Obtains piece at given position if player is owner of piece
+func (g *Game) GetPiece(pos Position, player *Player) (Movable, error) {
 
 	piece, ok := g.board.GetPiece(pos)
 	if !ok {
@@ -87,7 +87,7 @@ func (g *Game) getPiece(pos Position, player *Player) (Movable, error) {
 func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	if !g.WhiteTurn == player.White {
-		return errors.New("Not your turn.")
+		return fmt.Errorf("Not your turn, %s.", player.Name)
 	}
 
 	// Check if positions are in bounds
@@ -99,7 +99,7 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 	opponent := g.GetPlayerOpponent(player)
 
 	// Obtains piece to move
-	piece, err := g.getPiece(from, player)
+	piece, err := g.GetPiece(from, player)
 	if err != nil {
 		return err
 	}
@@ -118,6 +118,7 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	if capture != nil {
 		opponent.Pieces = DeletePiece(opponent.Pieces, capture)
+		player.Points += capture.GetValue()
 	}
 
 	attackedSquares := player.AttackedSquares(g.board)

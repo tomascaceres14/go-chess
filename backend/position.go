@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -13,15 +14,21 @@ type Direction struct {
 	dx, dy int
 }
 
-func Pos(col string, row int) Position {
+func Pos(pos string) Position {
+	nilPos := Position{-1, -1}
 
-	if row < 1 || row > 8 {
-		return Position{-1, -1}
+	if len(pos) != 2 {
+		return nilPos
 	}
 
-	col = strings.ToLower(col)
-	if len(col) != 1 || col[0] < 'a' || col[0] > 'h' {
-		return Position{-1, -1}
+	col := strings.ToLower(string(pos[0]))
+	row, err := strconv.Atoi(string(pos[1]))
+	if err != nil {
+		return nilPos
+	}
+
+	if (row < 1 || row > 8) || (col[0] < 'a' || col[0] > 'h') {
+		return nilPos
 	}
 
 	return Position{

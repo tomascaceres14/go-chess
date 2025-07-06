@@ -6,6 +6,7 @@ type Movable interface {
 	GetPosition() Position
 	SetPosition(pos Position)
 	IsWhite() bool
+	GetValue() int
 	String() string
 }
 
@@ -53,4 +54,8 @@ func (bp *BasePiece) LegalMovesDefault(b *Board) map[Position]bool {
 // Updates piece position
 func (bp *BasePiece) SetPosition(pos Position) {
 	bp.Pos = pos
+}
+
+func (bp *BasePiece) GetValue() int {
+	return bp.Value
 }

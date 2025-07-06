@@ -8,27 +8,34 @@ func main() {
 
 	game := NewGame(p1, p2)
 
-	if err := game.MovePiece(Pos("E", 7), Pos("E", 5), p2); err != nil {
+	pawn, err := game.GetPiece(Pos("E2"), p1)
+	if err != nil {
 		PrintError(err)
 	}
 
-	if err := game.MovePiece(Pos("F", 1), Pos("C", 4), p1); err != nil {
+	fmt.Println(pawn.LegalMoves(game.board))
+
+	if err := game.MovePiece(Pos("E7"), Pos("E5"), p2); err != nil {
 		PrintError(err)
 	}
 
-	if err := game.MovePiece(Pos("F", 3), Pos("F", 7), p1); err != nil {
+	if err := game.MovePiece(Pos("F1"), Pos("C4"), p1); err != nil {
 		PrintError(err)
 	}
 
-	if err := game.MovePiece(Pos("G", 1), Pos("F", 3), p1); err != nil {
+	if err := game.MovePiece(Pos("F3"), Pos("F7"), p1); err != nil {
 		PrintError(err)
 	}
 
-	if err := game.MovePiece(Pos("B", 1), Pos("C", 3), p1); err != nil {
+	if err := game.MovePiece(Pos("G1"), Pos("F3"), p1); err != nil {
 		PrintError(err)
 	}
 
-	if err := game.MovePiece(Pos("E", 7), Pos("E", 5), p2); err != nil {
+	if err := game.MovePiece(Pos("B1"), Pos("C3"), p1); err != nil {
+		PrintError(err)
+	}
+
+	if err := game.MovePiece(Pos("E7"), Pos("E5"), p2); err != nil {
 		PrintError(err)
 	}
 
