@@ -3,7 +3,6 @@ package main
 type Pawn struct {
 	*BasePiece
 	direction int
-	hasMoved  bool
 }
 
 func NewPawn(pos Position, p *Player) *Pawn {
@@ -17,7 +16,6 @@ func NewPawn(pos Position, p *Player) *Pawn {
 	pawn := &Pawn{
 		BasePiece: NewBasePiece(white, 1, pos, nil),
 		direction: dir,
-		hasMoved:  false,
 	}
 
 	p.Pieces = append(p.Pieces, pawn)

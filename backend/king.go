@@ -2,25 +2,31 @@ package main
 
 type King struct {
 	*BasePiece
-	hasMoved bool
 }
 
 func NewKing(pos Position, p *Player) *King {
 	white := p.White
 	directions := []Direction{
-		{0, 1},
-		{0, -1},
+		// left
 		{-1, 0},
+		// right
 		{1, 0},
+		// up
+		{0, 1},
+		// down
+		{0, -1},
+		// top right
 		{1, 1},
-		{1, -1},
+		// top left
 		{-1, 1},
+		// bottom right
+		{1, -1},
+		// bottom left
 		{-1, -1},
 	}
 
 	king := &King{
 		BasePiece: NewBasePiece(white, 0, pos, directions),
-		hasMoved:  false,
 	}
 
 	p.Pieces = append(p.Pieces, king)
@@ -50,7 +56,26 @@ func (k *King) AttackedSquares(b *Board) map[Position]bool {
 }
 
 func (k *King) LegalMoves(b *Board) map[Position]bool {
-	return k.LegalMovesDefault(b)
+	legalMoves := k.LegalMovesDefault(b)
+
+	if k.hasMoved {
+		return legalMoves
+	}
+
+	shortCastlePos := Position{Row: k.Pos.Row, Col: 7}
+	longCastlePos := Position{Row: k.Pos.Row, Col: 0}
+
+	shortRook, occ := b.GetPiece(shortCastlePos)
+	if occ && !shortRook.HasMoved() && b.IsRowPathClear(k.Pos, shortCastlePos) {
+		legalMoves[Position{Row: k.Pos.Row, Col: 6}] = true
+	}
+
+	longRook, occ := b.GetPiece(longCastlePos)
+	if occ && !longRook.HasMoved() && b.IsRowPathClear(k.Pos, longCastlePos) {
+		legalMoves[Position{Row: k.Pos.Row, Col: 2}] = true
+	}
+
+	return legalMoves
 }
 
 func (k *King) GetPosition() Position {

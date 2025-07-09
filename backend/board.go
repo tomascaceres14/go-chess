@@ -64,6 +64,25 @@ func (b *Board) IsChecked(p *Player) bool {
 	return p.Threats[p.King.Pos]
 }
 
+func (b *Board) IsRowPathClear(from, to Position) bool {
+	if from.Row != to.Row {
+		return false
+	}
+
+	step := 1
+	if from.Col > to.Col {
+		step = -1
+	}
+
+	for col := from.Col + step; col != to.Col; col += step {
+		if b.IsOccupied(Position{Row: from.Row, Col: col}) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (b *Board) String() string {
 	output := ""
 

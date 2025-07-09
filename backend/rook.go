@@ -2,7 +2,6 @@ package main
 
 type Rook struct {
 	*BasePiece
-	hasMoved bool
 }
 
 func NewRook(pos Position, p *Player) *Rook {
@@ -16,7 +15,6 @@ func NewRook(pos Position, p *Player) *Rook {
 
 	rook := &Rook{
 		BasePiece: NewBasePiece(white, 5, pos, directions),
-		hasMoved:  false,
 	}
 
 	p.Pieces = append(p.Pieces, rook)

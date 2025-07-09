@@ -8,6 +8,7 @@ type Movable interface {
 	IsWhite() bool
 	GetValue() int
 	String() string
+	HasMoved() bool
 }
 
 type BasePiece struct {
@@ -15,6 +16,7 @@ type BasePiece struct {
 	Value      int
 	Pos        Position
 	Directions []Direction
+	hasMoved   bool
 }
 
 func NewBasePiece(white bool, value int, pos Position, directions []Direction) *BasePiece {
@@ -23,6 +25,7 @@ func NewBasePiece(white bool, value int, pos Position, directions []Direction) *
 		Value:      value,
 		Pos:        pos,
 		Directions: directions,
+		hasMoved:   false,
 	}
 }
 
@@ -54,8 +57,13 @@ func (bp *BasePiece) LegalMovesDefault(b *Board) map[Position]bool {
 // Updates piece position
 func (bp *BasePiece) SetPosition(pos Position) {
 	bp.Pos = pos
+	bp.hasMoved = true
 }
 
 func (bp *BasePiece) GetValue() int {
 	return bp.Value
+}
+
+func (bp *BasePiece) HasMoved() bool {
+	return bp.hasMoved
 }
