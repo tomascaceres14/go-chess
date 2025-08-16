@@ -64,6 +64,8 @@ func NewGame(whites, blacks *Player) *Game {
 	whites.King = wKing
 	game.board.InsertPiece(wKing)
 
+	game.board.InsertPiece(NewPawn(Pos("e5"), whites))
+
 	return game
 }
 

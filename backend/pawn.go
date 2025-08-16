@@ -30,29 +30,19 @@ func (p *Pawn) AttackedSquares(b *Board) map[Position]bool {
 	diag1 := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col + 1}
 	diag2 := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col - 1}
 
-	if b.IsOccupied(front) {
-		return positions
-	}
-
 	if diag1.InBounds() {
-		if piece, occupied := b.GetPiece(diag1); !occupied || piece.IsWhite() != p.White {
-			positions[diag1] = true
-		}
+		positions[diag1] = true
 	}
 
 	if diag2.InBounds() {
-		if piece, occupied := b.GetPiece(diag2); !occupied || piece.IsWhite() != p.White {
-			positions[diag2] = true
-		}
+		positions[diag2] = true
 	}
 
 	positions[front] = true
 
 	if !p.hasMoved {
 		front.Row += 1 * p.direction
-		if !b.IsOccupied(front) {
-			positions[front] = true
-		}
+		positions[front] = true
 	}
 
 	return positions
@@ -63,17 +53,27 @@ func (p *Pawn) LegalMoves(b *Board) map[Position]bool {
 	positions := p.AttackedSquares(b)
 	legalMoves := map[Position]bool{}
 
-	for k := range positions {
+	for pos := range positions {
 
-		if k.Col != p.Pos.Col {
+		piece, occupied := b.GetPiece(pos)
+
+		// move front
+		if pos.Col == p.Pos.Col {
+			if !occupied {
+				legalMoves[pos] = true
+			}
 			continue
 		}
 
-		piece, occ := b.GetPiece(k)
-
-		if !occ || piece.IsWhite() != p.White {
-			legalMoves[k] = true
+		// capture diagonal
+		if occupied {
+			if piece.IsWhite() != p.White {
+				legalMoves[pos] = true
+			}
+			continue
 		}
+
+		// TODO: en passant
 	}
 
 	return legalMoves

@@ -15,17 +15,17 @@ func main() {
 
 	fmt.Println(pawn.LegalMoves(game.board))
 
-	if err := game.MovePiece(Pos("E7"), Pos("E5"), p2); err != nil {
+	if err := game.MovePiece(Pos("a2"), Pos("a4"), p1); err != nil {
 		PrintError(err)
 	}
-	if err := game.MovePiece(Pos("F1"), Pos("C4"), p1); err != nil {
+
+	if err := game.MovePiece(Pos("f7"), Pos("f6"), p2); err != nil {
 		PrintError(err)
 	}
-	if err := game.MovePiece(Pos("F3"), Pos("F7"), p1); err != nil {
+
+	if err := game.MovePiece(Pos("e5"), Pos("f6"), p1); err != nil {
 		PrintError(err)
 	}
-	if err := game.MovePiece(Pos("G1"), Pos("F3"), p1); err != nil {
-		PrintError(err)
-	}
+
 	fmt.Println(game.board)
 }
