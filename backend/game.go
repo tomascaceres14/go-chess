@@ -10,7 +10,7 @@ type Game struct {
 	PWhite, PBlack *Player
 	Captures       []Movable
 	WhiteTurn      bool
-	Moves          []Move
+	MoveHistory    []Move
 }
 
 // Generates a new board with classic chess configuration
@@ -21,12 +21,12 @@ func NewGame(whites, blacks *Player) *Game {
 	board := [8][8]Movable{}
 
 	game := &Game{
-		board:     &Board{grid: &board},
-		PWhite:    whites,
-		PBlack:    blacks,
-		Captures:  []Movable{},
-		WhiteTurn: true,
-		Moves:     []Move{},
+		board:       &Board{grid: &board},
+		PWhite:      whites,
+		PBlack:      blacks,
+		Captures:    []Movable{},
+		WhiteTurn:   true,
+		MoveHistory: []Move{},
 	}
 
 	// Pawns
@@ -147,11 +147,11 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		Capture:   capture,
 	}
 
-	g.Moves = append(g.Moves, move)
+	g.MoveHistory = append(g.MoveHistory, move)
 
 	g.WhiteTurn = !g.WhiteTurn
 
-	fmt.Println(g.Moves)
+	fmt.Println(g.MoveHistory)
 	return nil
 }
 
