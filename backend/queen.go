@@ -51,3 +51,7 @@ func (q *Queen) String() string {
 
 	return "Q" + color
 }
+
+func (q *Queen) Clone() Movable {
+	return &Queen{BasePiece: q.BasePiece.CloneBase()}
+}

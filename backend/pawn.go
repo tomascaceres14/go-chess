@@ -101,3 +101,7 @@ func (p *Pawn) String() string {
 
 	return "P" + color
 }
+
+func (p *Pawn) Clone() Movable {
+	return &Pawn{BasePiece: p.BasePiece.CloneBase()}
+}

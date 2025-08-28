@@ -73,3 +73,7 @@ func (n *Knight) String() string {
 
 	return "N" + color
 }
+
+func (n *Knight) Clone() Movable {
+	return &Knight{BasePiece: n.BasePiece.CloneBase()}
+}

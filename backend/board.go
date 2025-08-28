@@ -30,11 +30,12 @@ func (b *Board) InsertPieces(pieces []Movable) {
 	}
 }
 
-// Used for simulating movement when cloning board.
-func (b *Board) MovePieceSim(piece Movable, pos Position) {
-	prevPos := piece.GetPosition()
-	b.grid[prevPos.Row][prevPos.Col] = nil
-	b.grid[pos.Row][pos.Col] = piece
+func (b *Board) MovePieceSim(from, to Position) {
+	piece, _ := b.GetPiece(from)
+
+	(*b.grid)[from.Row][from.Col] = nil
+	(*b.grid)[to.Row][to.Col] = piece
+	piece.SetPosition(to)
 }
 
 // Moves piece from piece.Pos to pos and returns captured piece
@@ -56,8 +57,16 @@ func (b *Board) IsOccupied(pos Position) bool {
 }
 
 func (b *Board) Clone() *Board {
-	grid := *b.grid
-	return &Board{grid: &grid}
+	newGrid := &[8][8]Movable{}
+	for i := 0; i < 8; i++ {
+		for j := 0; j < 8; j++ {
+			piece := (*b.grid)[i][j]
+			if piece != nil {
+				newGrid[i][j] = piece.Clone() // usa Clone() de la pieza concreta
+			}
+		}
+	}
+	return &Board{grid: newGrid}
 }
 
 func (b *Board) IsChecked(p *Player) bool {

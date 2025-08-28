@@ -9,6 +9,7 @@ type Movable interface {
 	GetValue() int
 	String() string
 	HasMoved() bool
+	Clone() Movable
 }
 
 type BasePiece struct {
@@ -27,6 +28,27 @@ func NewBasePiece(white bool, value int, pos Position, directions []Direction) *
 		Directions: directions,
 		hasMoved:   false,
 	}
+}
+
+func (bp *BasePiece) AttackedSquares(b *Board) map[Position]bool {
+	return bp.AttackedSquaresDefault(b)
+}
+
+func (bp *BasePiece) LegalMoves(b *Board) map[Position]bool {
+	return bp.LegalMovesDefault(b)
+}
+
+func (bp *BasePiece) GetPosition() Position {
+	return bp.Pos
+}
+
+func (bp *BasePiece) SetPosition(pos Position) {
+	bp.Pos = pos
+	bp.hasMoved = true
+}
+
+func (bp *BasePiece) IsWhite() bool {
+	return bp.White
 }
 
 func (bp *BasePiece) AttackedSquaresDefault(b *Board) map[Position]bool {
@@ -54,16 +76,33 @@ func (bp *BasePiece) LegalMovesDefault(b *Board) map[Position]bool {
 	return moves
 }
 
-// Updates piece position
-func (bp *BasePiece) SetPosition(pos Position) {
-	bp.Pos = pos
-	bp.hasMoved = true
-}
-
 func (bp *BasePiece) GetValue() int {
 	return bp.Value
 }
 
+func (bp *BasePiece) String() string {
+	color := "w"
+
+	if !bp.White {
+		color = "b"
+	}
+
+	return "BP" + color
+}
+
 func (bp *BasePiece) HasMoved() bool {
 	return bp.hasMoved
+}
+
+func (bp *BasePiece) CloneBase() *BasePiece {
+	if bp == nil {
+		return nil
+	}
+	cp := *bp
+	// si Directions es slice, copiarlo también para que no compartan backing array
+	if bp.Directions != nil {
+		cp.Directions = make([]Direction, len(bp.Directions))
+		copy(cp.Directions, bp.Directions)
+	}
+	return &cp
 }

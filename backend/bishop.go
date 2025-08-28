@@ -47,3 +47,7 @@ func (b *Bishop) String() string {
 
 	return "B" + color
 }
+
+func (b *Bishop) Clone() Movable {
+	return &Bishop{BasePiece: b.BasePiece.CloneBase()}
+}

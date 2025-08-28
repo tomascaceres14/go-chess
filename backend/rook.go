@@ -51,3 +51,7 @@ func (r *Rook) String() string {
 
 	return "R" + color
 }
+
+func (r *Rook) Clone() Movable {
+	return &Rook{BasePiece: r.BasePiece.CloneBase()}
+}

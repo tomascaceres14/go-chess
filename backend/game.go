@@ -10,6 +10,7 @@ type Game struct {
 	PWhite, PBlack *Player
 	Captures       []Movable
 	WhiteTurn      bool
+	Moves          []Move
 }
 
 // Generates a new board with classic chess configuration
@@ -25,6 +26,7 @@ func NewGame(whites, blacks *Player) *Game {
 		PBlack:    blacks,
 		Captures:  []Movable{},
 		WhiteTurn: true,
+		Moves:     []Move{},
 	}
 
 	// Pawns
@@ -34,37 +36,35 @@ func NewGame(whites, blacks *Player) *Game {
 	}
 
 	// Rooks
-	game.board.InsertPiece(NewRook(Pos("A8"), blacks)) // black
-	game.board.InsertPiece(NewRook(Pos("H8"), blacks)) // black
-	game.board.InsertPiece(NewRook(Pos("A1"), whites)) // white
-	game.board.InsertPiece(NewRook(Pos("H1"), whites)) // white
+	game.board.InsertPiece(NewRook(Pos("a8"), blacks)) // black
+	game.board.InsertPiece(NewRook(Pos("h8"), blacks)) // black
+	game.board.InsertPiece(NewRook(Pos("a1"), whites)) // white
+	game.board.InsertPiece(NewRook(Pos("h1"), whites)) // white
 
 	// Knights
-	game.board.InsertPiece(NewKnight(Pos("B8"), blacks)) // black
-	game.board.InsertPiece(NewKnight(Pos("G8"), blacks)) // black
-	game.board.InsertPiece(NewKnight(Pos("B1"), whites)) // white
-	game.board.InsertPiece(NewKnight(Pos("G1"), whites)) // white
+	game.board.InsertPiece(NewKnight(Pos("b8"), blacks)) // black
+	game.board.InsertPiece(NewKnight(Pos("g8"), blacks)) // black
+	game.board.InsertPiece(NewKnight(Pos("b1"), whites)) // white
+	game.board.InsertPiece(NewKnight(Pos("g1"), whites)) // white
 
 	// Bishops
-	game.board.InsertPiece(NewBishop(Pos("C8"), blacks)) // black
-	game.board.InsertPiece(NewBishop(Pos("F8"), blacks)) // black
-	game.board.InsertPiece(NewBishop(Pos("C1"), whites)) // white
-	game.board.InsertPiece(NewBishop(Pos("F1"), whites)) // white
+	game.board.InsertPiece(NewBishop(Pos("c8"), blacks)) // black
+	game.board.InsertPiece(NewBishop(Pos("f8"), blacks)) // black
+	game.board.InsertPiece(NewBishop(Pos("c1"), whites)) // white
+	game.board.InsertPiece(NewBishop(Pos("f1"), whites)) // white
 
 	// Queens
-	game.board.InsertPiece(NewQueen(Pos("D8"), blacks)) // black
-	game.board.InsertPiece(NewQueen(Pos("D1"), whites)) // white
+	game.board.InsertPiece(NewQueen(Pos("d8"), blacks)) // black
+	game.board.InsertPiece(NewQueen(Pos("d1"), whites)) // white
 
 	// Kings
-	bKing := NewKing(Pos("E8"), blacks)
+	bKing := NewKing(Pos("e8"), blacks)
 	blacks.King = bKing
 	game.board.InsertPiece(bKing)
 
-	wKing := NewKing(Pos("E1"), whites)
+	wKing := NewKing(Pos("e1"), whites)
 	whites.King = wKing
 	game.board.InsertPiece(wKing)
-
-	game.board.InsertPiece(NewPawn(Pos("e5"), whites))
 
 	return game
 }
@@ -140,8 +140,18 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		fmt.Println("Stalemate pal :(")
 	}
 
+	move := Move{
+		PieceCopy: piece.Clone(),
+		From:      from,
+		To:        to,
+		Capture:   capture,
+	}
+
+	g.Moves = append(g.Moves, move)
+
 	g.WhiteTurn = !g.WhiteTurn
 
+	fmt.Println(g.Moves)
 	return nil
 }
 
@@ -156,6 +166,17 @@ func (g *Game) GetPlayer(white bool) *Player {
 	return player
 }
 
+// Returns pointer to player based on color
+func (g *Game) GetPlayerCopy(white bool) Player {
+	player := g.PWhite
+
+	if !white {
+		player = g.PBlack
+	}
+
+	return *player
+}
+
 // Returns pointer to player based on player
 func (g *Game) GetPlayerOpponent(p *Player) *Player {
 	opponent := g.PBlack
@@ -165,4 +186,15 @@ func (g *Game) GetPlayerOpponent(p *Player) *Player {
 	}
 
 	return opponent
+}
+
+// Returns pointer to player based on player
+func (g *Game) GetPlayerOpponentCopy(white bool) Player {
+	opponent := g.PBlack
+
+	if !white {
+		opponent = g.PWhite
+	}
+
+	return *opponent
 }
