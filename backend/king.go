@@ -34,11 +34,11 @@ func NewKing(pos Position, p *Player) *King {
 	return king
 }
 
-func (p *King) AttackedSquares(b *Board) map[Position]bool {
+func (k *King) AttackedSquares(b *Board) map[Position]bool {
 	positions := map[Position]bool{}
 
-	for _, v := range p.Directions {
-		pos := Position{Row: p.Pos.Row + v.dx, Col: p.Pos.Col + v.dy}
+	for _, v := range k.Directions {
+		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
 
 		if !pos.InBounds() {
 			continue
@@ -46,7 +46,7 @@ func (p *King) AttackedSquares(b *Board) map[Position]bool {
 
 		pieceAt, occupied := b.GetPiece(pos)
 
-		if !occupied || pieceAt.IsWhite() != p.White {
+		if !occupied || pieceAt.IsWhite() != k.White {
 			positions[pos] = true
 			continue
 		}
@@ -55,52 +55,56 @@ func (p *King) AttackedSquares(b *Board) map[Position]bool {
 	return positions
 }
 
-func (p *King) LegalMoves(b *Board) map[Position]bool {
-	legalMoves := p.LegalMovesDefault(b)
+func (k *King) LegalMoves(b *Board) map[Position]bool {
+	legalMoves := k.LegalMovesDefault(b)
 
-	if p.hasMoved {
+	if k.hasMoved {
 		return legalMoves
 	}
 
-	shortCastlePos := Position{Row: p.Pos.Row, Col: 7}
-	longCastlePos := Position{Row: p.Pos.Row, Col: 0}
+	shortCastlePos := Position{Row: k.Pos.Row, Col: 7}
+	longCastlePos := Position{Row: k.Pos.Row, Col: 0}
 
 	shortRook, occ := b.GetPiece(shortCastlePos)
-	if occ && !shortRook.HasMoved() && b.IsRowPathClear(p.Pos, shortCastlePos) {
-		legalMoves[Position{Row: p.Pos.Row, Col: 6}] = true
+	if occ && !shortRook.HasMoved() && b.IsRowPathClear(k.Pos, shortCastlePos) {
+		legalMoves[Position{Row: k.Pos.Row, Col: 6}] = true
 	}
 
 	longRook, occ := b.GetPiece(longCastlePos)
-	if occ && !longRook.HasMoved() && b.IsRowPathClear(p.Pos, longCastlePos) {
-		legalMoves[Position{Row: p.Pos.Row, Col: 2}] = true
+	if occ && !longRook.HasMoved() && b.IsRowPathClear(k.Pos, longCastlePos) {
+		legalMoves[Position{Row: k.Pos.Row, Col: 2}] = true
 	}
 
 	return legalMoves
 }
 
-func (p *King) GetPosition() Position {
-	return p.Pos
+func (k *King) GetPosition() Position {
+	return k.Pos
 }
 
-func (p *King) SetPosition(pos Position) {
-	p.hasMoved = true
-	p.Pos = pos
+func (k *King) SetPosition(pos Position) {
+	k.hasMoved = true
+	k.Pos = pos
 }
 
-func (p *King) IsWhite() bool {
-	return p.White
+func (k *King) IsWhite() bool {
+	return k.White
 }
 
-func (p *King) String() string {
-	color := "w"
+func (k *King) String() string {
+	piece := "♔"
 
-	if !p.White {
-		color = "b"
+	if !k.White {
+		piece = "♚"
 	}
 
-	return "K" + color
+	return piece
 }
 
-func (p *King) Clone() Movable {
-	return &King{BasePiece: p.BasePiece.CloneBase()}
+func (k *King) Clone() Movable {
+	return &King{BasePiece: k.BasePiece.CloneBase()}
+}
+
+func (k *King) GetType() PieceType {
+	return KingType
 }

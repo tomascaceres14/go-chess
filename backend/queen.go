@@ -43,15 +43,19 @@ func (q *Queen) IsWhite() bool {
 }
 
 func (q *Queen) String() string {
-	color := "w"
+	piece := "♕"
 
 	if !q.White {
-		color = "b"
+		piece = "♛"
 	}
 
-	return "Q" + color
+	return piece
 }
 
 func (q *Queen) Clone() Movable {
 	return &Queen{BasePiece: q.BasePiece.CloneBase()}
+}
+
+func (q *Queen) GetType() PieceType {
+	return QueenType
 }

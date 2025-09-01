@@ -65,15 +65,19 @@ func (n *Knight) IsWhite() bool {
 }
 
 func (n *Knight) String() string {
-	color := "w"
+	piece := "♘"
 
 	if !n.White {
-		color = "b"
+		piece = "♞"
 	}
 
-	return "N" + color
+	return piece
 }
 
 func (n *Knight) Clone() Movable {
 	return &Knight{BasePiece: n.BasePiece.CloneBase()}
+}
+
+func (n *Knight) GetType() PieceType {
+	return KnightType
 }

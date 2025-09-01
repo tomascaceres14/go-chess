@@ -1,5 +1,17 @@
 package main
 
+type PieceType int
+
+const (
+	KingType PieceType = iota
+	QueenType
+	RookType
+	BishopType
+	KnightType
+	PawnType
+	BasePieceType
+)
+
 type Movable interface {
 	AttackedSquares(b *Board) map[Position]bool
 	LegalMoves(b *Board) map[Position]bool
@@ -10,6 +22,7 @@ type Movable interface {
 	String() string
 	HasMoved() bool
 	Clone() Movable
+	GetType() PieceType
 }
 
 type BasePiece struct {
@@ -105,4 +118,8 @@ func (bp *BasePiece) CloneBase() *BasePiece {
 		copy(cp.Directions, bp.Directions)
 	}
 	return &cp
+}
+
+func (bp *BasePiece) GetType() PieceType {
+	return BasePieceType
 }

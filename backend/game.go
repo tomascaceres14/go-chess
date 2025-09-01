@@ -13,6 +13,19 @@ type Game struct {
 	MoveHistory    []Move
 }
 
+var castlingPositions = map[Position]struct {
+	rookFrom Position
+	rookTo   Position
+}{
+	// whites
+	Pos("g1"): {rookFrom: Pos("h1"), rookTo: Pos("f1")},
+	Pos("c1"): {rookFrom: Pos("a1"), rookTo: Pos("d1")},
+
+	// blacks
+	Pos("g8"): {rookFrom: Pos("h8"), rookTo: Pos("f8")},
+	Pos("c8"): {rookFrom: Pos("a8"), rookTo: Pos("d8")},
+}
+
 // Generates a new board with classic chess configuration
 func NewGame(whites, blacks *Player) *Game {
 
@@ -112,11 +125,22 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		return fmt.Errorf("%s can't move from %s to %s.", piece.String(), from, to)
 	}
 
+	// Check if the move leaves king vulnerable
 	if !IsMoveSafeToKing(piece, to, g) {
 		return fmt.Errorf("%s to %s leaves king checked.", piece, to)
 	}
 
+	// make move and return captured piece, if any
 	capture := g.board.MovePiece(piece, to)
+
+	// Special moves: castling, promoting, etc.
+	switch piece.GetType() {
+	case KingType:
+		if rookMove, ok := castlingPositions[to]; ok {
+			rook, _ := g.GetPiece(rookMove.rookFrom, player)
+			g.board.MovePiece(rook, rookMove.rookTo)
+		}
+	}
 
 	if capture != nil {
 		opponent.Pieces = DeletePiece(opponent.Pieces, capture)
@@ -151,7 +175,7 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	g.WhiteTurn = !g.WhiteTurn
 
-	fmt.Println(g.MoveHistory)
+	//fmt.Println(g.MoveHistory)
 	return nil
 }
 

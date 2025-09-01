@@ -43,15 +43,19 @@ func (r *Rook) IsWhite() bool {
 }
 
 func (r *Rook) String() string {
-	color := "w"
+	piece := "♖"
 
 	if !r.White {
-		color = "b"
+		piece = "♜"
 	}
 
-	return "R" + color
+	return piece
 }
 
 func (r *Rook) Clone() Movable {
 	return &Rook{BasePiece: r.BasePiece.CloneBase()}
+}
+
+func (r *Rook) GetType() PieceType {
+	return RookType
 }

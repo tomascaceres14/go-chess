@@ -39,15 +39,19 @@ func (b *Bishop) IsWhite() bool {
 }
 
 func (b *Bishop) String() string {
-	color := "w"
+	piece := "♗"
 
 	if !b.White {
-		color = "b"
+		piece = "♝"
 	}
 
-	return "B" + color
+	return piece
 }
 
 func (b *Bishop) Clone() Movable {
 	return &Bishop{BasePiece: b.BasePiece.CloneBase()}
+}
+
+func (b *Bishop) GetType() PieceType {
+	return BishopType
 }

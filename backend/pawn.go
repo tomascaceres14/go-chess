@@ -93,15 +93,19 @@ func (p *Pawn) IsWhite() bool {
 }
 
 func (p *Pawn) String() string {
-	color := "w"
+	piece := "♙"
 
 	if !p.White {
-		color = "b"
+		piece = "♟"
 	}
 
-	return "P" + color
+	return piece
 }
 
 func (p *Pawn) Clone() Movable {
 	return &Pawn{BasePiece: p.BasePiece.CloneBase()}
+}
+
+func (p *Pawn) GetType() PieceType {
+	return PawnType
 }

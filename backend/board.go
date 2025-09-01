@@ -108,7 +108,7 @@ func (b *Board) String() string {
 		output += "\n"
 	}
 
-	output += "   A  B  C  D  E  F  G  H\n"
+	output += "  A  B  C  D  E  F  G  H\n"
 
 	return output
 }
