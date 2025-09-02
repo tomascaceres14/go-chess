@@ -15,13 +15,8 @@ func (b *Board) GetPiece(pos Position) (Movable, bool) {
 }
 
 // Inserts piece in piece.Pos
-func (b *Board) InsertPiece(piece Movable) bool {
-	if b.IsOccupied(piece.GetPosition()) {
-		return false
-	}
-
+func (b *Board) InsertPiece(piece Movable) {
 	b.grid[piece.GetPosition().Row][piece.GetPosition().Col] = piece
-	return true
 }
 
 func (b *Board) InsertPieces(pieces []Movable) {
@@ -62,7 +57,7 @@ func (b *Board) Clone() *Board {
 		for j := 0; j < 8; j++ {
 			piece := (*b.grid)[i][j]
 			if piece != nil {
-				newGrid[i][j] = piece.Clone() // usa Clone() de la pieza concreta
+				newGrid[i][j] = piece.Clone()
 			}
 		}
 	}
@@ -95,7 +90,7 @@ func (b *Board) IsRowPathClear(from, to Position) bool {
 func (b *Board) String() string {
 	output := ""
 
-	for row := 7; row >= 0; row-- { // Mostrar del 8 al 1
+	for row := 7; row >= 0; row-- {
 		output += fmt.Sprintf("%d ", row+1)
 		for col := 0; col < 8; col++ {
 			piece := b.grid[row][col]

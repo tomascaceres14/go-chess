@@ -140,6 +140,10 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 			rook, _ := g.GetPiece(rookMove.rookFrom, player)
 			g.board.MovePiece(rook, rookMove.rookTo)
 		}
+	case PawnType:
+		if to.Row == 0 || to.Row == 7 {
+			g.board.InsertPiece(NewQueen(to, player))
+		}
 	}
 
 	if capture != nil {
