@@ -44,8 +44,8 @@ func NewGame(whites, blacks *Player) *Game {
 
 	// Pawns
 	for i := range 8 {
-		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"7"), blacks)) // black
-		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"2"), whites)) // white
+		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"5"), blacks)) // black
+		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"4"), whites)) // white
 	}
 
 	// Rooks
@@ -67,7 +67,7 @@ func NewGame(whites, blacks *Player) *Game {
 	game.board.InsertPiece(NewBishop(Pos("f1"), whites)) // white
 
 	// Queens
-	game.board.InsertPiece(NewQueen(Pos("d8"), blacks)) // black
+	game.board.InsertPiece(NewQueen(Pos("e3"), blacks)) // black
 	game.board.InsertPiece(NewQueen(Pos("d1"), whites)) // white
 
 	// Kings
@@ -142,7 +142,9 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		}
 	case PawnType:
 		if to.Row == 0 || to.Row == 7 {
-			g.board.InsertPiece(NewQueen(to, player))
+			queen := NewQueen(to, player)
+			g.board.InsertPiece(queen)
+			queen.SetMoved(true)
 		}
 	}
 

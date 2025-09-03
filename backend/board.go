@@ -19,7 +19,7 @@ func (b *Board) InsertPiece(piece Movable) {
 	b.grid[piece.GetPosition().Row][piece.GetPosition().Col] = piece
 }
 
-func (b *Board) InsertPieces(pieces []Movable) {
+func (b *Board) InsertPieceList(pieces []Movable) {
 	for _, v := range pieces {
 		b.InsertPiece(v)
 	}
@@ -43,6 +43,7 @@ func (b *Board) MovePiece(piece Movable, pos Position) Movable {
 	b.grid[pos.Row][pos.Col] = piece
 
 	piece.SetPosition(pos)
+	piece.SetMoved(true)
 
 	return capture
 }

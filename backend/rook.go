@@ -21,8 +21,8 @@ func NewRook(pos Position, p *Player) *Rook {
 	return rook
 }
 
-func (r *Rook) AttackedSquares(b *Board) map[Position]bool {
-	return r.AttackedSquaresDefault(b)
+func (r *Rook) VisibleSquares(b *Board) map[Position]bool {
+	return r.VisibleSquaresDefault(b)
 }
 
 func (r *Rook) LegalMoves(b *Board) map[Position]bool {

@@ -23,7 +23,7 @@ func NewPawn(pos Position, p *Player) *Pawn {
 	return pawn
 }
 
-func (p *Pawn) AttackedSquares(b *Board) map[Position]bool {
+func (p *Pawn) VisibleSquares(b *Board) map[Position]bool {
 
 	positions := map[Position]bool{}
 	front := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col}
@@ -50,7 +50,7 @@ func (p *Pawn) AttackedSquares(b *Board) map[Position]bool {
 
 func (p *Pawn) LegalMoves(b *Board) map[Position]bool {
 
-	positions := p.AttackedSquares(b)
+	positions := p.VisibleSquares(b)
 	legalMoves := map[Position]bool{}
 
 	for pos := range positions {

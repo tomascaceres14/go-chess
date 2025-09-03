@@ -29,7 +29,7 @@ func (p *Player) AttackedSquares(b *Board) map[Position]bool {
 
 	pieces := p.Pieces
 	for _, v := range pieces {
-		for k := range v.AttackedSquares(b) {
+		for k := range v.VisibleSquares(b) {
 			threats[k] = true
 		}
 	}

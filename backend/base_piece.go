@@ -13,7 +13,7 @@ const (
 )
 
 type Movable interface {
-	AttackedSquares(b *Board) map[Position]bool
+	VisibleSquares(b *Board) map[Position]bool
 	LegalMoves(b *Board) map[Position]bool
 	GetPosition() Position
 	SetPosition(pos Position)
@@ -21,6 +21,7 @@ type Movable interface {
 	GetValue() int
 	String() string
 	HasMoved() bool
+	SetMoved(moved bool)
 	Clone() Movable
 	GetType() PieceType
 }
@@ -43,8 +44,33 @@ func NewBasePiece(white bool, value int, pos Position, directions []Direction) *
 	}
 }
 
-func (bp *BasePiece) AttackedSquares(b *Board) map[Position]bool {
-	return bp.AttackedSquaresDefault(b)
+func (bp *BasePiece) VisibleSquaresDefault(b *Board) map[Position]bool {
+	positions := map[Position]bool{}
+
+	for _, v := range bp.Directions {
+		dir := Position{Row: bp.Pos.Row + v.dx, Col: bp.Pos.Col + v.dy}
+		CastRay(dir, v.dx, v.dy, b, bp.White, positions)
+	}
+
+	return positions
+}
+
+func (bp *BasePiece) VisibleSquares(b *Board) map[Position]bool {
+	return bp.VisibleSquaresDefault(b)
+}
+
+func (bp *BasePiece) LegalMovesDefault(b *Board) map[Position]bool {
+	threats := bp.VisibleSquaresDefault(b)
+	moves := map[Position]bool{}
+	for k := range threats {
+		piece, occupied := b.GetPiece(k)
+		if !occupied || piece.IsWhite() != bp.White {
+			moves[k] = true
+			continue
+		}
+	}
+
+	return moves
 }
 
 func (bp *BasePiece) LegalMoves(b *Board) map[Position]bool {
@@ -62,31 +88,6 @@ func (bp *BasePiece) SetPosition(pos Position) {
 
 func (bp *BasePiece) IsWhite() bool {
 	return bp.White
-}
-
-func (bp *BasePiece) AttackedSquaresDefault(b *Board) map[Position]bool {
-	positions := map[Position]bool{}
-
-	for _, v := range bp.Directions {
-		dir := Position{Row: bp.Pos.Row + v.dx, Col: bp.Pos.Col + v.dy}
-		CastRay(dir, v.dx, v.dy, b, bp.White, positions)
-	}
-
-	return positions
-}
-
-func (bp *BasePiece) LegalMovesDefault(b *Board) map[Position]bool {
-	threats := bp.AttackedSquaresDefault(b)
-	moves := map[Position]bool{}
-	for k := range threats {
-		piece, occupied := b.GetPiece(k)
-		if !occupied || piece.IsWhite() != bp.White {
-			moves[k] = true
-			continue
-		}
-	}
-
-	return moves
 }
 
 func (bp *BasePiece) GetValue() int {
@@ -112,7 +113,7 @@ func (bp *BasePiece) CloneBase() *BasePiece {
 		return nil
 	}
 	cp := *bp
-	// si Directions es slice, copiarlo también para que no compartan backing array
+	// Dont believe is necessary. Will check
 	if bp.Directions != nil {
 		cp.Directions = make([]Direction, len(bp.Directions))
 		copy(cp.Directions, bp.Directions)
@@ -122,4 +123,8 @@ func (bp *BasePiece) CloneBase() *BasePiece {
 
 func (bp *BasePiece) GetType() PieceType {
 	return BasePieceType
+}
+
+func (bp *BasePiece) SetMoved(moved bool) {
+	bp.hasMoved = moved
 }

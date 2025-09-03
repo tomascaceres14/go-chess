@@ -26,8 +26,8 @@ func NewQueen(pos Position, p *Player) *Queen {
 	return queen
 }
 
-func (q *Queen) AttackedSquares(b *Board) map[Position]bool {
-	return q.AttackedSquaresDefault(b)
+func (q *Queen) VisibleSquares(b *Board) map[Position]bool {
+	return q.VisibleSquaresDefault(b)
 }
 
 func (q *Queen) LegalMoves(b *Board) map[Position]bool {

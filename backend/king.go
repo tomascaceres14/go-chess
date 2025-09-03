@@ -34,7 +34,7 @@ func NewKing(pos Position, p *Player) *King {
 	return king
 }
 
-func (k *King) AttackedSquares(b *Board) map[Position]bool {
+func (k *King) VisibleSquares(b *Board) map[Position]bool {
 	positions := map[Position]bool{}
 
 	for _, v := range k.Directions {
@@ -56,7 +56,7 @@ func (k *King) AttackedSquares(b *Board) map[Position]bool {
 }
 
 func (k *King) LegalMoves(b *Board) map[Position]bool {
-	legalMoves := k.LegalMovesDefault(b)
+	legalMoves := k.VisibleSquares(b)
 
 	if k.hasMoved {
 		return legalMoves

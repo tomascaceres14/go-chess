@@ -100,7 +100,7 @@ func AttackedByColor(b *Board, white bool) map[Position]bool {
 		for j := range 8 {
 			p := (*b.grid)[i][j]
 			if p != nil && p.IsWhite() == white {
-				for sq := range p.AttackedSquares(b) {
+				for sq := range p.VisibleSquares(b) {
 					threats[sq] = true
 				}
 			}
