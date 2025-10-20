@@ -102,7 +102,6 @@ func (p *Pawn) String() string {
 	return piece
 }
 
-
 func (p *Pawn) Clone() Movable {
 	return &Pawn{BasePiece: p.BasePiece.CloneBase()}
 }

@@ -16,6 +16,10 @@ func NewMove(piece, capture Movable, from, to Position, isCheck bool) Move {
 
 	if capture == nil {
 		takes = ""
+	} else {
+		if _, ok := piece.(*Pawn); ok {
+			takes = from.GetCol() + takes
+		}
 	}
 
 	if isCheck {
@@ -33,6 +37,6 @@ func NewMove(piece, capture Movable, from, to Position, isCheck bool) Move {
 	}
 }
 
-func (m *Move) String() string {
+func (m Move) String() string {
 	return m.AlgebraicNotation
 }

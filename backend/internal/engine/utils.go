@@ -1,16 +1,7 @@
 package engine
 
-import (
-	"fmt"
-)
-
 // Board columns
 const cols = "abcdefgh"
-
-// Error printing for debugging
-func PrintError(err error) {
-	fmt.Printf("--- ERROR: %v\n", err)
-}
 
 // Recursive function to cast a ray and check for collisions in direction vector {dx, dy}.
 // Returns map of possible positions
@@ -125,10 +116,4 @@ func FindKingPos(b *Board, white bool) (Position, bool) {
 	return Position{}, false
 }
 
-func SwitchTurns(p1, p2 *Player, white bool) *Player {
-	if p1.White == white {
-		return p1
-	}
 
-	return p2
-}

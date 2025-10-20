@@ -79,6 +79,8 @@ func NewGame(whites, blacks *Player) *Game {
 	whites.King = wKing
 	game.board.InsertPiece(wKing)
 
+	fmt.Println(game.board)
+
 	return game
 }
 
@@ -169,19 +171,16 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 	} else if len(player.Pieces) == 1 && len(opponent.Pieces) == 1 {
 		fmt.Println("Stalemate pal :(")
 	}
-
-	move := Move{
-		PieceCopy: piece.Clone(),
-		From:      from,
-		To:        to,
-		Capture:   capture,
-	}
+	move := NewMove(piece.Clone(), capture, from, to, false)
 
 	g.MoveHistory = append(g.MoveHistory, move)
-
-	g.WhiteTurn = !g.WhiteTurn
-
 	fmt.Println(g.MoveHistory)
+	for _, v := range g.MoveHistory {
+		fmt.Println(v)
+	}
+	g.WhiteTurn = !g.WhiteTurn
+	fmt.Println(g.board)
+
 	return nil
 }
 

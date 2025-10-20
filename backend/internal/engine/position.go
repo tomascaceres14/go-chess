@@ -45,8 +45,12 @@ func (p Position) InBounds() bool {
 	return (0 <= p.Col && p.Col <= 7) && (0 <= p.Row && p.Row <= 7)
 }
 
+func (p Position) GetCol() string {
+	return string(cols[p.Col])
+}
+
 func (p Position) String() string {
-	return fmt.Sprintf("{%v%v}", string(cols[p.Col]), p.Row+1)
+	return fmt.Sprintf("%v%v", string(cols[p.Col]), p.Row+1)
 }
 
 func ContainsPosition(list []Position, pos Position) bool {

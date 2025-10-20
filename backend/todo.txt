@@ -1,0 +1,2 @@
+- Detect if king in check for algebraic notation
+- Implement FEN strings
