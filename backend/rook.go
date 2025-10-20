@@ -1,4 +1,4 @@
-package main
+package engine
 
 type Rook struct {
 	*BasePiece
@@ -50,6 +50,10 @@ func (r *Rook) String() string {
 	}
 
 	return piece
+}
+
+func (b *Rook) GetAlgebraicString() string {
+	return "R"
 }
 
 func (r *Rook) Clone() Movable {

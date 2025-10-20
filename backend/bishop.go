@@ -1,4 +1,4 @@
-package main
+package engine
 
 type Bishop struct {
 	*BasePiece
@@ -46,6 +46,10 @@ func (b *Bishop) String() string {
 	}
 
 	return piece
+}
+
+func (b *Bishop) GetAlgebraicString() string {
+	return "B"
 }
 
 func (b *Bishop) Clone() Movable {

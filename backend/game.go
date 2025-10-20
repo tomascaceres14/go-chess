@@ -1,4 +1,4 @@
-package main
+package engine
 
 import (
 	"errors"
@@ -44,8 +44,8 @@ func NewGame(whites, blacks *Player) *Game {
 
 	// Pawns
 	for i := range 8 {
-		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"5"), blacks)) // black
-		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"4"), whites)) // white
+		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"7"), blacks)) // black
+		game.board.InsertPiece(NewPawn(Pos(GetCol(i)+"2"), whites)) // white
 	}
 
 	// Rooks
@@ -67,7 +67,7 @@ func NewGame(whites, blacks *Player) *Game {
 	game.board.InsertPiece(NewBishop(Pos("f1"), whites)) // white
 
 	// Queens
-	game.board.InsertPiece(NewQueen(Pos("e3"), blacks)) // black
+	game.board.InsertPiece(NewQueen(Pos("d8"), blacks)) // black
 	game.board.InsertPiece(NewQueen(Pos("d1"), whites)) // white
 
 	// Kings
@@ -181,7 +181,7 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	g.WhiteTurn = !g.WhiteTurn
 
-	//fmt.Println(g.MoveHistory)
+	fmt.Println(g.MoveHistory)
 	return nil
 }
 

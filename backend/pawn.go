@@ -1,4 +1,4 @@
-package main
+package engine
 
 type Pawn struct {
 	*BasePiece
@@ -101,6 +101,7 @@ func (p *Pawn) String() string {
 
 	return piece
 }
+
 
 func (p *Pawn) Clone() Movable {
 	return &Pawn{BasePiece: p.BasePiece.CloneBase()}

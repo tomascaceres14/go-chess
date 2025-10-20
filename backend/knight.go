@@ -1,4 +1,4 @@
-package main
+package engine
 
 type Knight struct {
 	*BasePiece
@@ -72,6 +72,10 @@ func (n *Knight) String() string {
 	}
 
 	return piece
+}
+
+func (b *Knight) GetAlgebraicString() string {
+	return "N"
 }
 
 func (n *Knight) Clone() Movable {

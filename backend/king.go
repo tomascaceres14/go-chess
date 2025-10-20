@@ -1,4 +1,4 @@
-package main
+package engine
 
 type King struct {
 	*BasePiece
@@ -99,6 +99,10 @@ func (k *King) String() string {
 	}
 
 	return piece
+}
+
+func (b *King) GetAlgebraicString() string {
+	return "K"
 }
 
 func (k *King) Clone() Movable {

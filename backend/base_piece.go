@@ -1,4 +1,4 @@
-package main
+package engine
 
 type PieceType int
 
@@ -20,6 +20,7 @@ type Movable interface {
 	IsWhite() bool
 	GetValue() int
 	String() string
+	GetAlgebraicString() string
 	HasMoved() bool
 	SetMoved(moved bool)
 	Clone() Movable
@@ -102,6 +103,10 @@ func (bp *BasePiece) String() string {
 	}
 
 	return "BP" + color
+}
+
+func (b *BasePiece) GetAlgebraicString() string {
+	return ""
 }
 
 func (bp *BasePiece) HasMoved() bool {

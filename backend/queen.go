@@ -1,4 +1,4 @@
-package main
+package engine
 
 type Queen struct {
 	*BasePiece
@@ -50,6 +50,10 @@ func (q *Queen) String() string {
 	}
 
 	return piece
+}
+
+func (b *Queen) GetAlgebraicString() string {
+	return "Q"
 }
 
 func (q *Queen) Clone() Movable {
