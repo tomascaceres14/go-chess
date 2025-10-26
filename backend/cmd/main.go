@@ -6,8 +6,21 @@ import (
 	"os"
 	"strings"
 
+	_ "github.com/lib/pq"
+
 	"github.com/tomascaceres14/go-chess/backend/internal/engine"
 )
+
+type apiConfig struct {
+	//DbQueries   *database.Queries
+	Platform    string
+	JwtSecret   string
+	PolkaAPIKey string
+}
+
+type apiError struct {
+	Error string `json:"error"`
+}
 
 // Error printing for debugging
 func PrintError(err error) {
@@ -23,6 +36,29 @@ func SwitchTurns(p1, p2 *engine.Player, white bool) *engine.Player {
 }
 
 func main() {
+
+	const port = "8080"
+
+	// godotenv.Load(".env")
+
+	// dbURL := os.Getenv("DB_URL")
+	// platform := os.Getenv("PLATFORM")
+	// jwtSecret := os.Getenv("JWT_SECRET")
+
+	// db, err := sql.Open("postgres", dbURL)
+	// if err != nil {
+	// 	log.Fatal("DB connection error")
+	// }
+
+	// dbQueries := database.New(db)
+
+	// apiCfg := apiConfig{
+	// 	DbQueries: dbQueries,
+	// 	Platform:  platform,
+	// 	JwtSecret: jwtSecret,
+	// }
+
+	// mux := http.NewServeMux()
 
 	reader := bufio.NewReader(os.Stdin)
 
