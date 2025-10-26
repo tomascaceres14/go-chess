@@ -171,7 +171,8 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 	} else if len(player.Pieces) == 1 && len(opponent.Pieces) == 1 {
 		fmt.Println("Stalemate pal :(")
 	}
-	move := NewMove(piece.Clone(), capture, from, to, false)
+
+	move := NewMove(piece.Clone(), capture, from, to, opponent.Checked)
 
 	g.MoveHistory = append(g.MoveHistory, move)
 	fmt.Println(g.MoveHistory)
