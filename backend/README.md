@@ -22,6 +22,8 @@
 | [x]     | Castling                             | King-side and queen-side, with rule validation (path, check, etc.)         |
 | [x]     | Pawn promotion                       | Allow promotion when reaching final rank                                   |
 | [x]     | Move history                         | Store move history and print moves in algebraic notation                   |
+| [ ]     | REST API                             | Make game playable in web through a rest api                               |
+| [ ]     | Position analisis                    | Judge a given position and analize who has a better position               |
 | [ ]     | Undo/Redo moves                      | Go back number of moves, follow multiple different lines.                  |
 | [ ]     | Win/Tie rules                        | 50 moves-rule, 3 move repetition, insufficient material, etc               |
 | [ ]     | Simple AI (random or heuristic)      | Select legal moves for basic bot opponent                                  |

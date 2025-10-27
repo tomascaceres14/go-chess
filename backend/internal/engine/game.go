@@ -6,11 +6,13 @@ import (
 )
 
 type Game struct {
+	Id             string
 	board          *Board
 	PWhite, PBlack *Player
 	Captures       []Movable
 	WhiteTurn      bool
 	MoveHistory    []Move
+	result string
 }
 
 var castlingPositions = map[Position]struct {
@@ -27,7 +29,7 @@ var castlingPositions = map[Position]struct {
 }
 
 // Generates a new board with classic chess configuration
-func NewGame(whites, blacks *Player) *Game {
+func NewGame(id string, whites, blacks *Player) *Game {
 
 	println("generating new board...")
 
