@@ -3,7 +3,6 @@ package engine
 import (
 	"errors"
 	"fmt"
-	"time"
 	"strings"
 )
 
@@ -12,14 +11,6 @@ var games map[string]*Game
 // Error printing for debugging
 func PrintError(err error) {
 	fmt.Printf("--- ERROR: %v\n", err)
-}
-
-func SwitchTurns(p1, p2 *Player, white bool) *Player {
-	if p1.White == white {
-		return p1
-	}
-
-	return p2
 }
 
 func StartGame(whiteName, blackName string) (string, error) {
@@ -34,24 +25,22 @@ func StartGame(whiteName, blackName string) (string, error) {
 	pWhite := NewPlayer(whiteName, true)
 	pBlack := NewPlayer(blackName, false)
 
-	now := time.Now()
-	timestamp := now.Format("20060201150405")
+	game := NewGame(pWhite, pBlack)
 
-	id := whiteName + "_" + blackName + "_" + timestamp
-	
-	if _, exists := games[id]; exists {
-		return id, nil
-	}
+	games[game.id] = game
 
-	games[id] = NewGame(id, pWhite, pBlack)
-
-	return id, nil
+	return game.id, nil
 }
 
-func MakeMove(id, from, to string, playerColor bool) {
+func MakeMove(id string, player *Player, from, to Position, playerColor bool) error {
 
 	// Validate id belonging to player and game state = playing
 
 	game := games[id]
-	
+
+	if err := game.MovePiece(from, to, player); err != nil {
+		return err
+	}
+
+	return nil
 }

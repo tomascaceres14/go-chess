@@ -3,18 +3,30 @@ package engine
 import (
 	"errors"
 	"fmt"
+	"time"
+)
+
+type GameStatus int
+
+const (
+	Aborted GameStatus = iota
+	Playing
+	WhiteWins
+	BlackWins
+	Draw
 )
 
 type Game struct {
-	Id             string
+	id             string
 	board          *Board
 	PWhite, PBlack *Player
 	Captures       []Movable
 	WhiteTurn      bool
-	MoveHistory    []Move
-	result string
+	moveHistory    []Move
+	status         GameStatus
 }
 
+// Mapping initial available castle square for king (key) and rook from/to movement option (value)
 var castlingPositions = map[Position]struct {
 	rookFrom Position
 	rookTo   Position
@@ -29,19 +41,26 @@ var castlingPositions = map[Position]struct {
 }
 
 // Generates a new board with classic chess configuration
-func NewGame(id string, whites, blacks *Player) *Game {
+func NewGame(whites, blacks *Player) *Game {
 
 	println("generating new board...")
 
 	board := [8][8]Movable{}
 
+	// Generate ID for match
+	now := time.Now()
+	timestamp := now.Format("20060201150405")
+	id := whites.Name + "_" + blacks.Name + "_" + timestamp
+
 	game := &Game{
+		id:          id,
 		board:       &Board{grid: &board},
 		PWhite:      whites,
 		PBlack:      blacks,
 		Captures:    []Movable{},
 		WhiteTurn:   true,
-		MoveHistory: []Move{},
+		moveHistory: []Move{},
+		status:      Playing,
 	}
 
 	// Pawns
@@ -94,7 +113,7 @@ func (g *Game) GetPiece(pos Position, player *Player) (Movable, error) {
 		return nil, fmt.Errorf("Position %v is empty.", pos)
 	}
 
-	// validar que pieza pertenezca a player
+	// Validate piece belonging to player
 	if piece.IsWhite() != player.White {
 		return nil, fmt.Errorf("Not your piece, %s.", player.Name)
 	}
@@ -103,9 +122,9 @@ func (g *Game) GetPiece(pos Position, player *Player) (Movable, error) {
 }
 
 // Moves piece in position `from` to position `to` if player is owner of piece
-func (g *Game) MovePiece(from, to Position, player *Player) error {
+func (game *Game) MovePiece(from, to Position, player *Player) error {
 
-	if !g.WhiteTurn == player.White {
+	if !game.WhiteTurn == player.White {
 		return fmt.Errorf("Not your turn, %s.", player.Name)
 	}
 
@@ -115,39 +134,39 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 	}
 
 	// Obtains opponent
-	opponent := g.GetPlayerOpponent(player)
+	opponent := game.GetPlayerOpponent(player)
 
 	// Obtains piece to move
-	piece, err := g.GetPiece(from, player)
+	piece, err := game.GetPiece(from, player)
 	if err != nil {
 		return err
 	}
 
 	// Check if piece can move to desired position or if is trying to move in-place
-	legalMoves := piece.LegalMoves(g.board)
+	legalMoves := piece.LegalMoves(game.board)
 	if !legalMoves[to] || piece.GetPosition() == to {
 		return fmt.Errorf("%s can't move from %s to %s.", piece.String(), from, to)
 	}
 
 	// Check if the move leaves king vulnerable
-	if !IsMoveSafeToKing(piece, to, g) {
+	if !IsMoveSafeToKing(piece, to, game) {
 		return fmt.Errorf("%s to %s leaves king checked.", piece, to)
 	}
 
 	// make move and return captured piece, if any
-	capture := g.board.MovePiece(piece, to)
+	capture := game.board.MovePiece(piece, to)
 
 	// Special moves: castling, promoting, etc.
 	switch piece.GetType() {
 	case KingType:
 		if rookMove, ok := castlingPositions[to]; ok {
-			rook, _ := g.GetPiece(rookMove.rookFrom, player)
-			g.board.MovePiece(rook, rookMove.rookTo)
+			rook, _ := game.GetPiece(rookMove.rookFrom, player)
+			game.board.MovePiece(rook, rookMove.rookTo)
 		}
 	case PawnType:
 		if to.Row == 0 || to.Row == 7 {
 			queen := NewQueen(to, player)
-			g.board.InsertPiece(queen)
+			game.board.InsertPiece(queen)
 			queen.SetMoved(true)
 		}
 	}
@@ -157,14 +176,14 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 		player.Points += capture.GetValue()
 	}
 
-	attackedSquares := player.AttackedSquares(g.board)
+	attackedSquares := player.AttackedSquares(game.board)
 
 	// Update threats map of opponent and flag as checked or not
 	opponent.Threats = attackedSquares
 	opponent.Checked = attackedSquares[opponent.King.Pos]
 
 	// Check winning / draw conditions
-	if !opponent.HasLegalMoves(g) {
+	if !opponent.HasLegalMoves(game) {
 		if opponent.Checked {
 			fmt.Println("CHECKMATE!!!", player.Name, "WINS")
 		} else {
@@ -176,13 +195,16 @@ func (g *Game) MovePiece(from, to Position, player *Player) error {
 
 	move := NewMove(piece.Clone(), capture, from, to, opponent.Checked)
 
-	g.MoveHistory = append(g.MoveHistory, move)
-	fmt.Println(g.MoveHistory)
-	for _, v := range g.MoveHistory {
+	game.moveHistory = append(game.moveHistory, move)
+
+	fmt.Println(game.moveHistory)
+
+	for _, v := range game.moveHistory {
 		fmt.Println(v)
 	}
-	g.WhiteTurn = !g.WhiteTurn
-	fmt.Println(g.board)
+
+	game.WhiteTurn = !game.WhiteTurn
+	fmt.Println(game.board)
 
 	return nil
 }
