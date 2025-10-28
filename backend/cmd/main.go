@@ -1,18 +1,31 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
-    "database/sql"
-	_ "github.com/lib/pq"
+	"log"
+	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
+	_ "modernc.org/sqlite"
+
+	"github.com/tomascaceres14/go-chess/backend/internal/database"
 	"github.com/tomascaceres14/go-chess/backend/internal/engine"
 )
 
 type apiConfig struct {
-	//DbQueries   *database.Queries
+	DbQueries   *database.Queries
 	Platform    string
 	JwtSecret   string
 	PolkaAPIKey string
+}
+
+func (*apiConfig) HelloWorld(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	msg := "Hello World!"
+	w.Write([]byte(msg))
 }
 
 type apiError struct {
@@ -36,35 +49,36 @@ func main() {
 
 	const port = "8080"
 
-	db, err := sql.Open("sqlite", "../go_chess.db")
-	    if err != nil {
-        fmt.Println(err)
-        return
-    }
+	godotenv.Load("../.env")
+
+	DB_URL := os.Getenv("DB_URL")
+	DB_ENGINE := os.Getenv("DB_ENGINE")
+	JWT_SECRET := os.Getenv("JWT_SECRET")
+	db, err := sql.Open(DB_ENGINE, DB_URL)
+	if err != nil {
+		fmt.Println("Database connection error.")
+		log.Fatal(err)
+	}
 
 	defer db.Close()
 
+	dbQueries := database.New(db)
 
+	apiCfg := apiConfig{
+		DbQueries: dbQueries,
+		JwtSecret: JWT_SECRET,
+	}
 
-	// godotenv.Load(".env")
+	mux := http.NewServeMux()
 
-	// dbURL := os.Getenv("DB_URL")
-	// platform := os.Getenv("PLATFORM")
-	// jwtSecret := os.Getenv("JWT_SECRET")
+	mux.HandleFunc("GET /api/v1/test", apiCfg.HelloWorld)
 
-	// db, err := sql.Open("postgres", dbURL)
-	// if err != nil {
-	// 	log.Fatal("DB connection error")
-	// }
+	server := &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
+	}
 
-	// dbQueries := database.New(db)
-
-	// apiCfg := apiConfig{
-	// 	DbQueries: dbQueries,
-	// 	Platform:  platform,
-	// 	JwtSecret: jwtSecret,
-	// }
-
-	// mux := http.NewServeMux()
+	fmt.Println("Serving on port " + port)
+	log.Fatal(server.ListenAndServe())
 
 }
