@@ -1,0 +1,17 @@
+# Go build
+*.exe
+*.out
+*.test
+/bin/
+/dist/
+/build/
+
+# Backend and db
+backend/.env
+backend/*.db
+
+# Logs
+*.log
+
+# VSCode
+.vscode/

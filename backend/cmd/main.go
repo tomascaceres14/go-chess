@@ -15,10 +15,9 @@ import (
 )
 
 type apiConfig struct {
-	DbQueries   *database.Queries
-	Platform    string
-	JwtSecret   string
-	PolkaAPIKey string
+	DbQueries *database.Queries
+	Platform  string
+	JwtSecret string
 }
 
 func (*apiConfig) HelloWorld(w http.ResponseWriter, r *http.Request) {
