@@ -69,12 +69,14 @@ func main() {
 
 	const port = "8080"
 
-	godotenv.Load("../.env")
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatal(err)
+	}
 
-	//DB_URL := os.Getenv("DB_URL")
-	//DB_ENGINE := os.Getenv("DB_ENGINE")
+	DB_URL := os.Getenv("DB_URL")
+	DB_ENGINE := os.Getenv("DB_ENGINE")
 	JWT_SECRET := os.Getenv("JWT_SECRET")
-	db, err := sql.Open("sqlite", "./go_chess.db")
+	db, err := sql.Open(DB_ENGINE, DB_URL)
 	if err != nil {
 		fmt.Println("Database connection error.")
 		log.Fatal(err)
