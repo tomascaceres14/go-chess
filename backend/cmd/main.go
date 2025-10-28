@@ -20,15 +20,36 @@ type apiConfig struct {
 	JwtSecret string
 }
 
-func (*apiConfig) HelloWorld(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	msg := "Hello World!"
-	w.Write([]byte(msg))
+type errorResponse struct {
+	Error string `json:"error"`
 }
 
-type apiError struct {
-	Error string `json:"error"`
+func (cfg *apiConfig) HelloWorld(w http.ResponseWriter, r *http.Request) {
+
+	if err := cfg.DbQueries.CreateGame(r.Context(), database.CreateGameParams{
+		ID:          "black_v_white",
+		WhitePlayer: "tomas",
+		BlackPlayer: "isabela",
+		Result:      sql.NullInt64{Int64: 1},
+	}); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	games, err := cfg.DbQueries.GetGames(r.Context())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	print(len(games))
+
+	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+
+	w.Write([]byte(games[0].ID))
 }
 
 // Error printing for debugging
@@ -50,10 +71,10 @@ func main() {
 
 	godotenv.Load("../.env")
 
-	DB_URL := os.Getenv("DB_URL")
-	DB_ENGINE := os.Getenv("DB_ENGINE")
+	//DB_URL := os.Getenv("DB_URL")
+	//DB_ENGINE := os.Getenv("DB_ENGINE")
 	JWT_SECRET := os.Getenv("JWT_SECRET")
-	db, err := sql.Open(DB_ENGINE, DB_URL)
+	db, err := sql.Open("sqlite", "./go_chess.db")
 	if err != nil {
 		fmt.Println("Database connection error.")
 		log.Fatal(err)

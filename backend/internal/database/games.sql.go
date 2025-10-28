@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createGame = `-- name: CreateGame :exec
@@ -17,7 +18,7 @@ type CreateGameParams struct {
 	ID          string
 	WhitePlayer string
 	BlackPlayer string
-	Result      interface{}
+	Result      sql.NullInt64
 }
 
 func (q *Queries) CreateGame(ctx context.Context, arg CreateGameParams) error {

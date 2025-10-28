@@ -4,9 +4,13 @@
 
 package database
 
+import (
+	"database/sql"
+)
+
 type Game struct {
 	ID          string
 	WhitePlayer string
 	BlackPlayer string
-	Result      interface{}
+	Result      sql.NullInt64
 }
