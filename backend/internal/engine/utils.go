@@ -1,5 +1,10 @@
 package engine
 
+import (
+	"strconv"
+	"strings"
+)
+
 // Board columns
 const cols = "abcdefgh"
 
@@ -116,4 +121,82 @@ func FindKingPos(b *Board, white bool) (Position, bool) {
 	return Position{}, false
 }
 
+func GETFENPosition(g *Game) string {
+	FENString := ""
+	for i, row := range g.board.grid {
+		emptySquares := 0
+		for _, v := range row {
+			if v != nil {
+				if emptySquares > 0 {
+					FENString += strconv.Itoa(emptySquares)
+				}
+				letter := v.GetAlgebraicString()
+				if !v.IsWhite() {
+					strings.ToLower(letter)
+				}
+				FENString += letter
+			} else {
+				emptySquares++
+			}
+		}
 
+		if emptySquares > 0 {
+			FENString += strconv.Itoa(emptySquares)
+		}
+
+		endLine := "/"
+
+		if i == len(g.board.grid)-1 {
+			endLine = ""
+		}
+
+		FENString += endLine
+	}
+	return FENString
+}
+
+func GetFENCastling(g *Game) string {
+	FENString := ""
+
+	wKing := g.PWhite.King
+	bKing := g.PBlack.King
+
+	if wKing.ShortCastlingOpt {
+		FENString += "K"
+	}
+
+	if wKing.LongCastlingOpt {
+		FENString += "Q"
+	}
+
+	if bKing.ShortCastlingOpt {
+		FENString += "k"
+	}
+
+	if bKing.LongCastlingOpt {
+		FENString += "q"
+	}
+
+	if FENString == "" {
+		FENString = "-"
+	}
+
+	return FENString
+}
+
+func GetFENString(g *Game) string {
+
+	FENString := GETFENPosition(g)
+
+	// Define turn of player
+	turn := "w"
+	if !g.WhiteTurn {
+		turn = "b"
+	}
+
+	FENString += " " + turn + " "
+
+	FENString += GetFENCastling(g) + " "
+
+	return FENString
+}

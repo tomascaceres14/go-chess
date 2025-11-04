@@ -113,6 +113,10 @@ func (bp *BasePiece) HasMoved() bool {
 	return bp.hasMoved
 }
 
+func (bp *BasePiece) Clone() Movable {
+	return bp.CloneBase()
+}
+
 func (bp *BasePiece) CloneBase() *BasePiece {
 	if bp == nil {
 		return nil

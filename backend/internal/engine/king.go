@@ -2,6 +2,7 @@ package engine
 
 type King struct {
 	*BasePiece
+	LongCastlingOpt, ShortCastlingOpt bool
 }
 
 func NewKing(pos Position, p *Player) *King {
@@ -26,7 +27,9 @@ func NewKing(pos Position, p *Player) *King {
 	}
 
 	king := &King{
-		BasePiece: NewBasePiece(white, 0, pos, directions),
+		BasePiece:        NewBasePiece(white, 0, pos, directions),
+		LongCastlingOpt:  true,
+		ShortCastlingOpt: true,
 	}
 
 	p.Pieces = append(p.Pieces, king)
@@ -62,18 +65,19 @@ func (k *King) LegalMoves(b *Board) map[Position]bool {
 		return legalMoves
 	}
 
-	shortCastlePos := Position{Row: k.Pos.Row, Col: 7}
-	longCastlePos := Position{Row: k.Pos.Row, Col: 0}
+	// Initial rook pos hardocded. Should be obtained at game setup
+	shortCastlePos := Pos("a8")
+	longCastlePos := Pos("a1")
 
-	shortRook, occ := b.GetPiece(shortCastlePos)
-	if occ && !shortRook.HasMoved() && b.IsRowPathClear(k.Pos, shortCastlePos) {
-		legalMoves[Position{Row: k.Pos.Row, Col: 6}] = true
-	}
+	shortRook, shortOcc := b.GetPiece(shortCastlePos)
+	longRook, longOcc := b.GetPiece(longCastlePos)
 
-	longRook, occ := b.GetPiece(longCastlePos)
-	if occ && !longRook.HasMoved() && b.IsRowPathClear(k.Pos, longCastlePos) {
-		legalMoves[Position{Row: k.Pos.Row, Col: 2}] = true
-	}
+	canShortCastle := shortOcc && !shortRook.HasMoved() && b.IsRowPathClear(k.Pos, shortCastlePos)
+	canLongCastle := longOcc && !longRook.HasMoved() && b.IsRowPathClear(k.Pos, longCastlePos)
+
+	// King's castling position is hardcoded. Should make calculation based on initial pos and distance to rook for Chess960
+	legalMoves[Pos("a7")] = canShortCastle
+	legalMoves[Pos("a3")] = canLongCastle
 
 	return legalMoves
 }

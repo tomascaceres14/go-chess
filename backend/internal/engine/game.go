@@ -28,16 +28,17 @@ type Game struct {
 
 // Mapping initial available castle square for king (key) and rook from/to movement option (value)
 var castlingPositions = map[Position]struct {
-	rookFrom Position
-	rookTo   Position
+	rookFrom      Position
+	rookTo        Position
+	isShortCastle bool
 }{
 	// whites
-	Pos("g1"): {rookFrom: Pos("h1"), rookTo: Pos("f1")},
-	Pos("c1"): {rookFrom: Pos("a1"), rookTo: Pos("d1")},
+	Pos("g1"): {rookFrom: Pos("h1"), rookTo: Pos("f1"), isShortCastle: true},
+	Pos("c1"): {rookFrom: Pos("a1"), rookTo: Pos("d1"), isShortCastle: false},
 
 	// blacks
-	Pos("g8"): {rookFrom: Pos("h8"), rookTo: Pos("f8")},
-	Pos("c8"): {rookFrom: Pos("a8"), rookTo: Pos("d8")},
+	Pos("g8"): {rookFrom: Pos("h8"), rookTo: Pos("f8"), isShortCastle: true},
+	Pos("c8"): {rookFrom: Pos("a8"), rookTo: Pos("d8"), isShortCastle: false},
 }
 
 // Generates a new board with classic chess configuration
@@ -162,6 +163,13 @@ func (game *Game) MovePiece(from, to Position, player *Player) error {
 		if rookMove, ok := castlingPositions[to]; ok {
 			rook, _ := game.GetPiece(rookMove.rookFrom, player)
 			game.board.MovePiece(rook, rookMove.rookTo)
+
+			king, _ := piece.(*King)
+			if rookMove.isShortCastle {
+				king.ShortCastlingOpt = false
+			} else {
+				king.LongCastlingOpt = false
+			}
 		}
 	case PawnType:
 		if to.Row == 0 || to.Row == 7 {
