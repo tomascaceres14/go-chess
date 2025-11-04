@@ -43,10 +43,10 @@ func (r *Rook) IsWhite() bool {
 }
 
 func (r *Rook) String() string {
-	piece := "♖"
+	piece := "R"
 
 	if !r.White {
-		piece = "♜"
+		piece = "r"
 	}
 
 	return piece

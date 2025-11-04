@@ -26,30 +26,42 @@ type errorResponse struct {
 
 func (cfg *apiConfig) HelloWorld(w http.ResponseWriter, r *http.Request) {
 
-	if err := cfg.DbQueries.CreateGame(r.Context(), database.CreateGameParams{
-		ID:          "black_v_white",
-		WhitePlayer: "tomas",
-		BlackPlayer: "isabela",
-		Result:      sql.NullInt64{Int64: 1},
-	}); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	games, err := cfg.DbQueries.GetGames(r.Context())
+	id, err := engine.StartGame("wP", "bP")
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
 	}
 
-	print(len(games))
+	game := engine.GetGame(id)
 
-	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
+	fenstring := engine.GetFENString(game)
 
-	w.Write([]byte(games[0].ID))
+	w.Write([]byte(fenstring))
+
+	// if err := cfg.DbQueries.CreateGame(r.Context(), database.CreateGameParams{
+	// 	ID:          "black_v_white",
+	// 	WhitePlayer: "tomas",
+	// 	BlackPlayer: "isabela",
+	// 	Result:      sql.NullInt64{Int64: 1},
+	// }); err != nil {
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	w.Write([]byte(err.Error()))
+	// 	return
+	// }
+
+	// games, err := cfg.DbQueries.GetGames(r.Context())
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	w.Write([]byte(err.Error()))
+	// 	return
+	// }
+
+	// print(len(games))
+
+	// w.Header().Add("Content-Type", "text/plain; charset=utf-8")
+	// w.WriteHeader(http.StatusOK)
+
+	// w.Write([]byte(games[0].ID))
 }
 
 // Error printing for debugging

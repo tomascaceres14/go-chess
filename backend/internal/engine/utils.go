@@ -2,7 +2,6 @@ package engine
 
 import (
 	"strconv"
-	"strings"
 )
 
 // Board columns
@@ -123,18 +122,22 @@ func FindKingPos(b *Board, white bool) (Position, bool) {
 
 func GETFENPosition(g *Game) string {
 	FENString := ""
-	for i, row := range g.board.grid {
+	grid := g.board.grid
+	for i := len(grid) - 1; i >= 0; i-- {
+		row := grid[i]
 		emptySquares := 0
-		for _, v := range row {
+
+		if len(row) == 0 {
+			emptySquares = 8
+		}
+
+		for j := len(row) - 1; j >= 0; j-- {
+			v := row[j]
 			if v != nil {
 				if emptySquares > 0 {
 					FENString += strconv.Itoa(emptySquares)
 				}
-				letter := v.GetAlgebraicString()
-				if !v.IsWhite() {
-					strings.ToLower(letter)
-				}
-				FENString += letter
+				FENString += v.String()
 			} else {
 				emptySquares++
 			}

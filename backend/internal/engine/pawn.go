@@ -93,10 +93,10 @@ func (p *Pawn) IsWhite() bool {
 }
 
 func (p *Pawn) String() string {
-	piece := "♙"
+	piece := "P"
 
 	if !p.White {
-		piece = "♟"
+		piece = "p"
 	}
 
 	return piece

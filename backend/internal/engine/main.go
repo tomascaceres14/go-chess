@@ -14,8 +14,11 @@ func PrintError(err error) {
 }
 
 func StartGame(whiteName, blackName string) (string, error) {
+	if games == nil {
+		games = make(map[string]*Game, 5)
+	}
 
-	if len(games) <= 5 {
+	if len(games) == 5 {
 		return "", errors.New("Maximum of 5 simultaneous games reached")
 	}
 
@@ -30,6 +33,10 @@ func StartGame(whiteName, blackName string) (string, error) {
 	games[game.id] = game
 
 	return game.id, nil
+}
+
+func GetGame(id string) *Game {
+	return games[id]
 }
 
 func MakeMove(id string, player *Player, from, to Position, playerColor bool) error {

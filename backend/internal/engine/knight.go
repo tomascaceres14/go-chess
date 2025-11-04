@@ -65,10 +65,10 @@ func (n *Knight) IsWhite() bool {
 }
 
 func (n *Knight) String() string {
-	piece := "♘"
+	piece := "N"
 
 	if !n.White {
-		piece = "♞"
+		piece = "n"
 	}
 
 	return piece

@@ -39,10 +39,10 @@ func (b *Bishop) IsWhite() bool {
 }
 
 func (b *Bishop) String() string {
-	piece := "♗"
+	piece := "B"
 
 	if !b.White {
-		piece = "♝"
+		piece = "b"
 	}
 
 	return piece

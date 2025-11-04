@@ -43,10 +43,10 @@ func (q *Queen) IsWhite() bool {
 }
 
 func (q *Queen) String() string {
-	piece := "♕"
+	piece := "Q"
 
 	if !q.White {
-		piece = "♛"
+		piece = "q"
 	}
 
 	return piece

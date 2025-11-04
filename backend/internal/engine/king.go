@@ -96,10 +96,10 @@ func (k *King) IsWhite() bool {
 }
 
 func (k *King) String() string {
-	piece := "♔"
+	piece := "K"
 
 	if !k.White {
-		piece = "♚"
+		piece = "k"
 	}
 
 	return piece
