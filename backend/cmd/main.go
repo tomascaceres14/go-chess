@@ -26,15 +26,9 @@ type errorResponse struct {
 
 func (cfg *apiConfig) HelloWorld(w http.ResponseWriter, r *http.Request) {
 
-	id, err := engine.StartGame("wP", "bP")
-	if err != nil {
-		w.Write([]byte(err.Error()))
-		return
-	}
+	game := engine.NewEngine()
 
-	game := engine.GetGame(id)
-
-	fenstring := engine.GetFENString(game)
+	fenstring := engine.GetFENString(game.GetGame())
 
 	w.Write([]byte(fenstring))
 
