@@ -1,71 +1,71 @@
 package engine
 
-type PieceType int
+type pieceType int
 
 const (
-	KingType PieceType = iota
-	QueenType
-	RookType
-	BishopType
-	KnightType
-	PawnType
-	BasePieceType
+	kingType pieceType = iota
+	queenType
+	rookType
+	bishopType
+	knightType
+	pawnType
+	basePieceType
 )
 
-type Movable interface {
-	VisibleSquares(b *Board) map[Position]bool
-	LegalMoves(b *Board) map[Position]bool
-	GetPosition() Position
-	SetPosition(pos Position)
-	IsWhite() bool
-	GetValue() int
+type movable interface {
+	visibleSquares(b *board) map[position]bool
+	legalMoves(b *board) map[position]bool
+	getPosition() position
+	setPosition(pos position)
+	isWhite() bool
+	getValue() int
 	String() string
-	GetAlgebraicString() string
-	HasMoved() bool
-	SetMoved(moved bool)
-	Clone() Movable
-	GetType() PieceType
+	getAlgebraicString() string
+	hasMoved() bool
+	setMoved(moved bool)
+	clone() movable
+	getType() pieceType
 }
 
-type BasePiece struct {
-	White      bool
-	Value      int
-	Pos        Position
-	Directions []Direction
-	hasMoved   bool
+type basePiece struct {
+	white      bool
+	value      int
+	pos        position
+	directions []direction
+	moved      bool
 }
 
-func NewBasePiece(white bool, value int, pos Position, directions []Direction) *BasePiece {
-	return &BasePiece{
-		White:      white,
-		Value:      value,
-		Pos:        pos,
-		Directions: directions,
-		hasMoved:   false,
+func newBasePiece(white bool, value int, pos position, directions []direction) *basePiece {
+	return &basePiece{
+		white:      white,
+		value:      value,
+		pos:        pos,
+		directions: directions,
+		moved:      false,
 	}
 }
 
-func (bp *BasePiece) VisibleSquaresDefault(b *Board) map[Position]bool {
-	positions := map[Position]bool{}
+func (bp *basePiece) visibleSquaresDefault(b *board) map[position]bool {
+	positions := map[position]bool{}
 
-	for _, v := range bp.Directions {
-		dir := Position{Row: bp.Pos.Row + v.dx, Col: bp.Pos.Col + v.dy}
-		CastRay(dir, v.dx, v.dy, b, bp.White, positions)
+	for _, v := range bp.directions {
+		dir := position{Row: bp.pos.Row + v.dx, Col: bp.pos.Col + v.dy}
+		castRay(dir, v.dx, v.dy, b, bp.white, positions)
 	}
 
 	return positions
 }
 
-func (bp *BasePiece) VisibleSquares(b *Board) map[Position]bool {
-	return bp.VisibleSquaresDefault(b)
+func (bp *basePiece) visibleSquares(b *board) map[position]bool {
+	return bp.visibleSquaresDefault(b)
 }
 
-func (bp *BasePiece) LegalMovesDefault(b *Board) map[Position]bool {
-	threats := bp.VisibleSquaresDefault(b)
-	moves := map[Position]bool{}
+func (bp *basePiece) legalMovesDefault(b *board) map[position]bool {
+	threats := bp.visibleSquaresDefault(b)
+	moves := map[position]bool{}
 	for k := range threats {
-		piece, occupied := b.GetPiece(k)
-		if !occupied || piece.IsWhite() != bp.White {
+		piece, occupied := b.getPiece(k)
+		if !occupied || piece.isWhite() != bp.white {
 			moves[k] = true
 			continue
 		}
@@ -74,66 +74,66 @@ func (bp *BasePiece) LegalMovesDefault(b *Board) map[Position]bool {
 	return moves
 }
 
-func (bp *BasePiece) LegalMoves(b *Board) map[Position]bool {
-	return bp.LegalMovesDefault(b)
+func (bp *basePiece) legalMoves(b *board) map[position]bool {
+	return bp.legalMovesDefault(b)
 }
 
-func (bp *BasePiece) GetPosition() Position {
-	return bp.Pos
+func (bp *basePiece) getPosition() position {
+	return bp.pos
 }
 
-func (bp *BasePiece) SetPosition(pos Position) {
-	bp.Pos = pos
-	bp.hasMoved = true
+func (bp *basePiece) setPosition(pos position) {
+	bp.pos = pos
+	bp.moved = true
 }
 
-func (bp *BasePiece) IsWhite() bool {
-	return bp.White
+func (bp *basePiece) isWhite() bool {
+	return bp.white
 }
 
-func (bp *BasePiece) GetValue() int {
-	return bp.Value
+func (bp *basePiece) getValue() int {
+	return bp.value
 }
 
-func (bp *BasePiece) String() string {
+func (bp *basePiece) String() string {
 	color := "w"
 
-	if !bp.White {
+	if !bp.white {
 		color = "b"
 	}
 
 	return "BP" + color
 }
 
-func (b *BasePiece) GetAlgebraicString() string {
+func (b *basePiece) getAlgebraicString() string {
 	return ""
 }
 
-func (bp *BasePiece) HasMoved() bool {
-	return bp.hasMoved
+func (bp *basePiece) hasMoved() bool {
+	return bp.moved
 }
 
-func (bp *BasePiece) Clone() Movable {
-	return bp.CloneBase()
+func (bp *basePiece) clone() movable {
+	return bp.cloneBase()
 }
 
-func (bp *BasePiece) CloneBase() *BasePiece {
+func (bp *basePiece) cloneBase() *basePiece {
 	if bp == nil {
 		return nil
 	}
 	cp := *bp
 	// Dont believe is necessary. Will check
-	if bp.Directions != nil {
-		cp.Directions = make([]Direction, len(bp.Directions))
-		copy(cp.Directions, bp.Directions)
+	if bp.directions != nil {
+		cp.directions = make([]direction, len(bp.directions))
+		copy(cp.directions, bp.directions)
 	}
 	return &cp
 }
 
-func (bp *BasePiece) GetType() PieceType {
-	return BasePieceType
+func (bp *basePiece) getType() pieceType {
+	return basePieceType
 }
 
-func (bp *BasePiece) SetMoved(moved bool) {
-	bp.hasMoved = moved
+func (bp *basePiece) setMoved(moved bool) {
+	bp.moved = moved
 }

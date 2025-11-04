@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -9,46 +10,51 @@ const cols = "abcdefgh"
 
 // Recursive function to cast a ray and check for collisions in direction vector {dx, dy}.
 // Returns map of possible positions
-func CastRay(pos Position, dx, dy int, b *Board, white bool, positions map[Position]bool) {
+func castRay(pos position, dx, dy int, b *board, white bool, positions map[position]bool) {
 
-	if !pos.InBounds() {
+	if !pos.inBounds() {
 		return
 	}
 
-	piece, occupied := b.GetPiece(pos)
+	piece, occupied := b.getPiece(pos)
 	if occupied {
-		if piece.IsWhite() != white {
+		if piece.isWhite() != white {
 			positions[pos] = true
 		}
 		return
 	}
 
 	positions[pos] = true
-	next := Position{Row: pos.Row + dx, Col: pos.Col + dy}
-	CastRay(next, dx, dy, b, white, positions)
+	next := position{Row: pos.Row + dx, Col: pos.Col + dy}
+	castRay(next, dx, dy, b, white, positions)
 }
 
-func IsMoveSafeToKing(piece Movable, to Position, g *Game) bool {
+// Error printing for debugging
+func printError(err error) {
+	fmt.Printf("--- ERROR: %v\n", err)
+}
+
+func isMoveSafeToKing(piece movable, to position, g *game) bool {
 
 	// Clone board
-	board := g.board.Clone()
+	board := g.gameBoard.Clone()
 
 	// Simulate movement on cloned board
-	board.MovePieceSim(piece.GetPosition(), to)
+	board.MovePieceSim(piece.getPosition(), to)
 
 	// Calculate threats of opponent but using the individual pieces of the cloned board, not the player.Pieces slice.
 	// The latter would require to also deep copy the whole game.
-	opponentColor := !piece.IsWhite()
-	threats := AttackedByColor(board, opponentColor)
+	opponentColor := !piece.isWhite()
+	threats := attackedByColor(board, opponentColor)
 
 	// Find king on cloned board
-	kingPos, ok := FindKingPos(board, piece.IsWhite())
+	kingPos, ok := findKingPos(board, piece.isWhite())
 	if !ok {
 		return false
 	}
 
 	// If king was moved, then 'to' is its safe square
-	if piece == g.GetPlayer(piece.IsWhite()).King {
+	if piece == g.GetPlayer(piece.isWhite()).king {
 		kingPos = to
 	}
 
@@ -56,17 +62,17 @@ func IsMoveSafeToKing(piece Movable, to Position, g *Game) bool {
 }
 
 // Parse col from matrix index to board column letter
-func GetCol(col int) string {
+func getCol(col int) string {
 	return string(cols[col])
 }
 
 // Parse col from matrix index to board column letter
-func GetRow(row int) int {
+func getRow(row int) int {
 	return row + 1
 }
 
 // Removes a piece from a list of pieces
-func DeletePiece(list []Movable, piece Movable) []Movable {
+func deletePiece(list []movable, piece movable) []movable {
 	for i, v := range list {
 		if v == piece {
 			return append(list[0:i], list[i+1:]...)
@@ -80,7 +86,7 @@ func DeletePiece(list []Movable, piece Movable) []Movable {
 // 	return rand.Intn(2) == 0
 // }
 
-func ColorToString(isWhite bool) string {
+func colorToString(isWhite bool) string {
 	if isWhite {
 		return "Whites"
 	}
@@ -89,13 +95,13 @@ func ColorToString(isWhite bool) string {
 
 // Used for simulating movements
 // Calculate AttaquedSquares but using the board, not the player.Pieces slice
-func AttackedByColor(b *Board, white bool) map[Position]bool {
-	threats := make(map[Position]bool)
+func attackedByColor(b *board, white bool) map[position]bool {
+	threats := make(map[position]bool)
 	for i := range 8 {
 		for j := range 8 {
 			p := (*b.grid)[i][j]
-			if p != nil && p.IsWhite() == white {
-				for sq := range p.VisibleSquares(b) {
+			if p != nil && p.isWhite() == white {
+				for sq := range p.visibleSquares(b) {
 					threats[sq] = true
 				}
 			}
@@ -106,23 +112,23 @@ func AttackedByColor(b *Board, white bool) map[Position]bool {
 
 // Used for simulating movements
 // Find king by color using board
-func FindKingPos(b *Board, white bool) (Position, bool) {
+func findKingPos(b *board, white bool) (position, bool) {
 	for i := range 8 {
 		for j := range 8 {
 			p := (*b.grid)[i][j]
-			if p != nil && p.IsWhite() == white {
-				if _, ok := p.(*King); ok {
-					return p.GetPosition(), true
+			if p != nil && p.isWhite() == white {
+				if _, ok := p.(*king); ok {
+					return p.getPosition(), true
 				}
 			}
 		}
 	}
-	return Position{}, false
+	return position{}, false
 }
 
-func GETFENPosition(g *Game) string {
+func getFENPosition(g *game) string {
 	FENString := ""
-	grid := g.board.grid
+	grid := g.gameBoard.grid
 	for i := len(grid) - 1; i >= 0; i-- {
 		row := grid[i]
 		emptySquares := 0
@@ -149,7 +155,7 @@ func GETFENPosition(g *Game) string {
 
 		endLine := "/"
 
-		if i == len(g.board.grid)-1 {
+		if i == len(g.gameBoard.grid)-1 {
 			endLine = ""
 		}
 
@@ -158,25 +164,25 @@ func GETFENPosition(g *Game) string {
 	return FENString
 }
 
-func GetFENCastling(g *Game) string {
+func getFENCastling(g *game) string {
 	FENString := ""
 
-	wKing := g.PWhite.King
-	bKing := g.PBlack.King
+	wKing := g.pWhite.king
+	bKing := g.pBlack.king
 
-	if wKing.ShortCastlingOpt {
+	if wKing.shortCastlingOpt {
 		FENString += "K"
 	}
 
-	if wKing.LongCastlingOpt {
+	if wKing.longCastlingOpt {
 		FENString += "Q"
 	}
 
-	if bKing.ShortCastlingOpt {
+	if bKing.shortCastlingOpt {
 		FENString += "k"
 	}
 
-	if bKing.LongCastlingOpt {
+	if bKing.longCastlingOpt {
 		FENString += "q"
 	}
 
@@ -187,9 +193,9 @@ func GetFENCastling(g *Game) string {
 	return FENString
 }
 
-func GetFENString(g *Game) string {
+func (g *game) GetFENString() string {
 
-	FENString := GETFENPosition(g)
+	FENString := getFENPosition(g)
 
 	// Define turn of player
 	turn := "w"
@@ -199,7 +205,7 @@ func GetFENString(g *Game) string {
 
 	FENString += " " + turn + " "
 
-	FENString += GetFENCastling(g) + " "
+	FENString += getFENCastling(g) + " "
 
 	return FENString
 }

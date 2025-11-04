@@ -6,16 +6,16 @@ import (
 	"strings"
 )
 
-type Position struct {
+type position struct {
 	Row, Col int
 }
 
-type Direction struct {
+type direction struct {
 	dx, dy int
 }
 
-func Pos(pos string) Position {
-	nilPos := Position{-1, -1}
+func pos(pos string) position {
+	nilPos := position{-1, -1}
 
 	if len(pos) != 2 {
 		return nilPos
@@ -31,31 +31,31 @@ func Pos(pos string) Position {
 		return nilPos
 	}
 
-	return Position{
+	return position{
 		Row: row - 1,
 		Col: int(col[0] - 'a'),
 	}
 }
 
-func (p Position) Equals(other Position) bool {
+func (p position) equals(other position) bool {
 	return p.Row == other.Row && p.Col == other.Col
 }
 
-func (p Position) InBounds() bool {
+func (p position) inBounds() bool {
 	return (0 <= p.Col && p.Col <= 7) && (0 <= p.Row && p.Row <= 7)
 }
 
-func (p Position) GetCol() string {
+func (p position) getCol() string {
 	return string(cols[p.Col])
 }
 
-func (p Position) String() string {
+func (p position) String() string {
 	return fmt.Sprintf("%v%v", string(cols[p.Col]), p.Row+1)
 }
 
-func ContainsPosition(list []Position, pos Position) bool {
+func containsPosition(list []position, pos position) bool {
 	for _, p := range list {
-		if p.Equals(pos) {
+		if p.equals(pos) {
 			return true
 		}
 	}

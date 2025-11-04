@@ -1,61 +1,61 @@
 package engine
 
-type Bishop struct {
-	*BasePiece
+type bishop struct {
+	*basePiece
 }
 
-func NewBishop(pos Position, p *Player) *Bishop {
-	white := p.White
-	directions := []Direction{
+func newBishop(pos position, p *player) *bishop {
+	white := p.isWhite
+	directions := []direction{
 		{1, 1},
 		{1, -1},
 		{-1, 1},
 		{-1, -1},
 	}
 
-	bishop := &Bishop{
-		BasePiece: NewBasePiece(white, 3, pos, directions),
+	bishop := &bishop{
+		basePiece: newBasePiece(white, 3, pos, directions),
 	}
 
-	p.Pieces = append(p.Pieces, bishop)
+	p.pieces = append(p.pieces, bishop)
 
 	return bishop
 }
 
-func (bp *Bishop) VisibleSquares(b *Board) map[Position]bool {
-	return bp.VisibleSquaresDefault(b)
+func (bp *bishop) visibleSquares(b *board) map[position]bool {
+	return bp.visibleSquaresDefault(b)
 }
 
-func (bp *Bishop) LegalMoves(b *Board) map[Position]bool {
-	return bp.LegalMovesDefault(b)
+func (bp *bishop) legalMoves(b *board) map[position]bool {
+	return bp.legalMovesDefault(b)
 }
 
-func (b *Bishop) GetPosition() Position {
-	return b.Pos
+func (b *bishop) getPosition() position {
+	return b.pos
 }
 
-func (b *Bishop) IsWhite() bool {
-	return b.White
+func (b *bishop) isWhite() bool {
+	return b.white
 }
 
-func (b *Bishop) String() string {
+func (b *bishop) String() string {
 	piece := "B"
 
-	if !b.White {
+	if !b.white {
 		piece = "b"
 	}
 
 	return piece
 }
 
-func (b *Bishop) GetAlgebraicString() string {
+func (b *bishop) getAlgebraicString() string {
 	return "B"
 }
 
-func (b *Bishop) Clone() Movable {
-	return &Bishop{BasePiece: b.BasePiece.CloneBase()}
+func (b *bishop) clone() movable {
+	return &bishop{basePiece: b.basePiece.cloneBase()}
 }
 
-func (b *Bishop) GetType() PieceType {
-	return BishopType
+func (b *bishop) getType() pieceType {
+	return bishopType
 }

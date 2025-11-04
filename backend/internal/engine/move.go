@@ -1,15 +1,15 @@
 package engine
 
-type Move struct {
-	PieceCopy         Movable
-	From, To          Position
-	Capture           Movable
+type move struct {
+	PieceCopy         movable
+	From, To          position
+	Capture           movable
 	AlgebraicNotation string
 	IsCheck           bool
 }
 
-func NewMove(piece, capture Movable, from, to Position, isCheck bool) Move {
-	algebraicNotation := piece.GetAlgebraicString()
+func newMove(piece, capture movable, from, to position, isCheck bool) move {
+	algebraicNotation := piece.getAlgebraicString()
 
 	takes := "x"
 	check := ""
@@ -17,8 +17,8 @@ func NewMove(piece, capture Movable, from, to Position, isCheck bool) Move {
 	if capture == nil {
 		takes = ""
 	} else {
-		if _, ok := piece.(*Pawn); ok {
-			takes = from.GetCol() + takes
+		if _, ok := piece.(*pawn); ok {
+			takes = from.getCol() + takes
 		}
 	}
 
@@ -28,7 +28,7 @@ func NewMove(piece, capture Movable, from, to Position, isCheck bool) Move {
 
 	algebraicNotation = algebraicNotation + takes + to.String() + check
 
-	return Move{
+	return move{
 		PieceCopy:         piece,
 		Capture:           capture,
 		From:              from,
@@ -37,6 +37,6 @@ func NewMove(piece, capture Movable, from, to Position, isCheck bool) Move {
 	}
 }
 
-func (m Move) String() string {
+func (m move) String() string {
 	return m.AlgebraicNotation
 }

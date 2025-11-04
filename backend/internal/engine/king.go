@@ -1,13 +1,13 @@
 package engine
 
-type King struct {
-	*BasePiece
-	LongCastlingOpt, ShortCastlingOpt bool
+type king struct {
+	*basePiece
+	longCastlingOpt, shortCastlingOpt bool
 }
 
-func NewKing(pos Position, p *Player) *King {
-	white := p.White
-	directions := []Direction{
+func newKing(pos position, p *player) *king {
+	white := p.isWhite
+	directions := []direction{
 		// left
 		{-1, 0},
 		// right
@@ -26,30 +26,30 @@ func NewKing(pos Position, p *Player) *King {
 		{-1, -1},
 	}
 
-	king := &King{
-		BasePiece:        NewBasePiece(white, 0, pos, directions),
-		LongCastlingOpt:  true,
-		ShortCastlingOpt: true,
+	king := &king{
+		basePiece:        newBasePiece(white, 0, pos, directions),
+		longCastlingOpt:  true,
+		shortCastlingOpt: true,
 	}
 
-	p.Pieces = append(p.Pieces, king)
+	p.pieces = append(p.pieces, king)
 
 	return king
 }
 
-func (k *King) VisibleSquares(b *Board) map[Position]bool {
-	positions := map[Position]bool{}
+func (k *king) visibleSquares(b *board) map[position]bool {
+	positions := map[position]bool{}
 
-	for _, v := range k.Directions {
-		pos := Position{Row: k.Pos.Row + v.dx, Col: k.Pos.Col + v.dy}
+	for _, v := range k.directions {
+		pos := position{Row: k.pos.Row + v.dx, Col: k.pos.Col + v.dy}
 
-		if !pos.InBounds() {
+		if !pos.inBounds() {
 			continue
 		}
 
-		pieceAt, occupied := b.GetPiece(pos)
+		pieceAt, occupied := b.getPiece(pos)
 
-		if !occupied || pieceAt.IsWhite() != k.White {
+		if !occupied || pieceAt.isWhite() != k.white {
 			positions[pos] = true
 			continue
 		}
@@ -58,61 +58,61 @@ func (k *King) VisibleSquares(b *Board) map[Position]bool {
 	return positions
 }
 
-func (k *King) LegalMoves(b *Board) map[Position]bool {
-	legalMoves := k.VisibleSquares(b)
+func (k *king) legalMoves(b *board) map[position]bool {
+	legalMoves := k.visibleSquares(b)
 
-	if k.hasMoved {
+	if k.moved {
 		return legalMoves
 	}
 
 	// Initial rook pos hardocded. Should be obtained at game setup
-	shortCastlePos := Pos("a8")
-	longCastlePos := Pos("a1")
+	shortCastlePos := pos("a8")
+	longCastlePos := pos("a1")
 
-	shortRook, shortOcc := b.GetPiece(shortCastlePos)
-	longRook, longOcc := b.GetPiece(longCastlePos)
+	shortRook, shortOcc := b.getPiece(shortCastlePos)
+	longRook, longOcc := b.getPiece(longCastlePos)
 
-	canShortCastle := shortOcc && !shortRook.HasMoved() && b.IsRowPathClear(k.Pos, shortCastlePos)
-	canLongCastle := longOcc && !longRook.HasMoved() && b.IsRowPathClear(k.Pos, longCastlePos)
+	canShortCastle := shortOcc && !shortRook.hasMoved() && b.IsRowPathClear(k.pos, shortCastlePos)
+	canLongCastle := longOcc && !longRook.hasMoved() && b.IsRowPathClear(k.pos, longCastlePos)
 
 	// King's castling position is hardcoded. Should make calculation based on initial pos and distance to rook for Chess960
-	legalMoves[Pos("a7")] = canShortCastle
-	legalMoves[Pos("a3")] = canLongCastle
+	legalMoves[pos("a7")] = canShortCastle
+	legalMoves[pos("a3")] = canLongCastle
 
 	return legalMoves
 }
 
-func (k *King) GetPosition() Position {
-	return k.Pos
+func (k *king) getPosition() position {
+	return k.pos
 }
 
-func (k *King) SetPosition(pos Position) {
-	k.hasMoved = true
-	k.Pos = pos
+func (k *king) setPosition(pos position) {
+	k.moved = true
+	k.pos = pos
 }
 
-func (k *King) IsWhite() bool {
-	return k.White
+func (k *king) isWhite() bool {
+	return k.white
 }
 
-func (k *King) String() string {
+func (k *king) String() string {
 	piece := "K"
 
-	if !k.White {
+	if !k.white {
 		piece = "k"
 	}
 
 	return piece
 }
 
-func (b *King) GetAlgebraicString() string {
+func (b *king) getAlgebraicString() string {
 	return "K"
 }
 
-func (k *King) Clone() Movable {
-	return &King{BasePiece: k.BasePiece.CloneBase()}
+func (k *king) clone() movable {
+	return &king{basePiece: k.basePiece.cloneBase()}
 }
 
-func (k *King) GetType() PieceType {
-	return KingType
+func (k *king) getType() pieceType {
+	return kingType
 }

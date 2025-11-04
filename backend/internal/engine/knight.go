@@ -1,12 +1,12 @@
 package engine
 
-type Knight struct {
-	*BasePiece
+type knight struct {
+	*basePiece
 }
 
-func NewKnight(pos Position, p *Player) *Knight {
-	white := p.White
-	directions := []Direction{
+func newKnight(pos position, p *player) *knight {
+	white := p.isWhite
+	directions := []direction{
 		{2, 1},
 		{1, 2},
 		{2, -1},
@@ -16,22 +16,22 @@ func NewKnight(pos Position, p *Player) *Knight {
 		{-2, -1},
 		{-1, -2},
 	}
-	knight := &Knight{
-		BasePiece: NewBasePiece(white, 3, pos, directions),
+	knight := &knight{
+		basePiece: newBasePiece(white, 3, pos, directions),
 	}
 
-	p.Pieces = append(p.Pieces, knight)
+	p.pieces = append(p.pieces, knight)
 
 	return knight
 }
 
-func (n *Knight) VisibleSquares(b *Board) map[Position]bool {
-	positions := map[Position]bool{}
+func (n *knight) visibleSquares(b *board) map[position]bool {
+	positions := map[position]bool{}
 
-	for _, v := range n.Directions {
-		pos := Position{Row: n.Pos.Row + v.dx, Col: n.Pos.Col + v.dy}
+	for _, v := range n.directions {
+		pos := position{Row: n.pos.Row + v.dx, Col: n.pos.Col + v.dy}
 
-		if !pos.InBounds() {
+		if !pos.inBounds() {
 			continue
 		}
 
@@ -41,13 +41,13 @@ func (n *Knight) VisibleSquares(b *Board) map[Position]bool {
 	return positions
 }
 
-func (n *Knight) LegalMoves(b *Board) map[Position]bool {
-	threats := n.VisibleSquares(b)
-	moves := map[Position]bool{}
+func (n *knight) legalMoves(b *board) map[position]bool {
+	threats := n.visibleSquares(b)
+	moves := map[position]bool{}
 
 	for k := range threats {
-		piece, occupied := b.GetPiece(k)
-		if !occupied || piece.IsWhite() != n.White {
+		piece, occupied := b.getPiece(k)
+		if !occupied || piece.isWhite() != n.white {
 			moves[k] = true
 			continue
 		}
@@ -56,32 +56,32 @@ func (n *Knight) LegalMoves(b *Board) map[Position]bool {
 	return moves
 }
 
-func (n *Knight) GetPosition() Position {
-	return n.Pos
+func (n *knight) getPosition() position {
+	return n.pos
 }
 
-func (n *Knight) IsWhite() bool {
-	return n.White
+func (n *knight) isWhite() bool {
+	return n.white
 }
 
-func (n *Knight) String() string {
+func (n *knight) String() string {
 	piece := "N"
 
-	if !n.White {
+	if !n.white {
 		piece = "n"
 	}
 
 	return piece
 }
 
-func (b *Knight) GetAlgebraicString() string {
+func (b *knight) getAlgebraicString() string {
 	return "N"
 }
 
-func (n *Knight) Clone() Movable {
-	return &Knight{BasePiece: n.BasePiece.CloneBase()}
+func (n *knight) clone() movable {
+	return &knight{basePiece: n.basePiece.cloneBase()}
 }
 
-func (n *Knight) GetType() PieceType {
-	return KnightType
+func (n *knight) getType() pieceType {
+	return knightType
 }

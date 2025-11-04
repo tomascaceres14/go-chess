@@ -1,24 +1,19 @@
 package engine
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 )
 
-type Engine struct {
-	game *Game
+type ChessEngine struct {
+	game *game
 }
 
-func NewEngine() *Engine {
-	return &Engine{game: &Game{}}
+func NewChessEngine() *ChessEngine {
+	return &ChessEngine{}
 }
 
-// Error printing for debugging
-func PrintError(err error) {
-	fmt.Printf("--- ERROR: %v\n", err)
-}
-
-func (e *Engine) StartGame(whiteName, blackName string) (string, error) {
+func (e *ChessEngine) StartGame(whiteName, blackName string) (string, error) {
 
 	whiteName = strings.TrimSpace(whiteName)
 	blackName = strings.TrimSpace(blackName)
@@ -29,13 +24,13 @@ func (e *Engine) StartGame(whiteName, blackName string) (string, error) {
 	return game.id, nil
 }
 
-func (e *Engine) GetGame() *Game {
-	return e.game
-}
+func (e *ChessEngine) MakeMove(from, to position, pColor bool) error {
 
-func (e *Engine) MakeMove(from, to Position, pColor bool) error {
+	if e.game == nil {
+		return errors.New("Game not initialized.")
+	}
 
-	if err := e.game.MovePiece(from, to, pColor); err != nil {
+	if err := e.game.movePiece(from, to, pColor); err != nil {
 		return err
 	}
 

@@ -1,12 +1,12 @@
 package engine
 
-type Queen struct {
-	*BasePiece
+type queen struct {
+	*basePiece
 }
 
-func NewQueen(pos Position, p *Player) *Queen {
-	white := p.White
-	directions := []Direction{
+func newQueen(pos position, p *player) *queen {
+	white := p.isWhite
+	directions := []direction{
 		{0, 1},
 		{0, -1},
 		{-1, 0},
@@ -17,49 +17,49 @@ func NewQueen(pos Position, p *Player) *Queen {
 		{-1, -1},
 	}
 
-	queen := &Queen{
-		BasePiece: NewBasePiece(white, 9, pos, directions),
+	queen := &queen{
+		basePiece: newBasePiece(white, 9, pos, directions),
 	}
 
-	p.Pieces = append(p.Pieces, queen)
+	p.pieces = append(p.pieces, queen)
 
 	return queen
 }
 
-func (q *Queen) VisibleSquares(b *Board) map[Position]bool {
-	return q.VisibleSquaresDefault(b)
+func (q *queen) visibleSquares(b *board) map[position]bool {
+	return q.visibleSquaresDefault(b)
 }
 
-func (q *Queen) LegalMoves(b *Board) map[Position]bool {
-	return q.LegalMovesDefault(b)
+func (q *queen) legalMoves(b *board) map[position]bool {
+	return q.legalMovesDefault(b)
 }
 
-func (q *Queen) GetPosition() Position {
-	return q.Pos
+func (q *queen) getPosition() position {
+	return q.pos
 }
 
-func (q *Queen) IsWhite() bool {
-	return q.White
+func (q *queen) isWhite() bool {
+	return q.white
 }
 
-func (q *Queen) String() string {
+func (q *queen) String() string {
 	piece := "Q"
 
-	if !q.White {
+	if !q.white {
 		piece = "q"
 	}
 
 	return piece
 }
 
-func (b *Queen) GetAlgebraicString() string {
+func (b *queen) getAlgebraicString() string {
 	return "Q"
 }
 
-func (q *Queen) Clone() Movable {
-	return &Queen{BasePiece: q.BasePiece.CloneBase()}
+func (q *queen) clone() movable {
+	return &queen{basePiece: q.basePiece.cloneBase()}
 }
 
-func (q *Queen) GetType() PieceType {
-	return QueenType
+func (q *queen) getType() pieceType {
+	return queenType
 }

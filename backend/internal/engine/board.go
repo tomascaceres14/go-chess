@@ -4,72 +4,72 @@ import (
 	"fmt"
 )
 
-type Board struct {
-	grid *[8][8]Movable
+type board struct {
+	grid *[8][8]movable
 }
 
 // Returns piece in given pos and wether it's occupied or not.
-func (b *Board) GetPiece(pos Position) (Movable, bool) {
+func (b *board) getPiece(pos position) (movable, bool) {
 	piece := b.grid[pos.Row][pos.Col]
 	return piece, b.IsOccupied(pos)
 }
 
 // Inserts piece in piece.Pos
-func (b *Board) InsertPiece(piece Movable) {
-	b.grid[piece.GetPosition().Row][piece.GetPosition().Col] = piece
+func (b *board) insertPiece(piece movable) {
+	b.grid[piece.getPosition().Row][piece.getPosition().Col] = piece
 }
 
-func (b *Board) InsertPieceList(pieces []Movable) {
+func (b *board) InsertPieceList(pieces []movable) {
 	for _, v := range pieces {
-		b.InsertPiece(v)
+		b.insertPiece(v)
 	}
 }
 
-func (b *Board) MovePieceSim(from, to Position) {
-	piece, _ := b.GetPiece(from)
+func (b *board) MovePieceSim(from, to position) {
+	piece, _ := b.getPiece(from)
 
 	(*b.grid)[from.Row][from.Col] = nil
 	(*b.grid)[to.Row][to.Col] = piece
-	piece.SetPosition(to)
+	piece.setPosition(to)
 }
 
 // Moves piece from piece.Pos to pos and returns captured piece
-func (b *Board) MovePiece(piece Movable, pos Position) Movable {
-	prevPos := piece.GetPosition()
+func (b *board) MovePiece(piece movable, pos position) movable {
+	prevPos := piece.getPosition()
 
-	capture, _ := b.GetPiece(pos)
+	capture, _ := b.getPiece(pos)
 
 	b.grid[prevPos.Row][prevPos.Col] = nil
 	b.grid[pos.Row][pos.Col] = piece
 
-	piece.SetPosition(pos)
-	piece.SetMoved(true)
+	piece.setPosition(pos)
+	piece.setMoved(true)
 
 	return capture
 }
 
-func (b *Board) IsOccupied(pos Position) bool {
+func (b *board) IsOccupied(pos position) bool {
 	return b.grid[pos.Row][pos.Col] != nil
 }
 
-func (b *Board) Clone() *Board {
-	newGrid := &[8][8]Movable{}
+func (b *board) Clone() *board {
+	newGrid := &[8][8]movable{}
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
 			piece := (*b.grid)[i][j]
 			if piece != nil {
-				newGrid[i][j] = piece.Clone()
+				newGrid[i][j] = piece.clone()
 			}
 		}
 	}
-	return &Board{grid: newGrid}
+	return &board{grid: newGrid}
 }
 
-func (b *Board) IsChecked(p *Player) bool {
-	return p.Threats[p.King.Pos]
+func (b *board) IsChecked(p *player) bool {
+	return p.threats[p.king.pos]
 }
 
-func (b *Board) IsRowPathClear(from, to Position) bool {
+func (b *board) IsRowPathClear(from, to position) bool {
 	if from.Row != to.Row {
 		return false
 	}
@@ -80,7 +80,7 @@ func (b *Board) IsRowPathClear(from, to Position) bool {
 	}
 
 	for col := from.Col + step; col != to.Col; col += step {
-		if b.IsOccupied(Position{Row: from.Row, Col: col}) {
+		if b.IsOccupied(position{Row: from.Row, Col: col}) {
 			return false
 		}
 	}
@@ -88,7 +88,7 @@ func (b *Board) IsRowPathClear(from, to Position) bool {
 	return true
 }
 
-func (b *Board) String() string {
+func (b *board) String() string {
 	output := ""
 
 	for row := 7; row >= 0; row-- {

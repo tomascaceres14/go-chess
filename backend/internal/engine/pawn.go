@@ -1,46 +1,46 @@
 package engine
 
-type Pawn struct {
-	*BasePiece
+type pawn struct {
+	*basePiece
 	direction int
 }
 
-func NewPawn(pos Position, p *Player) *Pawn {
-	white := p.White
+func newPawn(pos position, p *player) *pawn {
+	white := p.isWhite
 
 	dir := 1
 	if !white {
 		dir = -1
 	}
 
-	pawn := &Pawn{
-		BasePiece: NewBasePiece(white, 1, pos, nil),
+	pawn := &pawn{
+		basePiece: newBasePiece(white, 1, pos, nil),
 		direction: dir,
 	}
 
-	p.Pieces = append(p.Pieces, pawn)
+	p.pieces = append(p.pieces, pawn)
 
 	return pawn
 }
 
-func (p *Pawn) VisibleSquares(b *Board) map[Position]bool {
+func (p *pawn) visibleSquares(b *board) map[position]bool {
 
-	positions := map[Position]bool{}
-	front := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col}
-	diag1 := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col + 1}
-	diag2 := Position{Row: p.Pos.Row + 1*p.direction, Col: p.Pos.Col - 1}
+	positions := map[position]bool{}
+	front := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col}
+	diag1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col + 1}
+	diag2 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col - 1}
 
-	if diag1.InBounds() {
+	if diag1.inBounds() {
 		positions[diag1] = true
 	}
 
-	if diag2.InBounds() {
+	if diag2.inBounds() {
 		positions[diag2] = true
 	}
 
 	positions[front] = true
 
-	if !p.hasMoved {
+	if !p.moved {
 		front.Row += 1 * p.direction
 		positions[front] = true
 	}
@@ -48,17 +48,17 @@ func (p *Pawn) VisibleSquares(b *Board) map[Position]bool {
 	return positions
 }
 
-func (p *Pawn) LegalMoves(b *Board) map[Position]bool {
+func (p *pawn) legalMoves(b *board) map[position]bool {
 
-	positions := p.VisibleSquares(b)
-	legalMoves := map[Position]bool{}
+	positions := p.visibleSquares(b)
+	legalMoves := map[position]bool{}
 
 	for pos := range positions {
 
-		piece, occupied := b.GetPiece(pos)
+		piece, occupied := b.getPiece(pos)
 
 		// move front
-		if pos.Col == p.Pos.Col {
+		if pos.Col == p.pos.Col {
 			if !occupied {
 				legalMoves[pos] = true
 			}
@@ -67,7 +67,7 @@ func (p *Pawn) LegalMoves(b *Board) map[Position]bool {
 
 		// capture diagonal
 		if occupied {
-			if piece.IsWhite() != p.White {
+			if piece.isWhite() != p.white {
 				legalMoves[pos] = true
 			}
 			continue
@@ -79,33 +79,33 @@ func (p *Pawn) LegalMoves(b *Board) map[Position]bool {
 	return legalMoves
 }
 
-func (p *Pawn) GetPosition() Position {
-	return p.Pos
+func (p *pawn) getPosition() position {
+	return p.pos
 }
 
-func (p *Pawn) SetPosition(pos Position) {
-	p.hasMoved = true
-	p.Pos = pos
+func (p *pawn) setPosition(pos position) {
+	p.moved = true
+	p.pos = pos
 }
 
-func (p *Pawn) IsWhite() bool {
-	return p.White
+func (p *pawn) isWhite() bool {
+	return p.white
 }
 
-func (p *Pawn) String() string {
+func (p *pawn) String() string {
 	piece := "P"
 
-	if !p.White {
+	if !p.white {
 		piece = "p"
 	}
 
 	return piece
 }
 
-func (p *Pawn) Clone() Movable {
-	return &Pawn{BasePiece: p.BasePiece.CloneBase()}
+func (p *pawn) clone() movable {
+	return &pawn{basePiece: p.basePiece.cloneBase()}
 }
 
-func (p *Pawn) GetType() PieceType {
-	return PawnType
+func (p *pawn) getType() pieceType {
+	return pawnType
 }

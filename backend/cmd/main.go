@@ -26,12 +26,8 @@ type errorResponse struct {
 
 func (cfg *apiConfig) HelloWorld(w http.ResponseWriter, r *http.Request) {
 
-	game := engine.NewEngine()
-
-	fenstring := engine.GetFENString(game.GetGame())
-
-	w.Write([]byte(fenstring))
-
+	game := engine.NewChessEngine()
+	game.StartGame("whites", "blacks")
 	// if err := cfg.DbQueries.CreateGame(r.Context(), database.CreateGameParams{
 	// 	ID:          "black_v_white",
 	// 	WhitePlayer: "tomas",
@@ -61,14 +57,6 @@ func (cfg *apiConfig) HelloWorld(w http.ResponseWriter, r *http.Request) {
 // Error printing for debugging
 func PrintError(err error) {
 	fmt.Printf("--- ERROR: %v\n", err)
-}
-
-func SwitchTurns(p1, p2 *engine.Player, white bool) *engine.Player {
-	if p1.White == white {
-		return p1
-	}
-
-	return p2
 }
 
 func main() {

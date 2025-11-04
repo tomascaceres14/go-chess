@@ -1,65 +1,65 @@
 package engine
 
-type Rook struct {
-	*BasePiece
+type rook struct {
+	*basePiece
 }
 
-func NewRook(pos Position, p *Player) *Rook {
-	white := p.White
-	directions := []Direction{
+func newRook(pos position, p *player) *rook {
+	white := p.isWhite
+	directions := []direction{
 		{0, 1},
 		{0, -1},
 		{-1, 0},
 		{1, 0},
 	}
 
-	rook := &Rook{
-		BasePiece: NewBasePiece(white, 5, pos, directions),
+	rook := &rook{
+		basePiece: newBasePiece(white, 5, pos, directions),
 	}
 
-	p.Pieces = append(p.Pieces, rook)
+	p.pieces = append(p.pieces, rook)
 	return rook
 }
 
-func (r *Rook) VisibleSquares(b *Board) map[Position]bool {
-	return r.VisibleSquaresDefault(b)
+func (r *rook) visibleSquares(b *board) map[position]bool {
+	return r.visibleSquaresDefault(b)
 }
 
-func (r *Rook) LegalMoves(b *Board) map[Position]bool {
-	return r.LegalMovesDefault(b)
+func (r *rook) legalMoves(b *board) map[position]bool {
+	return r.legalMovesDefault(b)
 }
 
-func (r *Rook) GetPosition() Position {
-	return r.Pos
+func (r *rook) getPosition() position {
+	return r.pos
 }
 
-func (r *Rook) SetPosition(pos Position) {
-	r.hasMoved = true
-	r.Pos = pos
+func (r *rook) setPosition(pos position) {
+	r.moved = true
+	r.pos = pos
 }
 
-func (r *Rook) IsWhite() bool {
-	return r.White
+func (r *rook) isWhite() bool {
+	return r.white
 }
 
-func (r *Rook) String() string {
+func (r *rook) String() string {
 	piece := "R"
 
-	if !r.White {
+	if !r.white {
 		piece = "r"
 	}
 
 	return piece
 }
 
-func (b *Rook) GetAlgebraicString() string {
+func (b *rook) getAlgebraicString() string {
 	return "R"
 }
 
-func (r *Rook) Clone() Movable {
-	return &Rook{BasePiece: r.BasePiece.CloneBase()}
+func (r *rook) clone() movable {
+	return &rook{basePiece: r.basePiece.cloneBase()}
 }
 
-func (r *Rook) GetType() PieceType {
-	return RookType
+func (r *rook) getType() pieceType {
+	return rookType
 }
