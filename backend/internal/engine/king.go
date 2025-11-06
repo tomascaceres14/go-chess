@@ -72,8 +72,8 @@ func (k *king) legalMoves(b *board) map[position]bool {
 	shortRook, shortOcc := b.getPiece(shortCastlePos)
 	longRook, longOcc := b.getPiece(longCastlePos)
 
-	canShortCastle := shortOcc && !shortRook.hasMoved() && b.IsRowPathClear(k.pos, shortCastlePos)
-	canLongCastle := longOcc && !longRook.hasMoved() && b.IsRowPathClear(k.pos, longCastlePos)
+	canShortCastle := shortOcc && !shortRook.hasMoved() && b.isRowPathClear(k.pos, shortCastlePos)
+	canLongCastle := longOcc && !longRook.hasMoved() && b.isRowPathClear(k.pos, longCastlePos)
 
 	// King's castling position is hardcoded. Should make calculation based on initial pos and distance to rook for Chess960
 	legalMoves[pos("a7")] = canShortCastle

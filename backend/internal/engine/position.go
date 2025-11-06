@@ -49,6 +49,10 @@ func (p position) getCol() string {
 	return string(cols[p.Col])
 }
 
+func (p position) getRow() int {
+	return p.Row + 1
+}
+
 func (p position) String() string {
 	return fmt.Sprintf("%v%v", string(cols[p.Col]), p.Row+1)
 }

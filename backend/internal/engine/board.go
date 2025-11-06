@@ -8,10 +8,11 @@ type board struct {
 	grid *[8][8]movable
 }
 
-// Returns piece in given pos and wether it's occupied or not.
+// Get piece at given pos. Returns piece and wether square is occupied or not.
+// (should refactor, second bool not necessary as piece can be nil, not necessarily zero value)
 func (b *board) getPiece(pos position) (movable, bool) {
 	piece := b.grid[pos.Row][pos.Col]
-	return piece, b.IsOccupied(pos)
+	return piece, piece != nil
 }
 
 // Inserts piece in piece.Pos
@@ -34,7 +35,7 @@ func (b *board) MovePieceSim(from, to position) {
 }
 
 // Moves piece from piece.Pos to pos and returns captured piece
-func (b *board) MovePiece(piece movable, pos position) movable {
+func (b *board) movePiece(piece movable, pos position) movable {
 	prevPos := piece.getPosition()
 
 	capture, _ := b.getPiece(pos)
@@ -52,7 +53,7 @@ func (b *board) IsOccupied(pos position) bool {
 	return b.grid[pos.Row][pos.Col] != nil
 }
 
-func (b *board) Clone() *board {
+func (b *board) clone() *board {
 	newGrid := &[8][8]movable{}
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
@@ -65,11 +66,11 @@ func (b *board) Clone() *board {
 	return &board{grid: newGrid}
 }
 
-func (b *board) IsChecked(p *player) bool {
-	return p.threats[p.king.pos]
+func (b *board) clearSquare(pos position) {
+	b.grid[pos.Row][pos.Col] = nil
 }
 
-func (b *board) IsRowPathClear(from, to position) bool {
+func (b *board) isRowPathClear(from, to position) bool {
 	if from.Row != to.Row {
 		return false
 	}

@@ -3,6 +3,7 @@ package engine
 type pawn struct {
 	*basePiece
 	direction int
+	jumped    bool
 }
 
 func newPawn(pos position, p *player) *pawn {
@@ -26,7 +27,8 @@ func newPawn(pos position, p *player) *pawn {
 func (p *pawn) visibleSquares(b *board) map[position]bool {
 
 	positions := map[position]bool{}
-	front := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col}
+	front1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col}
+	front2 := position{Row: p.pos.Row + 2*p.direction, Col: p.pos.Col}
 	diag1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col + 1}
 	diag2 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col - 1}
 
@@ -38,11 +40,10 @@ func (p *pawn) visibleSquares(b *board) map[position]bool {
 		positions[diag2] = true
 	}
 
-	positions[front] = true
+	positions[front1] = true
 
 	if !p.moved {
-		front.Row += 1 * p.direction
-		positions[front] = true
+		positions[front2] = true
 	}
 
 	return positions
@@ -57,24 +58,46 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 
 		piece, occupied := b.getPiece(pos)
 
-		// move front
 		if pos.Col == p.pos.Col {
-			if !occupied {
+
+			// if pawn moving one square up
+			if pos.Row == p.pos.Row+1*p.direction && !occupied {
 				legalMoves[pos] = true
+				continue
 			}
-			continue
+
+			// if pawn is jumping one square
+			if pos.Row == p.pos.Row+2*p.direction && !occupied && !b.IsOccupied(pos) {
+				legalMoves[pos] = true
+				continue
+			}
 		}
 
 		// capture diagonal
-		if occupied {
-			if piece.isWhite() != p.white {
-				legalMoves[pos] = true
-			}
-			continue
+		if occupied && piece.isWhite() != p.white {
+			legalMoves[pos] = true
 		}
-
-		// TODO: en passant
 	}
+
+	// en passant. Not checking if pawn not in 6th or 3rd rank.
+	if p.pos.getRow() != 6 || p.pos.getRow() != 3 {
+		return legalMoves
+	}
+
+	// Define left square
+	leftPos := position{Row: p.pos.Row, Col: p.pos.Col - 1}
+	// Get piece
+	leftMovable, occ := b.getPiece(leftPos)
+	// Cast to pawn
+	leftPiece, ok := castPawn(leftMovable)
+	// Verify left square is occupied, piece is pawn and its from opposite color
+	legalMoves[leftPos] = occ && ok && leftPiece.isWhite() != p.white
+
+	// Same for right square
+	rightPos := position{Row: p.pos.Row, Col: p.pos.Col - 1}
+	rightMovable, occ := b.getPiece(rightPos)
+	rightPiece, ok := castPawn(rightMovable)
+	legalMoves[rightPos] = occ && ok && rightPiece.isWhite() != p.white
 
 	return legalMoves
 }
@@ -100,6 +123,7 @@ func (p *pawn) String() string {
 	}
 
 	return piece
+
 }
 
 func (p *pawn) clone() movable {
@@ -108,4 +132,15 @@ func (p *pawn) clone() movable {
 
 func (p *pawn) getType() pieceType {
 	return pawnType
+}
+
+func castPawn(m movable) (*pawn, bool) {
+
+	if m == nil || m.getType() != pawnType {
+		return &pawn{}, false
+	}
+
+	pawn, _ := m.(*pawn)
+
+	return pawn, true
 }

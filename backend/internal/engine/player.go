@@ -20,7 +20,6 @@ func newPlayer(name string, isWhite bool) *player {
 		name:    name,
 		isWhite: isWhite,
 		points:  0,
-		threats: map[position]bool{},
 	}
 }
 

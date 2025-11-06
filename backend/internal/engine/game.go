@@ -43,7 +43,7 @@ var castlingPositions = map[position]struct {
 // Generates a new board with classic chess configuration
 func NewGame(whiteName, blackName string) *game {
 
-	println("generating new board...")
+	fmt.Println("generating new board...")
 
 	gameBoard := [8][8]movable{}
 
@@ -67,8 +67,8 @@ func NewGame(whiteName, blackName string) *game {
 
 	// Pawns
 	for i := range 8 {
-		game.gameBoard.insertPiece(newPawn(pos(getCol(i)+"7"), pBlack)) // black
-		game.gameBoard.insertPiece(newPawn(pos(getCol(i)+"2"), pWhite)) // white
+		game.gameBoard.insertPiece(newPawn(pos(getColLetter(i)+"7"), pBlack)) // black
+		game.gameBoard.insertPiece(newPawn(pos(getColLetter(i)+"2"), pWhite)) // white
 	}
 
 	// Rooks
@@ -108,22 +108,16 @@ func NewGame(whiteName, blackName string) *game {
 }
 
 // Obtains piece at given position if player is owner of piece
-func (g *game) getPiece(pos position, pColor bool) (movable, error) {
+func (g *game) getPlayerPiece(pos position, pColor bool) (movable, error) {
 
 	piece, ok := g.gameBoard.getPiece(pos)
 	if !ok {
 		return nil, fmt.Errorf("Position %v is empty.", pos)
 	}
 
-	player := g.pWhite
-
-	if pColor == false {
-		player = g.pBlack
-	}
-
 	// Validate piece belonging to player
-	if piece.isWhite() != player.isWhite {
-		return nil, fmt.Errorf("Not your piece, %s.", player.name)
+	if piece.isWhite() != pColor {
+		return nil, fmt.Errorf("Not your piece, %s.", colorToString(pColor))
 	}
 
 	return piece, nil
@@ -132,12 +126,9 @@ func (g *game) getPiece(pos position, pColor bool) (movable, error) {
 // Moves piece in position `from` to position `to` if player is owner of piece
 func (game *game) movePiece(from, to position, pColor bool) error {
 
-	if !game.WhiteTurn == pColor {
-		turn := "white"
-		if !pColor {
-			turn = "black"
-		}
-		return fmt.Errorf("Not your turn, %s.", turn)
+	// Check turn to play
+	if game.WhiteTurn != pColor {
+		return fmt.Errorf("Not your turn, %s.", colorToString(pColor))
 	}
 
 	// Check if positions are in bounds
@@ -145,12 +136,12 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 		return errors.New("Position out of bounds.")
 	}
 
-	// Obtains opponent
+	// Obtain player and opponent
 	player := game.GetPlayer(pColor)
 	opponent := game.GetPlayerOpponent(player.isWhite)
 
 	// Obtains piece to move
-	piece, err := game.getPiece(from, player.isWhite)
+	piece, err := game.getPlayerPiece(from, player.isWhite)
 	if err != nil {
 		return err
 	}
@@ -167,14 +158,14 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 	}
 
 	// make move and return captured piece, if any
-	capture := game.gameBoard.MovePiece(piece, to)
+	capture := game.gameBoard.movePiece(piece, to)
 
 	// Special moves: castling, promoting, etc.
 	switch piece.getType() {
 	case kingType:
 		if rookMove, ok := castlingPositions[to]; ok {
-			rook, _ := game.getPiece(rookMove.rookFrom, player.isWhite)
-			game.gameBoard.MovePiece(rook, rookMove.rookTo)
+			rook, _ := game.getPlayerPiece(rookMove.rookFrom, player.isWhite)
+			game.gameBoard.movePiece(rook, rookMove.rookTo)
 
 			king, _ := piece.(*king)
 			if rookMove.isShortCastle {
@@ -183,14 +174,36 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 				king.longCastlingOpt = false
 			}
 		}
+
 	case pawnType:
+
+		// Promotion
 		if to.Row == 0 || to.Row == 7 {
 			queen := newQueen(to, player)
 			game.gameBoard.insertPiece(queen)
 			queen.setMoved(true)
+			break
 		}
+
+		pawn, _ := castPawn(piece)
+
+		// Jumping
+		if diff := from.Row - to.Row; diff == 2 || diff == -2 {
+			pawn.jumped = true
+			break
+		}
+
+		// En passant
+		if to.Col != from.Col {
+			capturedPos := position{Row: from.Row, Col: to.Col}
+			capture, _ = game.gameBoard.getPiece(capturedPos)
+			game.gameBoard.clearSquare(capturedPos)
+			break
+		}
+
 	}
 
+	// if piece was captured
 	if capture != nil {
 		opponent.pieces = deletePiece(opponent.pieces, capture)
 		player.points += capture.getValue()
@@ -199,7 +212,6 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 	attackedSquares := player.attackedSquares(game.gameBoard)
 
 	// Update threats map of opponent and flag as checked or not
-	opponent.threats = attackedSquares
 	opponent.isChecked = attackedSquares[opponent.king.pos]
 
 	// Check winning / draw conditions
@@ -213,16 +225,11 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 		fmt.Println("Stalemate pal :(")
 	}
 
+	// Update moves history
 	move := newMove(piece.clone(), capture, from, to, opponent.isChecked)
-
 	game.moveHistory = append(game.moveHistory, move)
 
-	fmt.Println(game.moveHistory)
-
-	for _, v := range game.moveHistory {
-		fmt.Println(v)
-	}
-
+	// Switch turns
 	game.WhiteTurn = !game.WhiteTurn
 	fmt.Println(game.gameBoard)
 

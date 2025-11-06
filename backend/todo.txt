@@ -1,1 +1,2 @@
 - Finish en passant FEN strings
+- Separate chess engine into own repository and package for public usage

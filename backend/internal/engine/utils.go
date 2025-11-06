@@ -37,7 +37,7 @@ func printError(err error) {
 func isMoveSafeToKing(piece movable, to position, g *game) bool {
 
 	// Clone board
-	board := g.gameBoard.Clone()
+	board := g.gameBoard.clone()
 
 	// Simulate movement on cloned board
 	board.MovePieceSim(piece.getPosition(), to)
@@ -62,13 +62,8 @@ func isMoveSafeToKing(piece movable, to position, g *game) bool {
 }
 
 // Parse col from matrix index to board column letter
-func getCol(col int) string {
+func getColLetter(col int) string {
 	return string(cols[col])
-}
-
-// Parse col from matrix index to board column letter
-func getRow(row int) int {
-	return row + 1
 }
 
 // Removes a piece from a list of pieces
@@ -85,13 +80,6 @@ func deletePiece(list []movable, piece movable) []movable {
 // func randomBool() bool {
 // 	return rand.Intn(2) == 0
 // }
-
-func colorToString(isWhite bool) string {
-	if isWhite {
-		return "Whites"
-	}
-	return "Blacks"
-}
 
 // Used for simulating movements
 // Calculate AttaquedSquares but using the board, not the player.Pieces slice
@@ -208,4 +196,14 @@ func (g *game) GetFENString() string {
 	FENString += getFENCastling(g) + " "
 
 	return FENString
+}
+
+func colorToString(color bool) string {
+	colorStr := "white"
+
+	if !color {
+		colorStr = "black"
+	}
+
+	return colorStr
 }
