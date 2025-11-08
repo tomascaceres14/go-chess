@@ -1,4 +1,4 @@
-package engine
+package gochess
 
 import (
 	"errors"

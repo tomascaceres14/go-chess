@@ -1,1 +1,0 @@
-- Separate chess engine into own repository and package for public usage
