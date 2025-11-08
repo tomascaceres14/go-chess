@@ -178,6 +178,25 @@ func getFENCastling(g *game) string {
 		FENString = "-"
 	}
 
+	return FENString + " "
+}
+
+func getFENEnPassant(g *game) string {
+	FENString := "-"
+	player := g.pWhite
+	turn := g.WhiteTurn
+
+	if !turn {
+		player = g.pBlack
+	}
+
+	pawn := player.pawnJumped
+
+	if pawn != nil {
+		prevSquare := position{Col: pawn.pos.Col, Row: pawn.pos.Row - 1*pawn.direction}
+		FENString = prevSquare.String() + " "
+	}
+
 	return FENString
 }
 
@@ -193,7 +212,9 @@ func (g *game) GetFENString() string {
 
 	FENString += " " + turn + " "
 
-	FENString += getFENCastling(g) + " "
+	FENString += getFENCastling(g)
+
+	FENString += getFENEnPassant(g)
 
 	return FENString
 }

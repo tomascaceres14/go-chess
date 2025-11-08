@@ -185,14 +185,6 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 			break
 		}
 
-		pawn, _ := castPawn(piece)
-
-		// Jumping
-		if diff := from.Row - to.Row; diff == 2 || diff == -2 {
-			pawn.jumped = true
-			break
-		}
-
 		// En passant
 		if to.Col != from.Col {
 			capturedPos := position{Row: from.Row, Col: to.Col}
@@ -201,6 +193,15 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 			break
 		}
 
+		// Jump
+		pawn, _ := castPawn(piece)
+		diff := from.Row - to.Row
+
+		pawnJumped := diff == 2 || diff == -2
+
+		if pawnJumped {
+			player.pawnJumped = pawn
+		}
 	}
 
 	// if piece was captured
@@ -232,6 +233,10 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 	// Switch turns
 	game.WhiteTurn = !game.WhiteTurn
 	fmt.Println(game.gameBoard)
+
+	if opponent.pawnJumped != nil {
+		opponent.removeJumpedPawn()
+	}
 
 	return nil
 }

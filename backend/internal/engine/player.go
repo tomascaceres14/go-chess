@@ -6,13 +6,13 @@ import (
 )
 
 type player struct {
-	name      string
-	isWhite   bool
-	points    int
-	king      *king
-	isChecked bool
-	pieces    []movable
-	threats   map[position]bool
+	name               string
+	isWhite, isChecked bool
+	points             int
+	king               *king
+	pawnJumped         *pawn
+	pieces             []movable
+	threats            map[position]bool
 }
 
 func newPlayer(name string, isWhite bool) *player {
@@ -53,6 +53,10 @@ func (p *player) legalMoves(g *game) map[position]bool {
 
 func (p *player) hasLegalMoves(g *game) bool {
 	return len(p.legalMoves(g)) > 0
+}
+
+func (p *player) removeJumpedPawn() {
+	p.pawnJumped = nil
 }
 
 func (p *player) String() string {
