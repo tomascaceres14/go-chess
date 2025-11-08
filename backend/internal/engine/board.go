@@ -12,7 +12,7 @@ type board struct {
 // (should refactor, second bool not necessary as piece can be nil, not necessarily zero value)
 func (b *board) getPiece(pos position) (movable, bool) {
 	piece := b.grid[pos.Row][pos.Col]
-	return piece, piece != nil
+	return piece, b.IsOccupied(pos)
 }
 
 // Inserts piece in piece.Pos

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"database/sql"
+	"bufio"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
-	"github.com/joho/godotenv"
 	_ "modernc.org/sqlite"
 
 	"github.com/tomascaceres14/go-chess/backend/internal/database"
@@ -26,8 +26,6 @@ type errorResponse struct {
 
 func (cfg *apiConfig) HelloWorld(w http.ResponseWriter, r *http.Request) {
 
-	game := engine.NewChessEngine()
-	game.StartGame("whites", "blacks")
 	// if err := cfg.DbQueries.CreateGame(r.Context(), database.CreateGameParams{
 	// 	ID:          "black_v_white",
 	// 	WhitePlayer: "tomas",
@@ -59,42 +57,83 @@ func PrintError(err error) {
 	fmt.Printf("--- ERROR: %v\n", err)
 }
 
+func GetTurn(turn bool) string {
+	str := "white"
+
+	if !turn {
+		str = "black"
+	}
+
+	return str
+}
+
 func main() {
 
-	const port = "8080"
+	// const port = "8080"
 
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatal(err)
-	}
+	// if err := godotenv.Load(".env"); err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	DB_URL := os.Getenv("DB_URL")
-	DB_ENGINE := os.Getenv("DB_ENGINE")
-	JWT_SECRET := os.Getenv("JWT_SECRET")
-	db, err := sql.Open(DB_ENGINE, DB_URL)
+	// DB_URL := os.Getenv("DB_URL")
+	// DB_ENGINE := os.Getenv("DB_ENGINE")
+	// JWT_SECRET := os.Getenv("JWT_SECRET")
+	// db, err := sql.Open(DB_ENGINE, DB_URL)
+	// if err != nil {
+	// 	fmt.Println("Database connection error.")
+	// 	log.Fatal(err)
+	// }
+
+	// defer db.Close()
+
+	// dbQueries := database.New(db)
+
+	// apiCfg := apiConfig{
+	// 	DbQueries: dbQueries,
+	// 	JwtSecret: JWT_SECRET,
+	// }
+
+	// mux := http.NewServeMux()
+
+	// mux.HandleFunc("GET /api/v1/test", apiCfg.HelloWorld)
+
+	// server := &http.Server{
+	// 	Addr:    ":" + port,
+	// 	Handler: mux,
+	// }
+
+	// fmt.Println("Serving on port " + port)
+	// log.Fatal(server.ListenAndServe())
+
+	reader := bufio.NewReader(os.Stdin)
+
+	game := engine.NewChessEngine()
+	id, err := game.StartGame("whites", "blacks")
 	if err != nil {
-		fmt.Println("Database connection error.")
 		log.Fatal(err)
 	}
 
-	defer db.Close()
+	fmt.Println("Partido iniciado. ID:", id)
 
-	dbQueries := database.New(db)
+	turn := true
 
-	apiCfg := apiConfig{
-		DbQueries: dbQueries,
-		JwtSecret: JWT_SECRET,
+	for {
+
+		fmt.Println("Movimiento de", GetTurn(turn))
+		fmt.Print("Desde: ")
+		from, _ := reader.ReadString('\n')
+		from = strings.TrimSpace(from)
+
+		fmt.Print("Hacia: ")
+		to, _ := reader.ReadString('\n')
+		to = strings.TrimSpace(to)
+
+		if err := game.Move(from, to, turn); err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		turn = !turn
+
 	}
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("GET /api/v1/test", apiCfg.HelloWorld)
-
-	server := &http.Server{
-		Addr:    ":" + port,
-		Handler: mux,
-	}
-
-	fmt.Println("Serving on port " + port)
-	log.Fatal(server.ListenAndServe())
-
 }

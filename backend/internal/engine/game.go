@@ -179,6 +179,7 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 
 		// Promotion
 		if to.Row == 0 || to.Row == 7 {
+			println("PROMOTING")
 			queen := newQueen(to, player)
 			game.gameBoard.insertPiece(queen)
 			queen.setMoved(true)
@@ -189,12 +190,14 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 
 		// Jumping
 		if diff := from.Row - to.Row; diff == 2 || diff == -2 {
+			fmt.Println("JUMPING")
 			pawn.jumped = true
 			break
 		}
 
 		// En passant
 		if to.Col != from.Col {
+			println("ENPASSANT")
 			capturedPos := position{Row: from.Row, Col: to.Col}
 			capture, _ = game.gameBoard.getPiece(capturedPos)
 			game.gameBoard.clearSquare(capturedPos)
@@ -211,7 +214,7 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 
 	attackedSquares := player.attackedSquares(game.gameBoard)
 
-	// Update threats map of opponent and flag as checked or not
+	// flag as checked or not
 	opponent.isChecked = attackedSquares[opponent.king.pos]
 
 	// Check winning / draw conditions

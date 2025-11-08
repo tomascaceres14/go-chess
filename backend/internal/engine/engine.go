@@ -2,6 +2,7 @@ package engine
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -24,13 +25,23 @@ func (e *ChessEngine) StartGame(whiteName, blackName string) (string, error) {
 	return game.id, nil
 }
 
-func (e *ChessEngine) MakeMove(from, to position, pColor bool) error {
-
+func (e *ChessEngine) Move(from, to string, pColor bool) error {
+	println("making move from", from, "to", to)
 	if e.game == nil {
 		return errors.New("Game not initialized.")
 	}
 
-	if err := e.game.movePiece(from, to, pColor); err != nil {
+	fromPos := pos(from)
+	if !fromPos.isValid() {
+		return fmt.Errorf("%s", "'"+from+"' is an invalid position.")
+	}
+
+	toPos := pos(to)
+	if !toPos.isValid() {
+		return fmt.Errorf("%s", "'"+to+"' is an invalid position.")
+	}
+
+	if err := e.game.movePiece(fromPos, toPos, pColor); err != nil {
 		return err
 	}
 

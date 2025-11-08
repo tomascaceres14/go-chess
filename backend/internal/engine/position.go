@@ -14,6 +14,10 @@ type direction struct {
 	dx, dy int
 }
 
+func (p *position) isValid() bool {
+	return p.Row != -1 && p.Col != -1
+}
+
 func pos(pos string) position {
 	nilPos := position{-1, -1}
 
@@ -31,10 +35,11 @@ func pos(pos string) position {
 		return nilPos
 	}
 
-	return position{
+	newPos := position{
 		Row: row - 1,
 		Col: int(col[0] - 'a'),
 	}
+	return newPos
 }
 
 func (p position) equals(other position) bool {

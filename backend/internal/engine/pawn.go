@@ -1,5 +1,7 @@
 package engine
 
+import "fmt"
+
 type pawn struct {
 	*basePiece
 	direction int
@@ -71,33 +73,35 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 				legalMoves[pos] = true
 				continue
 			}
+
+		} else {
+			// capture diagonal
+			legalMoves[pos] = occupied && piece.isWhite() != p.white
 		}
 
-		// capture diagonal
-		if occupied && piece.isWhite() != p.white {
-			legalMoves[pos] = true
-		}
 	}
+
+	fmt.Println("Legal moves for pawn at: ", p.pos, legalMoves)
 
 	// en passant. Not checking if pawn not in 6th or 3rd rank.
 	if p.pos.getRow() != 6 || p.pos.getRow() != 3 {
 		return legalMoves
 	}
-
+	println("pawn maybe can enpassant")
 	// Define left square
 	leftPos := position{Row: p.pos.Row, Col: p.pos.Col - 1}
 	// Get piece
 	leftMovable, occ := b.getPiece(leftPos)
 	// Cast to pawn
-	leftPiece, ok := castPawn(leftMovable)
-	// Verify left square is occupied, piece is pawn and its from opposite color
-	legalMoves[leftPos] = occ && ok && leftPiece.isWhite() != p.white
+	leftPawn, ok := castPawn(leftMovable)
+	// Verify left square is occupied, piece is pawn, its from opposite color and has jumped
+	legalMoves[leftPos] = occ && ok && leftPawn.isWhite() != p.white && leftPawn.jumped
 
 	// Same for right square
 	rightPos := position{Row: p.pos.Row, Col: p.pos.Col - 1}
 	rightMovable, occ := b.getPiece(rightPos)
-	rightPiece, ok := castPawn(rightMovable)
-	legalMoves[rightPos] = occ && ok && rightPiece.isWhite() != p.white
+	rightPawn, ok := castPawn(rightMovable)
+	legalMoves[rightPos] = occ && ok && rightPawn.isWhite() != p.white && rightPawn.jumped
 
 	return legalMoves
 }
