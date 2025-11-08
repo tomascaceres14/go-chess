@@ -22,6 +22,7 @@
 | [x]     | Castling                             | King-side and queen-side, with rule validation (path, check, etc.)         |
 | [x]     | Pawn promotion                       | Allow promotion when reaching final rank                                   |
 | [x]     | Move history                         | Store move history and print moves in algebraic notation                   |
-| [x]     | FEN strings                          | Generate and interpretate FEN strings                                      |
+| [ ]     | FEN strings                          | Generate and interpretate FEN strings                                      |
+| [ ]     | PGNs?                                | Generate and interpretate PGN files                                        |
 | [ ]     | Undo/Redo moves                      | Go back number of moves, follow multiple different lines.                  |
 | [ ]     | Win/Tie rules                        | 50 moves-rule, 3 move repetition, insufficient material, etc               |
