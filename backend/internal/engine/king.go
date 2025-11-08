@@ -5,6 +5,22 @@ type king struct {
 	longCastlingOpt, shortCastlingOpt bool
 }
 
+type castleOption struct {
+	rookFrom position
+	rookTo   position
+}
+
+// Mapping initial available castle square for king (key) and rook from/to movement option (value)
+var castlingPositions = map[position]castleOption{
+	// whites
+	pos("g1"): {rookFrom: pos("h1"), rookTo: pos("f1")},
+	pos("c1"): {rookFrom: pos("a1"), rookTo: pos("d1")},
+
+	// blacks
+	pos("g8"): {rookFrom: pos("h8"), rookTo: pos("f8")},
+	pos("c8"): {rookFrom: pos("a8"), rookTo: pos("d8")},
+}
+
 func newKing(pos position, p *player) *king {
 	white := p.isWhite
 	directions := []direction{
@@ -65,9 +81,9 @@ func (k *king) legalMoves(b *board) map[position]bool {
 		return legalMoves
 	}
 
-	// Initial rook pos hardocded. Should be obtained at game setup
-	shortCastlePos := pos("a8")
-	longCastlePos := pos("a1")
+	// Initial rook pos hardcoded. Should be obtained at game setup
+	shortCastlePos := position{Row: k.pos.Row, Col: 7}
+	longCastlePos := position{Row: k.pos.Row, Col: 0}
 
 	shortRook, shortOcc := b.getPiece(shortCastlePos)
 	longRook, longOcc := b.getPiece(longCastlePos)
@@ -76,8 +92,8 @@ func (k *king) legalMoves(b *board) map[position]bool {
 	canLongCastle := longOcc && !longRook.hasMoved() && b.isRowPathClear(k.pos, longCastlePos)
 
 	// King's castling position is hardcoded. Should make calculation based on initial pos and distance to rook for Chess960
-	legalMoves[pos("a7")] = canShortCastle
-	legalMoves[pos("a3")] = canLongCastle
+	legalMoves[position{Row: k.pos.Row, Col: 6}] = canShortCastle
+	legalMoves[position{Row: k.pos.Row, Col: 2}] = canLongCastle
 
 	return legalMoves
 }

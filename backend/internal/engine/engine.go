@@ -22,6 +22,8 @@ func (e *ChessEngine) StartGame(whiteName, blackName string) (string, error) {
 	game := NewGame(whiteName, blackName)
 	e.game = game
 
+	fmt.Println("FEN STRING:", game.GetFENString())
+
 	return game.id, nil
 }
 
@@ -43,6 +45,8 @@ func (e *ChessEngine) Move(from, to string, pColor bool) error {
 	if err := e.game.movePiece(fromPos, toPos, pColor); err != nil {
 		return err
 	}
+
+	fmt.Println("FEN STRING:", e.game.GetFENString())
 
 	return nil
 }

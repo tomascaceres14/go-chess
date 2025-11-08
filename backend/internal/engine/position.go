@@ -62,12 +62,3 @@ func (p position) String() string {
 	return fmt.Sprintf("%v%v", string(cols[p.Col]), p.Row+1)
 }
 
-func containsPosition(list []position, pos position) bool {
-	for _, p := range list {
-		if p.equals(pos) {
-			return true
-		}
-	}
-
-	return false
-}

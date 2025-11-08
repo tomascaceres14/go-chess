@@ -59,6 +59,10 @@ func (p *player) removeJumpedPawn() {
 	p.pawnJumped = nil
 }
 
+func (p *player) getKing() *king {
+	return p.king
+}
+
 func (p *player) String() string {
 	col := "WHITE"
 

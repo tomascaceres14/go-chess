@@ -117,6 +117,8 @@ func findKingPos(b *board, white bool) (position, bool) {
 func getFENPosition(g *game) string {
 	FENString := ""
 	grid := g.gameBoard.grid
+
+	// in engine, grid starts with a1 being [0][0] so to generate FEN pos its necessary to do reverse traversal.
 	for i := len(grid) - 1; i >= 0; i-- {
 		row := grid[i]
 		emptySquares := 0
@@ -125,11 +127,12 @@ func getFENPosition(g *game) string {
 			emptySquares = 8
 		}
 
-		for j := len(row) - 1; j >= 0; j-- {
+		for j := range len(row) {
 			v := row[j]
 			if v != nil {
 				if emptySquares > 0 {
 					FENString += strconv.Itoa(emptySquares)
+					emptySquares = 0
 				}
 				FENString += v.String()
 			} else {
@@ -143,7 +146,7 @@ func getFENPosition(g *game) string {
 
 		endLine := "/"
 
-		if i == len(g.gameBoard.grid)-1 {
+		if i == 0 {
 			endLine = ""
 		}
 
@@ -182,16 +185,16 @@ func getFENCastling(g *game) string {
 }
 
 func getFENEnPassant(g *game) string {
-	FENString := "-"
+	FENString := "- "
 	player := g.pWhite
 	turn := g.WhiteTurn
 
-	if !turn {
+	if turn {
 		player = g.pBlack
 	}
 
 	pawn := player.pawnJumped
-
+	fmt.Println(pawn)
 	if pawn != nil {
 		prevSquare := position{Col: pawn.pos.Col, Row: pawn.pos.Row - 1*pawn.direction}
 		FENString = prevSquare.String() + " "
@@ -205,16 +208,20 @@ func (g *game) GetFENString() string {
 	FENString := getFENPosition(g)
 
 	// Define turn of player
-	turn := "w"
+	turn := " w "
 	if !g.WhiteTurn {
-		turn = "b"
+		turn = " b "
 	}
 
-	FENString += " " + turn + " "
+	FENString += turn
 
 	FENString += getFENCastling(g)
 
 	FENString += getFENEnPassant(g)
+
+	FENString += strconv.Itoa(g.halfmoveClock) + " "
+
+	FENString += strconv.Itoa(len(g.moveHistory))
 
 	return FENString
 }

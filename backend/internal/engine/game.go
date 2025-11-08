@@ -21,23 +21,9 @@ type game struct {
 	gameBoard      *board
 	pWhite, pBlack *player
 	WhiteTurn      bool
+	halfmoveClock  int
 	moveHistory    []move
 	status         gameStatus
-}
-
-// Mapping initial available castle square for king (key) and rook from/to movement option (value)
-var castlingPositions = map[position]struct {
-	rookFrom      position
-	rookTo        position
-	isShortCastle bool
-}{
-	// whites
-	pos("g1"): {rookFrom: pos("h1"), rookTo: pos("f1"), isShortCastle: true},
-	pos("c1"): {rookFrom: pos("a1"), rookTo: pos("d1"), isShortCastle: false},
-
-	// blacks
-	pos("g8"): {rookFrom: pos("h8"), rookTo: pos("f8"), isShortCastle: true},
-	pos("c8"): {rookFrom: pos("a8"), rookTo: pos("d8"), isShortCastle: false},
 }
 
 // Generates a new board with classic chess configuration
@@ -56,13 +42,14 @@ func NewGame(whiteName, blackName string) *game {
 	id := whiteName + "_" + blackName + "_" + timestamp
 
 	game := &game{
-		id:          id,
-		gameBoard:   &board{grid: &gameBoard},
-		pWhite:      pWhite,
-		pBlack:      pBlack,
-		WhiteTurn:   true,
-		moveHistory: []move{},
-		status:      playing,
+		id:            id,
+		gameBoard:     &board{grid: &gameBoard},
+		pWhite:        pWhite,
+		pBlack:        pBlack,
+		WhiteTurn:     true,
+		moveHistory:   []move{},
+		status:        playing,
+		halfmoveClock: 0,
 	}
 
 	// Pawns
@@ -167,12 +154,10 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 			rook, _ := game.getPlayerPiece(rookMove.rookFrom, player.isWhite)
 			game.gameBoard.movePiece(rook, rookMove.rookTo)
 
-			king, _ := piece.(*king)
-			if rookMove.isShortCastle {
-				king.shortCastlingOpt = false
-			} else {
-				king.longCastlingOpt = false
-			}
+			king := player.getKing()
+
+			king.shortCastlingOpt = false
+			king.longCastlingOpt = false
 		}
 
 	case pawnType:
@@ -196,11 +181,21 @@ func (game *game) movePiece(from, to position, pColor bool) error {
 		// Jump
 		pawn, _ := castPawn(piece)
 		diff := from.Row - to.Row
-
 		pawnJumped := diff == 2 || diff == -2
-
 		if pawnJumped {
+			println("pawnjumped")
 			player.pawnJumped = pawn
+			fmt.Println(player.pawnJumped)
+		}
+
+	case rookType:
+		king := player.getKing()
+		if from.Col == 0 {
+			king.shortCastlingOpt = false
+		}
+
+		if from.Col == 7 {
+			king.longCastlingOpt = false
 		}
 	}
 
