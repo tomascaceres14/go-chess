@@ -26,7 +26,6 @@ func (e *ChessEngine) StartGame(whiteName, blackName string) (string, error) {
 }
 
 func (e *ChessEngine) Move(from, to string, pColor bool) error {
-	println("making move from", from, "to", to)
 	if e.game == nil {
 		return errors.New("Game not initialized.")
 	}

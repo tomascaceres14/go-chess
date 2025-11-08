@@ -1,7 +1,5 @@
 package engine
 
-import "fmt"
-
 type pawn struct {
 	*basePiece
 	direction int
@@ -78,16 +76,13 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 			// capture diagonal
 			legalMoves[pos] = occupied && piece.isWhite() != p.white
 		}
-
 	}
-
-	fmt.Println("Legal moves for pawn at: ", p.pos, legalMoves)
 
 	// en passant. Not checking if pawn not in 6th or 3rd rank.
 	if p.pos.getRow() != 6 || p.pos.getRow() != 3 {
 		return legalMoves
 	}
-	println("pawn maybe can enpassant")
+
 	// Define left square
 	leftPos := position{Row: p.pos.Row, Col: p.pos.Col - 1}
 	// Get piece
