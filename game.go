@@ -484,7 +484,7 @@ func (game *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 	row := capturePosition.getRow()
 
 	if row != 6 && row != 3 {
-		return fmt.Errorf("En passant target should be either on rank 6 or 3. Current rank: %b", capturePosition.getRow())
+		return fmt.Errorf("En passant target should be either on rank 6 or 3. Current rank: %d", capturePosition.getRow())
 	}
 
 	// If it's white to play, it means the pawnDirection of the pawn is downwards (black pawn).
@@ -519,7 +519,7 @@ func (game *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 func (g *game) setHalfmoveClock(halfmoveClock int) error {
 
 	if 0 > halfmoveClock || halfmoveClock > 50 {
-		return fmt.Errorf("Halfmove clock should be a number between 0 and 50. Got: %s", halfmoveClock)
+		return fmt.Errorf("Halfmove clock should be a number between 0 and 50. Got: %d", halfmoveClock)
 	}
 
 	g.halfmoveClock = halfmoveClock
@@ -530,7 +530,7 @@ func (g *game) setHalfmoveClock(halfmoveClock int) error {
 func (g *game) setFullmoveCount(fullmoveCount int) error {
 
 	if 1 > fullmoveCount {
-		return fmt.Errorf("Halfmove clock should be a number greater than 1. Got: %s", fullmoveCount)
+		return fmt.Errorf("Halfmove clock should be a number greater than 1. Got: %d", fullmoveCount)
 	}
 
 	g.fullmoveCount = fullmoveCount
