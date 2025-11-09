@@ -3,7 +3,10 @@ package gochess
 import (
 	"errors"
 	"fmt"
+	"slices"
+	"strings"
 	"time"
+	"unicode"
 )
 
 type gameStatus int
@@ -27,14 +30,20 @@ type game struct {
 }
 
 // Generates a new board with classic chess configuration
-func NewGame(whiteName, blackName string) *game {
+func NewDefaultGame(whiteName, blackName string) (*game, error) {
 
 	fmt.Println("generating new board...")
 
 	gameBoard := [8][8]movable{}
 
-	pWhite := newPlayer(whiteName, true)
-	pBlack := newPlayer(blackName, false)
+	pWhite, err := newPlayerWhite(whiteName)
+	if err != nil {
+		return nil, err
+	}
+	pBlack, err := newPlayerBlack(blackName)
+	if err != nil {
+		return nil, err
+	}
 
 	// Generate ID for match
 	now := time.Now()
@@ -91,7 +100,7 @@ func NewGame(whiteName, blackName string) *game {
 
 	fmt.Println(game.gameBoard)
 
-	return game
+	return game, nil
 }
 
 // Obtains piece at given position if player is owner of piece
@@ -111,7 +120,7 @@ func (g *game) getPlayerPiece(pos position, pColor bool) (movable, error) {
 }
 
 // Moves piece in position `from` to position `to` if player is owner of piece
-func (game *game) movePiece(from, to position, pColor bool) error {
+func (game *game) makeMove(from, to position, pColor bool) error {
 
 	// Check turn to play
 	if game.WhiteTurn != pColor {
@@ -278,4 +287,155 @@ func (g *game) GetPlayerOpponentCopy(white bool) player {
 	}
 
 	return *opponent
+}
+
+func (game *game) setupPositionFENString(FENPosition []string) error {
+
+	pWhite := game.pWhite
+	pBlack := game.pBlack
+
+	for i, row := range FENPosition {
+
+		colNum := 0
+		rowNum := 7 - i
+
+		for _, char := range row {
+			// empty squares
+			if unicode.IsNumber(char) {
+				num := int(char - '0')
+				if num < 1 || num > 8 {
+					return errors.New("Error reading FEN String: Incorrect format for num in position. Check pos string and try again.")
+				}
+
+				colNum += num
+				continue
+			}
+
+			letter := string(char)
+			position := position{Row: rowNum, Col: colNum}
+			var piece movable
+			switch letter {
+			case "p":
+				piece = newPawn(position, pBlack)
+			case "P":
+				piece = newPawn(position, pWhite)
+			case "n":
+				piece = newKnight(position, pBlack)
+			case "N":
+				piece = newKnight(position, pWhite)
+			case "b":
+				piece = newBishop(position, pBlack)
+			case "B":
+				piece = newBishop(position, pWhite)
+			case "r":
+				piece = newRook(position, pBlack)
+			case "R":
+				piece = newRook(position, pWhite)
+			case "q":
+				piece = newQueen(position, pBlack)
+			case "Q":
+				piece = newQueen(position, pWhite)
+			case "k":
+				piece = newKing(position, pBlack)
+				king, _ := castKing(piece)
+				pBlack.king = king
+			case "K":
+				piece = newKing(position, pWhite)
+				king, _ := castKing(piece)
+				pWhite.king = king
+			}
+
+			game.gameBoard.insertPiece(piece)
+			colNum++
+		}
+
+	}
+
+	return nil
+}
+
+func (game *game) setupCastlingFENString(FENCastling string) error {
+
+	pWhite := game.pWhite
+	pBlack := game.pBlack
+
+	if FENCastling == "-" {
+		return nil
+	}
+
+	options := []string{"K", "Q", "k", "q"}
+
+	for _, char := range FENCastling {
+		letter := string(char)
+		if !slices.Contains(options, letter) {
+			return fmt.Errorf("Incorrect character for castling options. Is: '%s'. Should be: [ 'K' | 'Q' | 'k' | 'q' ].", letter)
+		}
+	}
+
+	if !strings.Contains(FENCastling, "K") {
+		pWhite.king.shortCastlingOpt = false
+	}
+
+	if !strings.Contains(FENCastling, "Q") {
+		pWhite.king.longCastlingOpt = false
+	}
+
+	if !strings.Contains(FENCastling, "k") {
+		pBlack.king.shortCastlingOpt = false
+	}
+
+	if !strings.Contains(FENCastling, "q") {
+		pBlack.king.longCastlingOpt = false
+	}
+
+	return nil
+}
+
+func (game *game) setupEnPassantFENString(FENEnPassant string, turn bool) error {
+
+	if FENEnPassant == "-" {
+		fmt.Println("No en passant")
+		return nil
+	}
+
+	capturePosition := pos(FENEnPassant)
+	if capturePosition.Col == -1 && capturePosition.Row == -1 {
+		return fmt.Errorf("Error reading enpassant target position. Make sure it's the right format and is in bounds of the board.")
+	}
+
+	row := capturePosition.getRow()
+
+	if row != 6 && row != 3 {
+		return fmt.Errorf("En passant target should be either on rank 6 or 3. Current rank: %b", capturePosition.getRow())
+	}
+
+	// If it's white to play, it means the pawnDirection of the pawn is downwards (black pawn).
+	// If it's black to play, it means the pawnDirection of the pawn is upwards (white pawn).
+	pawnDirection := -1
+
+	if !turn {
+		pawnDirection *= -1
+	}
+
+	pawnPosition := position{Col: capturePosition.Col, Row: capturePosition.Row + 1*pawnDirection}
+
+	piece, ok := game.gameBoard.getPiece(pawnPosition)
+	if !ok {
+		return fmt.Errorf("Not pawn found at position %s", pawnPosition)
+	}
+
+	pawn, ok := castPawn(piece)
+	if !ok {
+		return fmt.Errorf("Piece at position %s is not a pawn.", pawnPosition)
+	}
+
+	if pawn.isWhite() == turn {
+		return fmt.Errorf("Piece at position %s is of same color as player's turn.", pawnPosition)
+	}
+
+	pawn.jumped = true
+
+	fmt.Println("en passant for pawn at", pawnPosition.String())
+
+	return nil
 }

@@ -42,10 +42,6 @@ func pos(pos string) position {
 	return newPos
 }
 
-func (p position) equals(other position) bool {
-	return p.Row == other.Row && p.Col == other.Col
-}
-
 func (p position) inBounds() bool {
 	return (0 <= p.Col && p.Col <= 7) && (0 <= p.Row && p.Row <= 7)
 }

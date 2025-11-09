@@ -132,3 +132,8 @@ func (k *king) clone() movable {
 func (k *king) getType() pieceType {
 	return kingType
 }
+
+func castKing(piece movable) (*king, bool) {
+	king, ok := piece.(*king)
+	return king, ok
+}

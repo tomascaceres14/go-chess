@@ -1,8 +1,10 @@
 package gochess
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type player struct {
@@ -15,12 +17,27 @@ type player struct {
 	threats            map[position]bool
 }
 
-func newPlayer(name string, isWhite bool) *player {
+func newPlayer(name string, isWhite bool) (*player, error) {
+	name = strings.TrimSpace(name)
+
+	if len(name) <= 0 {
+		return nil, errors.New("Player name should include at least one character.")
+	}
 	return &player{
 		name:    name,
 		isWhite: isWhite,
 		points:  0,
-	}
+	}, nil
+}
+
+func newPlayerWhite(name string) (*player, error) {
+	p, err := newPlayer(name, true)
+	return p, err
+}
+
+func newPlayerBlack(name string) (*player, error) {
+	p, err := newPlayer(name, false)
+	return p, err
 }
 
 func (p *player) attackedSquares(b *board) map[position]bool {

@@ -29,11 +29,6 @@ func castRay(pos position, dx, dy int, b *board, white bool, positions map[posit
 	castRay(next, dx, dy, b, white, positions)
 }
 
-// Error printing for debugging
-func printError(err error) {
-	fmt.Printf("--- ERROR: %v\n", err)
-}
-
 func isMoveSafeToKing(piece movable, to position, g *game) bool {
 
 	// Clone board
