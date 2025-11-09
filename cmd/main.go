@@ -22,7 +22,7 @@ func main() {
 
 	game := gochess.NewChessEngine()
 
-	if _, err := game.NewGameFromFENString("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c9 0 2", "whites", "blacks"); err != nil {
+	if _, err := game.NewGameFENString("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c9 0 2", "whites", "blacks"); err != nil {
 		log.Fatal(err)
 	}
 

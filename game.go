@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -20,18 +21,16 @@ const (
 )
 
 type game struct {
-	id             string
-	gameBoard      *board
-	pWhite, pBlack *player
-	WhiteTurn      bool
-	halfmoveClock  int
-	moveHistory    []move
-	status         gameStatus
+	id                           string
+	gameBoard                    *board
+	pWhite, pBlack               *player
+	WhiteTurn                    bool
+	halfmoveClock, fullmoveCount int
+	moveHistory                  []move
+	status                       gameStatus
 }
 
-// Generates a new board with classic chess configuration
-func NewDefaultGame(whiteName, blackName string) (*game, error) {
-
+func newGame(whiteName, blackName string) (*game, error) {
 	fmt.Println("generating new board...")
 
 	gameBoard := [8][8]movable{}
@@ -40,6 +39,7 @@ func NewDefaultGame(whiteName, blackName string) (*game, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	pBlack, err := newPlayerBlack(blackName)
 	if err != nil {
 		return nil, err
@@ -58,8 +58,23 @@ func NewDefaultGame(whiteName, blackName string) (*game, error) {
 		WhiteTurn:     true,
 		moveHistory:   []move{},
 		status:        playing,
+		fullmoveCount: 1,
 		halfmoveClock: 0,
 	}
+
+	return game, nil
+}
+
+// Generates a new board with classic chess configuration
+func newGameClassic(whiteName, blackName string) (*game, error) {
+
+	game, err := newGame(whiteName, blackName)
+	if err != nil {
+		return nil, err
+	}
+
+	pWhite := game.pWhite
+	pBlack := game.pBlack
 
 	// Pawns
 	for i := range 8 {
@@ -103,20 +118,67 @@ func NewDefaultGame(whiteName, blackName string) (*game, error) {
 	return game, nil
 }
 
-// Obtains piece at given position if player is owner of piece
-func (g *game) getPlayerPiece(pos position, pColor bool) (movable, error) {
+func newGameFENString(FENString string, whiteName, blackName string) (*game, error) {
 
-	piece, ok := g.gameBoard.getPiece(pos)
-	if !ok {
-		return nil, fmt.Errorf("Position %v is empty.", pos)
+	game, err := newGame(whiteName, blackName)
+	if err != nil {
+		return nil, err
 	}
 
-	// Validate piece belonging to player
-	if piece.isWhite() != pColor {
-		return nil, fmt.Errorf("Not your piece, %s.", colorToString(pColor))
+	FENSplit := strings.Split(FENString, " ")
+	if len(FENSplit) != 6 {
+		return nil, errors.New("Error reading FEN String: Incorrect format. FEN string should contain 6 tramos")
 	}
 
-	return piece, nil
+	FENPosition := strings.Split(FENSplit[0], "/")
+	if len(FENPosition) != 8 {
+		return nil, errors.New("Error reading FEN String: Incorrect format for position. Should contain 8 tramos")
+	}
+
+	if err := game.setFENStringPos(FENPosition); err != nil {
+		return nil, err
+	}
+
+	FENTurn := FENSplit[1]
+	if len(FENTurn) != 1 || (FENTurn != "w" && FENTurn != "b") {
+		return nil, errors.New("Incorrect format for turn. Should be 1 character, either 'b' or 'w'.")
+	}
+
+	game.WhiteTurn = FENTurn == "w"
+
+	FENCastling := FENSplit[2]
+	if err := game.setFENStringCastling(FENCastling); err != nil {
+		return nil, err
+	}
+
+	FENEnPassant := FENSplit[3]
+	if err := game.setFENStringEnPassant(FENEnPassant, game.WhiteTurn); err != nil {
+		return nil, err
+	}
+
+	FENHalfmoveClock := FENSplit[4]
+	halfmoveClock, err := strconv.Atoi(FENHalfmoveClock)
+	if err != nil {
+		return nil, fmt.Errorf("Halfmove clock should be a number. Got: %s", FENHalfmoveClock)
+	}
+
+	if err := game.setHalfmoveClock(halfmoveClock); err != nil {
+		return nil, err
+	}
+
+	FENFullmoveCount := FENSplit[5]
+	fullmoveCount, err := strconv.Atoi(FENFullmoveCount)
+	if err != nil {
+		return nil, fmt.Errorf("Fullmove count should be a number. Got: %s", FENHalfmoveClock)
+	}
+
+	if err := game.setFullmoveCount(fullmoveCount); err != nil {
+		return nil, err
+	}
+
+	fmt.Println(game.gameBoard)
+
+	return game, nil
 }
 
 // Moves piece in position `from` to position `to` if player is owner of piece
@@ -192,7 +254,6 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 		diff := from.Row - to.Row
 		pawnJumped := diff == 2 || diff == -2
 		if pawnJumped {
-			println("pawnjumped")
 			player.pawnJumped = pawn
 			fmt.Println(player.pawnJumped)
 		}
@@ -242,6 +303,8 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 		opponent.removeJumpedPawn()
 	}
 
+	game.fullmoveCount++
+
 	return nil
 }
 
@@ -254,6 +317,22 @@ func (g *game) GetPlayer(pColor bool) *player {
 	}
 
 	return player
+}
+
+// Obtains piece at given position if player is owner of piece
+func (g *game) getPlayerPiece(pos position, pColor bool) (movable, error) {
+
+	piece, ok := g.gameBoard.getPiece(pos)
+	if !ok {
+		return nil, fmt.Errorf("Position %v is empty.", pos)
+	}
+
+	// Validate piece belonging to player
+	if piece.isWhite() != pColor {
+		return nil, fmt.Errorf("Not your piece, %s.", colorToString(pColor))
+	}
+
+	return piece, nil
 }
 
 // Returns pointer to player based on color
@@ -289,7 +368,7 @@ func (g *game) GetPlayerOpponentCopy(white bool) player {
 	return *opponent
 }
 
-func (game *game) setupPositionFENString(FENPosition []string) error {
+func (game *game) setFENStringPos(FENPosition []string) error {
 
 	pWhite := game.pWhite
 	pBlack := game.pBlack
@@ -354,7 +433,7 @@ func (game *game) setupPositionFENString(FENPosition []string) error {
 	return nil
 }
 
-func (game *game) setupCastlingFENString(FENCastling string) error {
+func (game *game) setFENStringCastling(FENCastling string) error {
 
 	pWhite := game.pWhite
 	pBlack := game.pBlack
@@ -391,10 +470,9 @@ func (game *game) setupCastlingFENString(FENCastling string) error {
 	return nil
 }
 
-func (game *game) setupEnPassantFENString(FENEnPassant string, turn bool) error {
+func (game *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 
 	if FENEnPassant == "-" {
-		fmt.Println("No en passant")
 		return nil
 	}
 
@@ -435,7 +513,27 @@ func (game *game) setupEnPassantFENString(FENEnPassant string, turn bool) error 
 
 	pawn.jumped = true
 
-	fmt.Println("en passant for pawn at", pawnPosition.String())
+	return nil
+}
+
+func (g *game) setHalfmoveClock(halfmoveClock int) error {
+
+	if 0 > halfmoveClock || halfmoveClock > 50 {
+		return fmt.Errorf("Halfmove clock should be a number between 0 and 50. Got: %s", halfmoveClock)
+	}
+
+	g.halfmoveClock = halfmoveClock
+
+	return nil
+}
+
+func (g *game) setFullmoveCount(fullmoveCount int) error {
+
+	if 1 > fullmoveCount {
+		return fmt.Errorf("Halfmove clock should be a number greater than 1. Got: %s", fullmoveCount)
+	}
+
+	g.fullmoveCount = fullmoveCount
 
 	return nil
 }
