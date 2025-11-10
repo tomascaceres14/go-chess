@@ -22,19 +22,19 @@ func (e *ChessEngine) NewGame(whiteName, blackName string) (string, error) {
 
 	e.game = game
 
-	fmt.Println("FEN STRING:", game.GetFENString())
-
 	return game.id, nil
 }
 
-func (e *ChessEngine) NewGameFENString(FENString string, whiteName, blackName string) (*game, error) {
+func (e *ChessEngine) NewGameFENString(FENString string, whiteName, blackName string) (string, error) {
 
 	game, err := newGameFENString(FENString, whiteName, blackName)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return game, nil
+	e.game = game
+
+	return game.id, nil
 }
 
 func (e *ChessEngine) Move(from, to string, pColor bool) error {
@@ -56,7 +56,9 @@ func (e *ChessEngine) Move(from, to string, pColor bool) error {
 		return err
 	}
 
-	fmt.Println("FEN STRING:", e.game.GetFENString())
-
 	return nil
+}
+
+func (e *ChessEngine) GetFENString() string {
+	return e.game.GetFENString()
 }

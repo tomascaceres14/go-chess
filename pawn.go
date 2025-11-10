@@ -74,30 +74,35 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 
 		} else {
 			// capture diagonal
-			legalMoves[pos] = occupied && piece.isWhite() != p.white
+			regularCapture := occupied && piece.isWhite() != p.white
+			legalMoves[pos] = regularCapture
+
+			// check if is in rank of en passant
+			if p.pos.getRow() != 5 && p.pos.getRow() != 4 {
+				continue
+			}
+
+			// create en passant position
+			enPassant := pos
+			enPassant.Row = enPassant.Row - 1*p.direction
+
+			// get piece at en passant square. Continue if empty
+			enPassantMovable, enPassantOcc := b.getPiece(enPassant)
+			if !enPassantOcc {
+				continue
+			}
+
+			// Cast to pawn. Continue if not pawn
+			enPassantPawn, ok := castPawn(enPassantMovable)
+			if !ok {
+				continue
+			}
+
+			// Check pawn has jumped and its not white
+			enPassantCapture := enPassantPawn.jumped && enPassantPawn.white != p.white
+			legalMoves[pos] = regularCapture || enPassantCapture
 		}
 	}
-
-	// en passant. Not checking if pawn not in 6th or 3rd rank.
-	if p.pos.getRow() != 6 || p.pos.getRow() != 3 {
-		return legalMoves
-	}
-
-	// Define left square
-	leftPos := position{Row: p.pos.Row, Col: p.pos.Col - 1}
-	// Get piece
-	leftMovable, occ := b.getPiece(leftPos)
-	// Cast to pawn
-	leftPawn, ok := castPawn(leftMovable)
-	// Verify left square is occupied, piece is pawn, its from opposite color and has jumped
-	legalMoves[leftPos] = occ && ok && leftPawn.isWhite() != p.white && leftPawn.jumped
-
-	// Same for right square
-	rightPos := position{Row: p.pos.Row, Col: p.pos.Col - 1}
-	rightMovable, occ := b.getPiece(rightPos)
-	rightPawn, ok := castPawn(rightMovable)
-	legalMoves[rightPos] = occ && ok && rightPawn.isWhite() != p.white && rightPawn.jumped
-
 	return legalMoves
 }
 

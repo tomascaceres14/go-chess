@@ -31,7 +31,6 @@ type game struct {
 }
 
 func newGame(whiteName, blackName string) (*game, error) {
-	fmt.Println("generating new board...")
 
 	gameBoard := [8][8]movable{}
 
@@ -113,8 +112,6 @@ func newGameClassic(whiteName, blackName string) (*game, error) {
 	pWhite.king = wKing
 	game.gameBoard.insertPiece(wKing)
 
-	fmt.Println(game.gameBoard)
-
 	return game, nil
 }
 
@@ -176,8 +173,6 @@ func newGameFENString(FENString string, whiteName, blackName string) (*game, err
 		return nil, err
 	}
 
-	fmt.Println(game.gameBoard)
-
 	return game, nil
 }
 
@@ -218,14 +213,24 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 	// make move and return captured piece, if any
 	capture := game.gameBoard.movePiece(piece, to)
 
+	castleDir := -1
+
 	// Special moves: castling, promoting, etc.
 	switch piece.getType() {
 	case kingType:
-		if rookMove, ok := castlingPositions[to]; ok {
-			rook, _ := game.getPlayerPiece(rookMove.rookFrom, player.isWhite)
-			game.gameBoard.movePiece(rook, rookMove.rookTo)
 
-			king := player.getKing()
+		king := player.getKing()
+		fromStr := from.String()
+
+		if castleMove, ok := castlingPositions[to]; ok && (fromStr == "e1" || fromStr == "e8") {
+			rook, _ := game.getPlayerPiece(castleMove.rookFrom, player.isWhite)
+			game.gameBoard.movePiece(rook, castleMove.rookTo)
+
+			if castleMove.shortCastle {
+				castleDir = 0
+			} else {
+				castleDir = 1
+			}
 
 			king.shortCastlingOpt = false
 			king.longCastlingOpt = false
@@ -253,9 +258,10 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 		pawn, _ := castPawn(piece)
 		diff := from.Row - to.Row
 		pawnJumped := diff == 2 || diff == -2
+
 		if pawnJumped {
+			pawn.jumped = pawnJumped
 			player.pawnJumped = pawn
-			fmt.Println(player.pawnJumped)
 		}
 
 	case rookType:
@@ -292,12 +298,11 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 	}
 
 	// Update moves history
-	move := newMove(piece.clone(), capture, from, to, opponent.isChecked)
+	move := newMove(piece.clone(), capture, from, to, opponent.isChecked, castleDir)
 	game.moveHistory = append(game.moveHistory, move)
 
 	// Switch turns
 	game.WhiteTurn = !game.WhiteTurn
-	fmt.Println(game.gameBoard)
 
 	if opponent.pawnJumped != nil {
 		opponent.removeJumpedPawn()
@@ -366,6 +371,25 @@ func (g *game) GetPlayerOpponentCopy(white bool) player {
 	}
 
 	return *opponent
+}
+
+func (g *game) GetFENString() string {
+
+	FENString := getFENPosition(g)
+
+	// Define turn of player
+	turn := " w "
+	if !g.WhiteTurn {
+		turn = " b "
+	}
+
+	FENString += turn
+	FENString += getFENCastling(g)
+	FENString += getFENEnPassant(g)
+	FENString += strconv.Itoa(g.halfmoveClock) + " "
+	FENString += strconv.Itoa(g.fullmoveCount)
+
+	return FENString
 }
 
 func (game *game) setFENStringPos(FENPosition []string) error {

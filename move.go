@@ -8,7 +8,7 @@ type move struct {
 	IsCheck           bool
 }
 
-func newMove(piece, capture movable, from, to position, isCheck bool) move {
+func newMove(piece, capture movable, from, to position, isCheck bool, castleDir int) move {
 	algebraicNotation := piece.getAlgebraicString()
 
 	takes := "x"
@@ -16,17 +16,22 @@ func newMove(piece, capture movable, from, to position, isCheck bool) move {
 
 	if capture == nil {
 		takes = ""
-	} else {
-		if _, ok := piece.(*pawn); ok {
-			takes = from.getCol() + takes
-		}
+	} else if piece.getType() == pawnType {
+		takes = from.getCol() + takes
 	}
 
 	if isCheck {
 		check = "+"
 	}
 
-	algebraicNotation = algebraicNotation + takes + to.String() + check
+	switch castleDir {
+	case -1:
+		algebraicNotation = algebraicNotation + takes + to.String() + check
+	case 0:
+		algebraicNotation = "0-0"
+	case 1:
+		algebraicNotation = "0-0-0"
+	}
 
 	return move{
 		PieceCopy:         piece,

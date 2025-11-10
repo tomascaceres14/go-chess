@@ -1,7 +1,6 @@
 package gochess
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -189,7 +188,7 @@ func getFENEnPassant(g *game) string {
 	}
 
 	pawn := player.pawnJumped
-	fmt.Println(pawn)
+
 	if pawn != nil {
 		prevSquare := position{Col: pawn.pos.Col, Row: pawn.pos.Row - 1*pawn.direction}
 		FENString = prevSquare.String() + " "
@@ -198,28 +197,7 @@ func getFENEnPassant(g *game) string {
 	return FENString
 }
 
-func (g *game) GetFENString() string {
 
-	FENString := getFENPosition(g)
-
-	// Define turn of player
-	turn := " w "
-	if !g.WhiteTurn {
-		turn = " b "
-	}
-
-	FENString += turn
-
-	FENString += getFENCastling(g)
-
-	FENString += getFENEnPassant(g)
-
-	FENString += strconv.Itoa(g.halfmoveClock) + " "
-
-	FENString += strconv.Itoa(len(g.moveHistory))
-
-	return FENString
-}
 
 func colorToString(color bool) string {
 	colorStr := "white"

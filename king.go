@@ -5,20 +5,20 @@ type king struct {
 	longCastlingOpt, shortCastlingOpt bool
 }
 
-type castleOption struct {
-	rookFrom position
-	rookTo   position
+type castleMove struct {
+	rookFrom, rookTo position
+	shortCastle      bool
 }
 
 // Mapping initial available castle square for king (key) and rook from/to movement option (value)
-var castlingPositions = map[position]castleOption{
+var castlingPositions = map[position]castleMove{
 	// whites
-	pos("g1"): {rookFrom: pos("h1"), rookTo: pos("f1")},
-	pos("c1"): {rookFrom: pos("a1"), rookTo: pos("d1")},
+	pos("g1"): {rookFrom: pos("h1"), rookTo: pos("f1"), shortCastle: true},
+	pos("c1"): {rookFrom: pos("a1"), rookTo: pos("d1"), shortCastle: false},
 
 	// blacks
-	pos("g8"): {rookFrom: pos("h8"), rookTo: pos("f8")},
-	pos("c8"): {rookFrom: pos("a8"), rookTo: pos("d8")},
+	pos("g8"): {rookFrom: pos("h8"), rookTo: pos("f8"), shortCastle: true},
+	pos("c8"): {rookFrom: pos("a8"), rookTo: pos("d8"), shortCastle: false},
 }
 
 func newKing(pos position, p *player) *king {

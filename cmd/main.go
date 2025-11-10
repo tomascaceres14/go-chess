@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	gochess "github.com/tomascaceres14/go-chess"
 )
@@ -18,11 +22,10 @@ func GetTurn(turn bool) string {
 
 func main() {
 
-	//reader := bufio.NewReader(os.Stdin)
-
 	game := gochess.NewChessEngine()
 
-	if _, err := game.NewGameFENString("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c9 0 2", "whites", "blacks"); err != nil {
+	id, err := game.NewGameFENString("r3kbnr/pppq1ppp/2n5/3ppb2/3PPB2/2N5/PPPQ1PPP/R3KBNR w KQkq - 6 6", "whites", "blacks")
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -31,27 +34,28 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
-	// fmt.Println("Partido iniciado. ID:", id)
+	fmt.Println("Partido iniciado. ID:", id)
+	turn := true
 
-	// turn := true
+	reader := bufio.NewReader(os.Stdin)
 
-	// for {
+	for {
 
-	// 	fmt.Println("Movimiento de", GetTurn(turn))
-	// 	fmt.Print("Desde: ")
-	// 	from, _ := reader.ReadString('\n')
-	// 	from = strings.TrimSpace(from)
+		fmt.Println("Movimiento de", GetTurn(turn))
+		fmt.Print("From: ")
+		from, _ := reader.ReadString('\n')
+		from = strings.TrimSpace(from)
 
-	// 	fmt.Print("Hacia: ")
-	// 	to, _ := reader.ReadString('\n')
-	// 	to = strings.TrimSpace(to)
+		fmt.Print("To: ")
+		to, _ := reader.ReadString('\n')
+		to = strings.TrimSpace(to)
 
-	// 	if err := game.Move(from, to, turn); err != nil {
-	// 		fmt.Println(err)
-	// 		continue
-	// 	}
+		if err := game.Move(from, to, turn); err != nil {
+			fmt.Println(err)
+			continue
+		}
 
-	// 	turn = !turn
+		turn = !turn
 
-	// }
+	}
 }
