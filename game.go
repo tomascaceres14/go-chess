@@ -177,10 +177,10 @@ func newGameFENString(FENString string, whiteName, blackName string) (*game, err
 }
 
 // Moves piece in position `from` to position `to` if player is owner of piece
-func (game *game) makeMove(from, to position, pColor bool) error {
+func (g *game) makeMove(from, to position, pColor bool) error {
 
 	// Check turn to play
-	if game.WhiteTurn != pColor {
+	if g.WhiteTurn != pColor {
 		return fmt.Errorf("Not your turn, %s.", colorToString(pColor))
 	}
 
@@ -190,28 +190,28 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 	}
 
 	// Obtain player and opponent
-	player := game.GetPlayer(pColor)
-	opponent := game.GetPlayerOpponent(player.isWhite)
+	player := g.GetPlayer(pColor)
+	opponent := g.GetPlayerOpponent(player.isWhite)
 
 	// Obtains piece to move
-	piece, err := game.getPlayerPiece(from, player.isWhite)
+	piece, err := g.getPlayerPiece(from, player.isWhite)
 	if err != nil {
 		return err
 	}
 
 	// Check if piece can move to desired position or if is trying to move in-place
-	legalMoves := piece.legalMoves(game.gameBoard)
+	legalMoves := piece.legalMoves(g.gameBoard)
 	if !legalMoves[to] || piece.getPosition() == to {
 		return fmt.Errorf("%s can't move from %s to %s.", piece.String(), from, to)
 	}
 
 	// Check if the move leaves king vulnerable
-	if !isMoveSafeToKing(piece, to, game) {
+	if !isMoveSafeToKing(piece, to, g) {
 		return fmt.Errorf("%s to %s leaves king checked.", piece, to)
 	}
 
 	// make move and return captured piece, if any
-	capture := game.gameBoard.movePiece(piece, to)
+	capture := g.gameBoard.movePiece(piece, to)
 
 	castleDir := -1
 
@@ -223,8 +223,8 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 		fromStr := from.String()
 
 		if castleMove, ok := castlingPositions[to]; ok && (fromStr == "e1" || fromStr == "e8") {
-			rook, _ := game.getPlayerPiece(castleMove.rookFrom, player.isWhite)
-			game.gameBoard.movePiece(rook, castleMove.rookTo)
+			rook, _ := g.getPlayerPiece(castleMove.rookFrom, player.isWhite)
+			g.gameBoard.movePiece(rook, castleMove.rookTo)
 
 			if castleMove.shortCastle {
 				castleDir = 0
@@ -241,7 +241,7 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 		// Promotion
 		if to.Row == 0 || to.Row == 7 {
 			queen := newQueen(to, player)
-			game.gameBoard.insertPiece(queen)
+			g.gameBoard.insertPiece(queen)
 			queen.setMoved(true)
 			break
 		}
@@ -249,8 +249,8 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 		// En passant
 		if to.Col != from.Col {
 			capturedPos := position{Row: from.Row, Col: to.Col}
-			capture, _ = game.gameBoard.getPiece(capturedPos)
-			game.gameBoard.clearSquare(capturedPos)
+			capture, _ = g.gameBoard.getPiece(capturedPos)
+			g.gameBoard.clearSquare(capturedPos)
 			break
 		}
 
@@ -281,13 +281,13 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 		player.points += capture.getValue()
 	}
 
-	attackedSquares := player.attackedSquares(game.gameBoard)
+	attackedSquares := player.attackedSquares(g.gameBoard)
 
 	// flag as checked or not
 	opponent.isChecked = attackedSquares[opponent.king.pos]
 
 	// Check winning / draw conditions
-	if !opponent.hasLegalMoves(game) {
+	if !opponent.hasLegalMoves(g) {
 		if opponent.isChecked {
 			fmt.Println("CHECKMATE!!!", player.name, "WINS")
 		} else {
@@ -299,16 +299,16 @@ func (game *game) makeMove(from, to position, pColor bool) error {
 
 	// Update moves history
 	move := newMove(piece.clone(), capture, from, to, opponent.isChecked, castleDir)
-	game.moveHistory = append(game.moveHistory, move)
+	g.moveHistory = append(g.moveHistory, move)
 
 	// Switch turns
-	game.WhiteTurn = !game.WhiteTurn
+	g.WhiteTurn = !g.WhiteTurn
 
 	if opponent.pawnJumped != nil {
-		opponent.removeJumpedPawn()
+		opponent.removeJumpFromPawn()
 	}
 
-	game.fullmoveCount++
+	g.fullmoveCount++
 
 	return nil
 }
@@ -392,10 +392,10 @@ func (g *game) GetFENString() string {
 	return FENString
 }
 
-func (game *game) setFENStringPos(FENPosition []string) error {
+func (g *game) setFENStringPos(FENPosition []string) error {
 
-	pWhite := game.pWhite
-	pBlack := game.pBlack
+	pWhite := g.pWhite
+	pBlack := g.pBlack
 
 	for i, row := range FENPosition {
 
@@ -448,7 +448,7 @@ func (game *game) setFENStringPos(FENPosition []string) error {
 				pWhite.king = king
 			}
 
-			game.gameBoard.insertPiece(piece)
+			g.gameBoard.insertPiece(piece)
 			colNum++
 		}
 
@@ -457,10 +457,10 @@ func (game *game) setFENStringPos(FENPosition []string) error {
 	return nil
 }
 
-func (game *game) setFENStringCastling(FENCastling string) error {
+func (g *game) setFENStringCastling(FENCastling string) error {
 
-	pWhite := game.pWhite
-	pBlack := game.pBlack
+	pWhite := g.pWhite
+	pBlack := g.pBlack
 
 	if FENCastling == "-" {
 		return nil
@@ -494,7 +494,7 @@ func (game *game) setFENStringCastling(FENCastling string) error {
 	return nil
 }
 
-func (game *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
+func (g *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 
 	if FENEnPassant == "-" {
 		return nil
@@ -514,14 +514,15 @@ func (game *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 	// If it's white to play, it means the pawnDirection of the pawn is downwards (black pawn).
 	// If it's black to play, it means the pawnDirection of the pawn is upwards (white pawn).
 	pawnDirection := -1
-
+	player := g.pWhite
 	if !turn {
 		pawnDirection *= -1
+		player = g.pBlack
 	}
 
 	pawnPosition := position{Col: capturePosition.Col, Row: capturePosition.Row + 1*pawnDirection}
 
-	piece, ok := game.gameBoard.getPiece(pawnPosition)
+	piece, ok := g.gameBoard.getPiece(pawnPosition)
 	if !ok {
 		return fmt.Errorf("Not pawn found at position %s", pawnPosition)
 	}
@@ -536,6 +537,7 @@ func (game *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 	}
 
 	pawn.jumped = true
+	player.pawnJumped = pawn
 
 	return nil
 }

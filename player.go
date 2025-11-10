@@ -72,7 +72,8 @@ func (p *player) hasLegalMoves(g *game) bool {
 	return len(p.legalMoves(g)) > 0
 }
 
-func (p *player) removeJumpedPawn() {
+func (p *player) removeJumpFromPawn() {
+	p.pawnJumped.jumped = false
 	p.pawnJumped = nil
 }
 
