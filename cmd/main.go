@@ -10,7 +10,7 @@ import (
 	gochess "github.com/tomascaceres14/go-chess"
 )
 
-func GetTurn(turn bool) string {
+func TurnToString(turn bool) string {
 	str := "white"
 
 	if !turn {
@@ -34,14 +34,14 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
-	fmt.Println("Partido iniciado. ID:", id)
-	turn := true
+	fmt.Println("Match started. ID:", id)
 
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
 
-		fmt.Println("Movimiento de", GetTurn(turn))
+		turn := game.GetTurn()
+		fmt.Println(TurnToString(turn), "'s turn")
 		fmt.Print("From: ")
 		from, _ := reader.ReadString('\n')
 		from = strings.TrimSpace(from)
@@ -54,8 +54,6 @@ func main() {
 			fmt.Println(err)
 			continue
 		}
-
-		turn = !turn
 
 	}
 }

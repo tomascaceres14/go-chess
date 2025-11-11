@@ -127,8 +127,8 @@ func TestPawnEnPassantFEN(t *testing.T) {
 	}
 }
 
-func TestPawnCantEnPassantAfterMove(t *testing.T) {
-	testName := "TestPawnCantEnPassantAfterMove"
+func TestPawnCantEnPassantNextTurn(t *testing.T) {
+	testName := "TestPawnCantEnPassantNextTurn"
 	pos := "rnbqkbnr/1pp1pppp/p7/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
 	engine := testFENPos(pos)
 
@@ -152,7 +152,5 @@ func TestPawnCantEnPassantAfterMove(t *testing.T) {
 	if err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}
-
-	fmt.Println(engine.game.gameBoard)
 
 }

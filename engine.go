@@ -62,3 +62,7 @@ func (e *ChessEngine) Move(from, to string, pColor bool) error {
 func (e *ChessEngine) GetFENString() string {
 	return e.game.GetFENString()
 }
+
+func (e *ChessEngine) GetTurn() bool {
+	return e.game.WhiteTurn
+}
