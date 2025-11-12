@@ -47,3 +47,7 @@ func (m *move) getAlgebraicString() string {
 	return m.algebraicNotation
 
 }
+
+func (m *move) getPiece() movable {
+	return m.piece
+}

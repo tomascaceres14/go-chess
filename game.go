@@ -176,19 +176,14 @@ func newGameFENString(FENString string, whiteName, blackName string) (*game, err
 	return game, nil
 }
 
-// Moves piece in position `from` to position `to` if player is owner of piece
-func (g *game) makeMove(from, to position, pColor bool) error {
-
-	move := move{
-		from:      from,
-		to:        to,
-		color:     pColor,
-		castleDir: -1,
-	}
+func (g *game) validateMove(move *move) error {
+	color := move.color
+	from := move.from
+	to := move.to
 
 	// Check turn to play
-	if g.WhiteTurn != pColor {
-		return fmt.Errorf("Not your turn, %s.", colorToString(pColor))
+	if g.WhiteTurn != color {
+		return fmt.Errorf("Not your turn, %s.", colorToString(color))
 	}
 
 	// Check if positions are in bounds
@@ -196,15 +191,13 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 		return errors.New("Position out of bounds.")
 	}
 
-	// Obtain player and opponent
-	player := g.GetPlayer(pColor)
-	opponent := g.GetPlayerOpponent(player.isWhite)
-
 	// Obtains piece to move
-	piece, err := g.getPlayerPiece(from, player.isWhite)
+	piece, err := g.getPlayerPiece(from, color)
 	if err != nil {
 		return err
 	}
+
+	move.piece = piece
 
 	// Check if piece can move to desired position or if is trying to move in-place
 	legalMoves := piece.legalMoves(g.gameBoard)
@@ -216,6 +209,29 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 	if !isMoveSafeToKing(piece, to, g) {
 		return fmt.Errorf("%s to %s leaves king checked.", piece, to)
 	}
+
+	return nil
+}
+
+// Moves piece in position `from` to position `to` if player is owner of piece
+func (g *game) makeMove(from, to position, pColor bool) error {
+
+	move := move{
+		from:      from,
+		to:        to,
+		color:     pColor,
+		castleDir: -1,
+	}
+
+	if err := g.validateMove(&move); err != nil {
+		return err
+	}
+
+	piece := move.getPiece()
+
+	// Obtain player and opponent
+	player := g.GetPlayer(pColor)
+	opponent := g.GetPlayerOpponent(player.isWhite)
 
 	// make move and return captured piece, if any
 	capture := g.gameBoard.movePiece(piece, to)
