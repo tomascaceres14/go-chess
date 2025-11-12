@@ -1,7 +1,6 @@
 package gochess
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -110,8 +109,6 @@ func TestPawnEnPassant(t *testing.T) {
 	if err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
-
-	fmt.Println(engine.game.gameBoard)
 }
 
 func TestPawnEnPassantFEN(t *testing.T) {

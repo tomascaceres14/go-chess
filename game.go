@@ -179,6 +179,13 @@ func newGameFENString(FENString string, whiteName, blackName string) (*game, err
 // Moves piece in position `from` to position `to` if player is owner of piece
 func (g *game) makeMove(from, to position, pColor bool) error {
 
+	move := move{
+		from:      from,
+		to:        to,
+		color:     pColor,
+		castleDir: -1,
+	}
+
 	// Check turn to play
 	if g.WhiteTurn != pColor {
 		return fmt.Errorf("Not your turn, %s.", colorToString(pColor))
@@ -213,8 +220,6 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 	// make move and return captured piece, if any
 	capture := g.gameBoard.movePiece(piece, to)
 
-	castleDir := -1
-
 	// Special moves: castling, promoting, etc.
 	switch piece.getType() {
 	case kingType:
@@ -227,9 +232,9 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 			g.gameBoard.movePiece(rook, castleMove.rookTo)
 
 			if castleMove.shortCastle {
-				castleDir = 0
+				move.castleDir = 0
 			} else {
-				castleDir = 1
+				move.castleDir = 1
 			}
 
 			king.shortCastlingOpt = false
@@ -298,7 +303,7 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 	}
 
 	// Update moves history
-	move := newMove(piece.clone(), capture, from, to, opponent.isChecked, castleDir)
+	//move := newMove(piece.clone(), capture, from, to, opponent.isChecked, castleDir)
 	g.moveHistory = append(g.moveHistory, move)
 
 	// Switch turns
