@@ -206,7 +206,7 @@ func (g *game) validateMove(move *move) error {
 	}
 
 	// Check if the move leaves king vulnerable
-	if !isMoveSafeToKing(piece, to, g) {
+	if !isMoveSafeToKing(piece, to, g.gameBoard) {
 		return fmt.Errorf("%s to %s leaves king checked.", piece, to)
 	}
 
@@ -229,12 +229,12 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 
 	piece := move.getPiece()
 
+	// make move and return captured piece, if any
+	capture := g.gameBoard.movePiece(piece, to)
+
 	// Obtain player and opponent
 	player := g.GetPlayer(pColor)
 	opponent := g.GetPlayerOpponent(player.isWhite)
-
-	// make move and return captured piece, if any
-	capture := g.gameBoard.movePiece(piece, to)
 
 	// Special moves: castling, promoting, etc.
 	switch piece.getType() {
@@ -298,14 +298,16 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 
 	// if piece was captured
 	if capture != nil {
-		opponent.pieces = deletePiece(opponent.pieces, capture)
-		player.points += capture.getValue()
+		opponent.deletePiece(capture)
+		player.incrementPoints(capture.getValue())
+		move.capture = capture
 	}
 
-	attackedSquares := player.attackedSquares(g.gameBoard)
+	isCheck := g.isKingInCheck(pColor)
 
 	// flag as checked or not
-	opponent.isChecked = attackedSquares[opponent.king.pos]
+	opponent.isChecked = isCheck
+	move.isCheck = isCheck
 
 	// Check winning / draw conditions
 	if !opponent.hasLegalMoves(g) {
@@ -319,7 +321,6 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 	}
 
 	// Update moves history
-	//move := newMove(piece.clone(), capture, from, to, opponent.isChecked, castleDir)
 	g.moveHistory = append(g.moveHistory, move)
 
 	// Switch turns
@@ -392,6 +393,12 @@ func (g *game) GetPlayerOpponentCopy(white bool) player {
 	}
 
 	return *opponent
+}
+
+func (g *game) isKingInCheck(color bool) bool {
+	player := g.GetPlayer(color)
+	kingPos := player.getKing().getPosition()
+	return g.gameBoard.isKingInCheck(kingPos, color)
 }
 
 func (g *game) GetFENString() string {

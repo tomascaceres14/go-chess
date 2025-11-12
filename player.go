@@ -59,7 +59,7 @@ func (p *player) legalMoves(g *game) map[position]bool {
 	pieces := p.pieces
 	for _, piece := range pieces {
 		for pos := range piece.legalMoves(g.gameBoard) {
-			if isMoveSafeToKing(piece, pos, g) {
+			if isMoveSafeToKing(piece, pos, g.gameBoard) {
 				moves[pos] = true
 			}
 		}
@@ -79,6 +79,20 @@ func (p *player) removeJumpFromPawn() {
 
 func (p *player) getKing() *king {
 	return p.king
+}
+
+func (p *player) deletePiece(piece movable) {
+	pieces := p.pieces
+	for i, v := range pieces {
+		if v == piece {
+			p.pieces = append(pieces[0:i], pieces[i+1:]...)
+			return
+		}
+	}
+}
+
+func (p *player) incrementPoints(inc int) {
+	p.points += inc
 }
 
 func (p *player) String() string {

@@ -49,6 +49,45 @@ func (b *board) movePiece(piece movable, pos position) movable {
 	return capture
 }
 
+func (b *board) isKingInCheck(pos position, color bool) bool {
+	return b.isSquareAttacked(pos, color)
+}
+
+func (b *board) isSquareAttacked(pos position, color bool) bool {
+	return b.attackedByColor(!color)[pos]
+}
+
+// Calculates which squares are attacked by color
+func (b *board) attackedByColor(white bool) map[position]bool {
+	threats := make(map[position]bool)
+	for i := range 8 {
+		for j := range 8 {
+			p := (*b.grid)[i][j]
+			if p != nil && p.isWhite() == white {
+				for sq := range p.visibleSquares(b) {
+					threats[sq] = true
+				}
+			}
+		}
+	}
+	return threats
+}
+
+// Find king by color
+func (b *board) findKingPos(white bool) (position, bool) {
+	for i := range 8 {
+		for j := range 8 {
+			p := (*b.grid)[i][j]
+			if p != nil && p.isWhite() == white {
+				if _, ok := p.(*king); ok {
+					return p.getPosition(), true
+				}
+			}
+		}
+	}
+	return position{}, false
+}
+
 func (b *board) IsOccupied(pos position) bool {
 	return b.grid[pos.Row][pos.Col] != nil
 }
