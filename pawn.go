@@ -110,7 +110,7 @@ func (p *pawn) move(to position, game *game) movable {
 	from := p.pos
 	board := game.gameBoard
 	player := game.GetPlayer(p.white)
-	capture := board.movePiece2(p, to)
+	capture := board.movePiece(p, to)
 
 	p.setPosition(to)
 	p.setMoved(true)

@@ -11,10 +11,14 @@ type move struct {
 }
 
 func (m move) String() string {
-	return m.algebraicNotation
+	return m.getAlgebraicString()
 }
 
 func (m *move) getAlgebraicString() string {
+
+	if m.piece == nil {
+		return "-"
+	}
 
 	if m.algebraicNotation != "" {
 		return m.algebraicNotation

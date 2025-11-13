@@ -230,7 +230,6 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 	piece := move.getPiece()
 
 	// make move and return captured piece, if any
-	//capture := g.gameBoard.movePiece(piece, to)
 	capture := piece.move(to, g)
 
 	// Obtain player and opponent
@@ -250,6 +249,9 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 	opponent.isChecked = isCheck
 	move.isCheck = isCheck
 
+	// Update moves history
+	g.moveHistory = append(g.moveHistory, move)
+
 	// Check winning / draw conditions
 	if !opponent.hasLegalMoves(g) {
 		if opponent.isChecked {
@@ -260,9 +262,6 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 	} else if len(player.pieces) == 1 && len(opponent.pieces) == 1 {
 		fmt.Println("Stalemate pal :(")
 	}
-
-	// Update moves history
-	g.moveHistory = append(g.moveHistory, move)
 
 	// Switch turns
 	g.WhiteTurn = !g.WhiteTurn
@@ -340,6 +339,10 @@ func (g *game) isKingInCheck(color bool) bool {
 	player := g.GetPlayer(color)
 	kingPos := player.getKing().getPosition()
 	return g.gameBoard.isKingInCheck(kingPos, color)
+}
+
+func (g game) getCurrentTurn() bool {
+	return g.WhiteTurn
 }
 
 func (g *game) GetFENString() string {

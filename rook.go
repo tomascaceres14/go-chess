@@ -33,7 +33,7 @@ func (r *rook) move(to position, game *game) movable {
 	from := r.pos
 	board := game.gameBoard
 
-	capture := board.movePiece2(r, to)
+	capture := board.movePiece(r, to)
 	r.setPosition(to)
 
 	if r.moved {

@@ -34,23 +34,8 @@ func (b *board) MovePieceSim(from, to position) {
 
 }
 
-// Moves piece from piece.Pos to pos and returns captured piece
+// Moves piece on board. Does not update piece, only relocates in grid
 func (b *board) movePiece(piece movable, pos position) movable {
-	from := piece.getPosition()
-
-	capture, _ := b.getPiece(pos)
-
-	b.grid[from.Row][from.Col] = nil
-	b.grid[pos.Row][pos.Col] = piece
-
-	piece.setPosition(pos)
-	piece.setMoved(true)
-
-	return capture
-}
-
-// Moves piece on board without updating state of piece
-func (b *board) movePiece2(piece movable, pos position) movable {
 	capture, _ := b.getPiece(pos)
 	b.grid[piece.getPosition().Row][piece.getPosition().Col] = nil
 	b.grid[pos.Row][pos.Col] = piece

@@ -104,7 +104,7 @@ func (k *king) move(to position, game *game) movable {
 	prevPos := k.pos
 	board := game.gameBoard
 
-	capture := board.movePiece2(k, to)
+	capture := board.movePiece(k, to)
 	k.setPosition(to)
 
 	if k.moved {

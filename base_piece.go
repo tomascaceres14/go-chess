@@ -79,6 +79,18 @@ func (bp *basePiece) legalMoves(b *board) map[position]bool {
 	return bp.legalMovesDefault(b)
 }
 
+func (bp *basePiece) moveDefault(to position, game *game) movable {
+	board := game.gameBoard
+	capture := board.movePiece(bp, to)
+	bp.setPosition(to)
+	bp.setMoved(true)
+	return capture
+}
+
+func (bp *basePiece) move(to position, game *game) movable {
+	return bp.moveDefault(to, game)
+}
+
 func (bp *basePiece) getPosition() position {
 	return bp.pos
 }
@@ -108,18 +120,6 @@ func (bp *basePiece) String() string {
 
 func (b *basePiece) getAlgebraicString() string {
 	return ""
-}
-
-func (bp *basePiece) moveDefault(to position, game *game) movable {
-	board := game.gameBoard
-	capture := board.movePiece2(bp, to)
-	bp.setPosition(to)
-	bp.setMoved(true)
-	return capture
-}
-
-func (bp *basePiece) move(to position, game *game) movable {
-	return bp.moveDefault(to, game)
 }
 
 func (bp *basePiece) hasMoved() bool {
