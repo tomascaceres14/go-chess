@@ -106,6 +106,41 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 	return legalMoves
 }
 
+func (p *pawn) move(to position, game *game) movable {
+	from := p.pos
+	board := game.gameBoard
+	player := game.GetPlayer(p.white)
+	capture := board.movePiece2(p, to)
+
+	p.setPosition(to)
+	p.setMoved(true)
+
+	// Promotion
+	if to.Row == 0 || to.Row == 7 {
+		queen := newQueen(to, player)
+		board.insertPiece(queen)
+		queen.setMoved(true)
+		return capture
+	}
+
+	// En passant
+	if to.Col != from.Col {
+		capturedPos := position{Row: from.Row, Col: to.Col}
+		capture, _ = board.getPiece(capturedPos)
+		board.clearSquare(capturedPos)
+		return capture
+	}
+
+	diff := from.Row - to.Row
+	pawnJumped := diff == 2 || diff == -2
+
+	if pawnJumped {
+		p.jumped = pawnJumped
+		player.pawnJumped = p
+	}
+
+	return capture
+}
 func (p *pawn) getPosition() position {
 	return p.pos
 }

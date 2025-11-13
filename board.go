@@ -29,23 +29,31 @@ func (b *board) InsertPieceList(pieces []movable) {
 func (b *board) MovePieceSim(from, to position) {
 	piece, _ := b.getPiece(from)
 
-	(*b.grid)[from.Row][from.Col] = nil
-	(*b.grid)[to.Row][to.Col] = piece
-	piece.setPosition(to)
+	b.grid[from.Row][from.Col] = nil
+	b.grid[to.Row][to.Col] = piece
+
 }
 
 // Moves piece from piece.Pos to pos and returns captured piece
 func (b *board) movePiece(piece movable, pos position) movable {
-	prevPos := piece.getPosition()
+	from := piece.getPosition()
 
 	capture, _ := b.getPiece(pos)
 
-	b.grid[prevPos.Row][prevPos.Col] = nil
+	b.grid[from.Row][from.Col] = nil
 	b.grid[pos.Row][pos.Col] = piece
 
 	piece.setPosition(pos)
 	piece.setMoved(true)
 
+	return capture
+}
+
+// Moves piece on board without updating state of piece
+func (b *board) movePiece2(piece movable, pos position) movable {
+	capture, _ := b.getPiece(pos)
+	b.grid[piece.getPosition().Row][piece.getPosition().Col] = nil
+	b.grid[pos.Row][pos.Col] = piece
 	return capture
 }
 

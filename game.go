@@ -230,71 +230,12 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 	piece := move.getPiece()
 
 	// make move and return captured piece, if any
-	capture := g.gameBoard.movePiece(piece, to)
+	//capture := g.gameBoard.movePiece(piece, to)
+	capture := piece.move(to, g)
 
 	// Obtain player and opponent
 	player := g.GetPlayer(pColor)
 	opponent := g.GetPlayerOpponent(player.isWhite)
-
-	// Special moves: castling, promoting, etc.
-	switch piece.getType() {
-	case kingType:
-
-		king := player.getKing()
-		fromStr := from.String()
-
-		if castleMove, ok := castlingPositions[to]; ok && (fromStr == "e1" || fromStr == "e8") {
-			rook, _ := g.getPlayerPiece(castleMove.rookFrom, player.isWhite)
-			g.gameBoard.movePiece(rook, castleMove.rookTo)
-
-			if castleMove.shortCastle {
-				move.castleDir = 0
-			} else {
-				move.castleDir = 1
-			}
-
-			king.shortCastlingOpt = false
-			king.longCastlingOpt = false
-		}
-
-	case pawnType:
-
-		// Promotion
-		if to.Row == 0 || to.Row == 7 {
-			queen := newQueen(to, player)
-			g.gameBoard.insertPiece(queen)
-			queen.setMoved(true)
-			break
-		}
-
-		// En passant
-		if to.Col != from.Col {
-			capturedPos := position{Row: from.Row, Col: to.Col}
-			capture, _ = g.gameBoard.getPiece(capturedPos)
-			g.gameBoard.clearSquare(capturedPos)
-			break
-		}
-
-		// Jump
-		pawn, _ := castPawn(piece)
-		diff := from.Row - to.Row
-		pawnJumped := diff == 2 || diff == -2
-
-		if pawnJumped {
-			pawn.jumped = pawnJumped
-			player.pawnJumped = pawn
-		}
-
-	case rookType:
-		king := player.getKing()
-		if from.Col == 0 {
-			king.shortCastlingOpt = false
-		}
-
-		if from.Col == 7 {
-			king.longCastlingOpt = false
-		}
-	}
 
 	// if piece was captured
 	if capture != nil {

@@ -71,8 +71,8 @@ func TestPawnCantCaptureForward(t *testing.T) {
 
 }
 
-func TestPawnEnPassant(t *testing.T) {
-	testName := "TestPawnEnPassant"
+func TestPawnEnPassantLeftOption(t *testing.T) {
+	testName := "TestPawnEnPassantLeftOption"
 	engine := testStartingPos()
 
 	from := "e2"
@@ -109,6 +109,48 @@ func TestPawnEnPassant(t *testing.T) {
 	if err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
+
+}
+
+func TestPawnEnPassantRightOption(t *testing.T) {
+	testName := "TestPawnEnPassantRightOption"
+	engine := testStartingPos()
+
+	from := "e2"
+	to := "e4"
+	movesWhite := true
+	if err := engine.Move(from, to, movesWhite); err != nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
+	}
+
+	from = "a7"
+	to = "a5"
+	movesWhite = false
+	if err := engine.Move(from, to, movesWhite); err != nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
+	}
+
+	from = "e4"
+	to = "e5"
+	movesWhite = true
+	if err := engine.Move(from, to, movesWhite); err != nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
+	}
+
+	from = "f7"
+	to = "f5"
+	movesWhite = false
+	if err := engine.Move(from, to, movesWhite); err != nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
+	}
+
+	from = "e5"
+	to = "f6"
+	movesWhite = true
+	if err := engine.Move(from, to, movesWhite); err != nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
+	}
+
 }
 
 func TestPawnEnPassantFEN(t *testing.T) {
@@ -146,6 +188,20 @@ func TestPawnCantEnPassantNextTurn(t *testing.T) {
 	from = "e5"
 	to = "d6"
 	movesWhite = true
+	if err := engine.Move(from, to, movesWhite); err == nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
+	}
+
+}
+
+func TestPawnCantEnPassantOtherPieces(t *testing.T) {
+	testName := "TestPawnCantEnPassantOtherPieces"
+	pos := "r1bqkbnr/pppppppp/8/3nP3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
+	engine := testFENPos(pos)
+
+	from := "e5"
+	to := "d6"
+	movesWhite := true
 	if err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}

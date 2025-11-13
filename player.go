@@ -40,19 +40,6 @@ func newPlayerBlack(name string) (*player, error) {
 	return p, err
 }
 
-func (p *player) attackedSquares(b *board) map[position]bool {
-	threats := make(map[position]bool)
-
-	pieces := p.pieces
-	for _, v := range pieces {
-		for k := range v.visibleSquares(b) {
-			threats[k] = true
-		}
-	}
-
-	return threats
-}
-
 func (p *player) legalMoves(g *game) map[position]bool {
 	moves := make(map[position]bool)
 

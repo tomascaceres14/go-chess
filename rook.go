@@ -29,6 +29,31 @@ func (r *rook) legalMoves(b *board) map[position]bool {
 	return r.legalMovesDefault(b)
 }
 
+func (r *rook) move(to position, game *game) movable {
+	from := r.pos
+	board := game.gameBoard
+
+	capture := board.movePiece2(r, to)
+	r.setPosition(to)
+
+	if r.moved {
+		return capture
+	}
+
+	r.setMoved(true)
+
+	king := game.GetPlayer(r.white).getKing()
+	if from.Col == 0 {
+		king.longCastlingOpt = false
+	}
+
+	if from.Col == 7 {
+		king.shortCastlingOpt = false
+	}
+
+	return capture
+}
+
 func (r *rook) getPosition() position {
 	return r.pos
 }

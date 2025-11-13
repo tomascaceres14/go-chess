@@ -3,6 +3,7 @@ package gochess
 type king struct {
 	*basePiece
 	longCastlingOpt, shortCastlingOpt bool
+	castleDir                         int
 }
 
 type castleMove struct {
@@ -46,6 +47,7 @@ func newKing(pos position, p *player) *king {
 		basePiece:        newBasePiece(white, 0, pos, directions),
 		longCastlingOpt:  true,
 		shortCastlingOpt: true,
+		castleDir:        -1,
 	}
 
 	p.pieces = append(p.pieces, king)
@@ -96,6 +98,37 @@ func (k *king) legalMoves(b *board) map[position]bool {
 	legalMoves[position{Row: k.pos.Row, Col: 2}] = canLongCastle
 
 	return legalMoves
+}
+
+func (k *king) move(to position, game *game) movable {
+	prevPos := k.pos
+	board := game.gameBoard
+
+	capture := board.movePiece2(k, to)
+	k.setPosition(to)
+
+	if k.moved {
+		return capture
+	}
+
+	k.setMoved(true)
+
+	diff := prevPos.Col - to.Col
+
+	if diff != 2 && diff != -2 {
+		return capture
+	}
+
+	k.castleDir = 0
+
+	if diff == 2 && k.isWhite() {
+		k.castleDir = 1
+	}
+
+	k.setPosition(to)
+	k.setMoved(true)
+
+	return capture
 }
 
 func (k *king) getPosition() position {

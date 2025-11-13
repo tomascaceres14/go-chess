@@ -21,6 +21,7 @@ type movable interface {
 	getValue() int
 	String() string
 	getAlgebraicString() string
+	move(to position, game *game) movable
 	hasMoved() bool
 	setMoved(moved bool)
 	clone() movable
@@ -107,6 +108,18 @@ func (bp *basePiece) String() string {
 
 func (b *basePiece) getAlgebraicString() string {
 	return ""
+}
+
+func (bp *basePiece) moveDefault(to position, game *game) movable {
+	board := game.gameBoard
+	capture := board.movePiece2(bp, to)
+	bp.setPosition(to)
+	bp.setMoved(true)
+	return capture
+}
+
+func (bp *basePiece) move(to position, game *game) movable {
+	return bp.moveDefault(to, game)
 }
 
 func (bp *basePiece) hasMoved() bool {
