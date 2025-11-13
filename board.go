@@ -28,10 +28,8 @@ func (b *board) InsertPieceList(pieces []movable) {
 
 func (b *board) MovePieceSim(from, to position) {
 	piece, _ := b.getPiece(from)
-
 	b.grid[from.Row][from.Col] = nil
 	b.grid[to.Row][to.Col] = piece
-
 }
 
 // Moves piece on board. Does not update piece, only relocates in grid
@@ -67,18 +65,18 @@ func (b *board) attackedByColor(white bool) map[position]bool {
 }
 
 // Find king by color
-func (b *board) findKingPos(white bool) (position, bool) {
+func (b *board) findKingPos(white bool) position {
 	for i := range 8 {
 		for j := range 8 {
 			p := (*b.grid)[i][j]
 			if p != nil && p.isWhite() == white {
 				if _, ok := p.(*king); ok {
-					return p.getPosition(), true
+					return position{Row: i, Col: j}
 				}
 			}
 		}
 	}
-	return position{}, false
+	return position{}
 }
 
 func (b *board) IsOccupied(pos position) bool {

@@ -36,16 +36,14 @@ func isMoveSafeToKing(piece movable, to position, board *board) bool {
 	// Simulate movement on cloned board
 	boardSim.MovePieceSim(piece.getPosition(), to)
 
+	var kingPos position
 	if piece.getType() == kingType {
-		return !boardSim.isKingInCheck(to, piece.isWhite())
+		kingPos = to
+	} else {
+		kingPos = boardSim.findKingPos(piece.isWhite())
 	}
 
-	kingPos, ok := boardSim.findKingPos(piece.isWhite())
-	if !ok {
-		return false
-	}
 	return !boardSim.isKingInCheck(kingPos, piece.isWhite())
-
 }
 
 // Parse col from matrix index to board column letter

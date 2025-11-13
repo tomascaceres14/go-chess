@@ -1,6 +1,8 @@
 package gochess
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCantGoOutofBounds(t *testing.T) {
 	testName := "TestCantGoOutofBounds"
@@ -35,6 +37,45 @@ func TestPinnedPieceCantMove(t *testing.T) {
 	movesWhite := true
 
 	if err := engine.Move(from, to, movesWhite); err == nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
+	}
+}
+
+func TestPinnedPieceCanCaptureAttacker(t *testing.T) {
+	testName := "TestPinnedPieceCantMove"
+	pos := "rnbqkbnr/ppp1pppp/8/8/8/8/PPPQPPPP/RNBK1BNR w kq - 0 1"
+	engine := newTestFENPos(pos)
+
+	// Pinned piece cant move out of pin
+	from := "d2"
+	to := "c3"
+	movesWhite := true
+	if err := engine.Move(from, to, movesWhite); err == nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
+	}
+
+	// Pinned piece can move in same line as attacker
+	from = "d2"
+	to = "d4"
+	movesWhite = true
+	if err := engine.Move(from, to, movesWhite); err != nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
+	}
+
+	from = "a7"
+	to = "a6"
+	movesWhite = false
+	if err := engine.Move(from, to, movesWhite); err != nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
+	}
+
+	// Pinned piece can take attacker
+	from = "d4"
+	to = "d8"
+	movesWhite = true
+	if err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 }
+
+

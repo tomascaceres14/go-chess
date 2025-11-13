@@ -245,7 +245,7 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 		move.capture = capture
 	}
 
-	isCheck := g.isKingInCheck(pColor)
+	isCheck := g.isKingInCheck(!pColor)
 
 	// flag as checked or not
 	opponent.isChecked = isCheck
@@ -486,7 +486,6 @@ func (g *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 	}
 
 	row := capturePosition.getRow()
-
 	if row != 6 && row != 3 {
 		return fmt.Errorf("En passant target should be either on rank 6 or 3. Current rank: %d", capturePosition.getRow())
 	}

@@ -27,6 +27,7 @@ func newPawn(pos position, p *player) *pawn {
 func (p *pawn) visibleSquares(b *board) map[position]bool {
 
 	positions := map[position]bool{}
+
 	front1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col}
 	front2 := position{Row: p.pos.Row + 2*p.direction, Col: p.pos.Col}
 	diag1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col + 1}
@@ -167,7 +168,7 @@ func (p *pawn) String() string {
 }
 
 func (p *pawn) clone() movable {
-	return &pawn{basePiece: p.basePiece.cloneBase()}
+	return &pawn{basePiece: p.basePiece.cloneBase(), direction: p.direction}
 }
 
 func (p *pawn) getType() pieceType {
