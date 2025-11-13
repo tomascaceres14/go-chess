@@ -5,7 +5,8 @@ import (
 )
 
 type board struct {
-	grid *[8][8]movable
+	grid            *[8][8]movable
+	enPassantTarget *position
 }
 
 // Get piece at given pos. Returns piece and wether square is occupied or not.

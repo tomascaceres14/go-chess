@@ -123,14 +123,11 @@ func getFENCastling(g *game) string {
 
 func getFENEnPassant(g *game) string {
 	FENString := "- "
-	turn := g.getCurrentTurn()
-	player := g.GetPlayer(!turn)
 
-	pawn := player.pawnJumped
+	EPTarget := g.gameBoard.enPassantTarget
+	if EPTarget != nil {
 
-	if pawn != nil {
-		prevSquare := position{col: pawn.pos.col, row: pawn.pos.row - 1*pawn.direction}
-		FENString = prevSquare.String() + " "
+		FENString = g.gameBoard.enPassantTarget.String() + " "
 	}
 
 	return FENString

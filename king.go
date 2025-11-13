@@ -147,7 +147,6 @@ func (k *king) getPosition() position {
 }
 
 func (k *king) setPosition(pos position) {
-	k.moved = true
 	k.pos = pos
 }
 

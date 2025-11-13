@@ -12,7 +12,6 @@ type player struct {
 	isWhite, isChecked bool
 	points             int
 	king               *king
-	pawnJumped         *pawn
 	pieces             []movable
 	threats            map[position]bool
 }
@@ -57,11 +56,6 @@ func (p *player) legalMoves(g *game) map[position]bool {
 
 func (p *player) hasLegalMoves(g *game) bool {
 	return len(p.legalMoves(g)) > 0
-}
-
-func (p *player) removeJumpFromPawn() {
-	p.pawnJumped.jumped = false
-	p.pawnJumped = nil
 }
 
 func (p *player) getKing() *king {

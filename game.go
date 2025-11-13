@@ -151,7 +151,7 @@ func newGameFENString(FENString string, whiteName, blackName string) (*game, err
 	}
 
 	FENEnPassant := FENSplit[3]
-	if err := game.setFENStringEnPassant(FENEnPassant, game.WhiteTurn); err != nil {
+	if err := game.setFENStringEnPassant(FENEnPassant); err != nil {
 		return nil, err
 	}
 
@@ -336,20 +336,10 @@ func (g *game) isKingInCheck(color bool) bool {
 	return g.gameBoard.isKingInCheck(kingPos, color)
 }
 
-func (g game) getCurrentTurn() bool {
-	return g.WhiteTurn
-}
-
 func (g *game) switchTurns() {
 
 	g.WhiteTurn = !g.WhiteTurn
 	g.castleDir = -1
-	player := g.GetPlayer(g.WhiteTurn)
-
-	if player.pawnJumped != nil {
-		player.removeJumpFromPawn()
-	}
-
 	g.fullmoveCount++
 }
 
@@ -474,11 +464,13 @@ func (g *game) setFENStringCastling(FENCastling string) error {
 	return nil
 }
 
-func (g *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
+func (g *game) setFENStringEnPassant(FENEnPassant string) error {
 
 	if FENEnPassant == "-" {
 		return nil
 	}
+
+	turn := g.WhiteTurn
 
 	capturePosition := pos(FENEnPassant)
 	if capturePosition.col == -1 && capturePosition.row == -1 {
@@ -493,17 +485,15 @@ func (g *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 	// If it's white to play, it means the pawnDirection of the pawn is downwards (black pawn).
 	// If it's black to play, it means the pawnDirection of the pawn is upwards (white pawn).
 	pawnDirection := -1
-	player := g.pWhite
 	if !turn {
 		pawnDirection *= -1
-		player = g.pBlack
 	}
 
 	pawnPosition := position{col: capturePosition.col, row: capturePosition.row + 1*pawnDirection}
 
 	piece, ok := g.gameBoard.getPiece(pawnPosition)
 	if !ok {
-		return fmt.Errorf("Not pawn found at position %s", pawnPosition)
+		return fmt.Errorf("No piece found at position %s", pawnPosition)
 	}
 
 	pawn, ok := castPawn(piece)
@@ -512,11 +502,10 @@ func (g *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 	}
 
 	if pawn.isWhite() == turn {
-		return fmt.Errorf("Piece at position %s is of same color as player's turn.", pawnPosition)
+		return fmt.Errorf("Pawn at %s is of same color as player's turn.", pawnPosition)
 	}
 
-	pawn.jumped = true
-	player.pawnJumped = pawn
+	g.gameBoard.enPassantTarget = &capturePosition
 
 	return nil
 }

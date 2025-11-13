@@ -54,6 +54,10 @@ func (p position) getRank() int {
 	return p.row + 1
 }
 
+func (p *position) equals(pos position) bool {
+	return p.row == pos.row && p.col == pos.col
+}
+
 func (p position) String() string {
 	return fmt.Sprintf("%v%v", string(cols[p.col]), p.row+1)
 }

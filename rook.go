@@ -59,7 +59,6 @@ func (r *rook) getPosition() position {
 }
 
 func (r *rook) setPosition(pos position) {
-	r.moved = true
 	r.pos = pos
 }
 
