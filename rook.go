@@ -43,11 +43,11 @@ func (r *rook) move(to position, game *game) movable {
 	r.setMoved(true)
 
 	king := game.GetPlayer(r.white).getKing()
-	if from.Col == 0 {
+	if from.col == 0 {
 		king.longCastlingOpt = false
 	}
 
-	if from.Col == 7 {
+	if from.col == 7 {
 		king.shortCastlingOpt = false
 	}
 
@@ -59,7 +59,6 @@ func (r *rook) getPosition() position {
 }
 
 func (r *rook) setPosition(pos position) {
-	r.moved = true
 	r.pos = pos
 }
 

@@ -29,7 +29,7 @@ func (n *knight) visibleSquares(b *board) map[position]bool {
 	positions := map[position]bool{}
 
 	for _, v := range n.directions {
-		pos := position{Row: n.pos.Row + v.dx, Col: n.pos.Col + v.dy}
+		pos := position{row: n.pos.row + v.dx, col: n.pos.col + v.dy}
 
 		if !pos.inBounds() {
 			continue

@@ -52,7 +52,7 @@ func (bp *basePiece) visibleSquaresDefault(b *board) map[position]bool {
 	positions := map[position]bool{}
 
 	for _, v := range bp.directions {
-		dir := position{Row: bp.pos.Row + v.dx, Col: bp.pos.Col + v.dy}
+		dir := position{row: bp.pos.row + v.dx, col: bp.pos.col + v.dy}
 		castRay(dir, v.dx, v.dy, b, bp.white, positions)
 	}
 

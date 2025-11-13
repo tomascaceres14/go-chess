@@ -1,13 +1,18 @@
 package gochess
 
+import "fmt"
+
 type pawn struct {
 	*basePiece
 	direction int
-	jumped    bool
 }
 
 func newPawn(pos position, p *player) *pawn {
+
 	white := p.isWhite
+
+	const WhiteInitialRank = 2
+	const BlackInitialRank = 7
 
 	dir := 1
 	if !white {
@@ -19,6 +24,14 @@ func newPawn(pos position, p *player) *pawn {
 		direction: dir,
 	}
 
+	rank := pos.getRank()
+
+	if white {
+		pawn.moved = rank != WhiteInitialRank
+	} else {
+		pawn.moved = rank != BlackInitialRank
+	}
+
 	p.pieces = append(p.pieces, pawn)
 
 	return pawn
@@ -28,10 +41,10 @@ func (p *pawn) visibleSquares(b *board) map[position]bool {
 
 	positions := map[position]bool{}
 
-	front1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col}
-	front2 := position{Row: p.pos.Row + 2*p.direction, Col: p.pos.Col}
-	diag1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col + 1}
-	diag2 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col - 1}
+	front1 := position{row: p.pos.row + 1*p.direction, col: p.pos.col}
+	front2 := position{row: p.pos.row + 2*p.direction, col: p.pos.col}
+	diag1 := position{row: p.pos.row + 1*p.direction, col: p.pos.col + 1}
+	diag2 := position{row: p.pos.row + 1*p.direction, col: p.pos.col - 1}
 
 	if diag1.inBounds() {
 		positions[diag1] = true
@@ -55,21 +68,20 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 
 	positions := p.visibleSquares(b)
 	legalMoves := map[position]bool{}
-
 	for pos := range positions {
 
 		piece, occupied := b.getPiece(pos)
 
-		if pos.Col == p.pos.Col {
+		if pos.col == p.pos.col {
 
 			// if pawn moving one square up
-			if pos.Row == p.pos.Row+1*p.direction && !occupied {
+			if pos.row == p.pos.row+1*p.direction && !occupied {
 				legalMoves[pos] = true
 				continue
 			}
 
-			// if pawn is jumping one square
-			if pos.Row == p.pos.Row+2*p.direction && !occupied && !b.IsOccupied(pos) {
+			// if pawn is jumping
+			if pos.row == p.pos.row+2*p.direction && !occupied && !b.IsOccupied(pos) {
 				legalMoves[pos] = true
 				continue
 			}
@@ -77,31 +89,11 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 		} else {
 			// capture diagonal
 			regularCapture := occupied && piece.isWhite() != p.white
-			legalMoves[pos] = regularCapture
-
-			// check if is in rank of en passant
-			if p.pos.getRow() != 5 && p.pos.getRow() != 4 {
-				continue
+			EPTarget := b.enPassantTarget
+			enPassantCapture := false
+			if EPTarget != nil {
+				enPassantCapture = b.enPassantTarget.equals(pos)
 			}
-
-			// create en passant position
-			enPassant := pos
-			enPassant.Row = enPassant.Row - 1*p.direction
-
-			// get piece at en passant square. Continue if empty
-			enPassantMovable, enPassantOcc := b.getPiece(enPassant)
-			if !enPassantOcc {
-				continue
-			}
-
-			// Cast to pawn. Continue if not pawn
-			enPassantPawn, ok := castPawn(enPassantMovable)
-			if !ok {
-				continue
-			}
-
-			// Check pawn has jumped and its not white
-			enPassantCapture := enPassantPawn.jumped && enPassantPawn.white != p.white
 			legalMoves[pos] = regularCapture || enPassantCapture
 		}
 	}
@@ -109,35 +101,45 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 }
 
 func (p *pawn) move(to position, game *game) movable {
+
 	from := p.pos
 	board := game.gameBoard
-	player := game.GetPlayer(p.white)
+
 	capture := board.movePiece(p, to)
 	p.setPosition(to)
-	p.setMoved(true)
+
+	// calculate if its trying to jump
+	if !p.moved {
+
+		diff := from.row - to.row
+		if diff == 2 || diff == -2 {
+			mid := position{row: to.row - 1*p.direction, col: from.col}
+			board.enPassantTarget = &mid
+		}
+
+		p.setMoved(true)
+		return capture
+	}
+
+	rank := to.getRank()
 
 	// Promotion
-	if to.Row == 0 || to.Row == 7 {
-		queen := newQueen(to, player)
+	if rank == 1 || rank == 8 {
+		queen := newQueen(to, game.GetPlayer(p.white))
 		board.insertPiece(queen)
 		queen.setMoved(true)
 		return capture
 	}
 
 	// En passant
-	if to.Col != from.Col {
-		capturedPos := position{Row: from.Row, Col: to.Col}
+	EPTarget := board.enPassantTarget
+	if EPTarget != nil && EPTarget.equals(to) {
+		fmt.Println("capturing enpassant from", from, "to", to)
+		capturedPos := position{row: from.row - 1*p.direction, col: to.col}
 		capture, _ = board.getPiece(capturedPos)
 		board.clearSquare(capturedPos)
+		board.enPassantTarget = nil
 		return capture
-	}
-
-	diff := from.Row - to.Row
-	pawnJumped := diff == 2 || diff == -2
-
-	if pawnJumped {
-		p.jumped = pawnJumped
-		player.pawnJumped = p
 	}
 
 	return capture
@@ -148,7 +150,6 @@ func (p *pawn) getPosition() position {
 }
 
 func (p *pawn) setPosition(pos position) {
-	p.moved = true
 	p.pos = pos
 }
 

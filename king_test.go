@@ -26,28 +26,28 @@ func TestKingCanMove(t *testing.T) {
 	to := "e4"
 	movesWhite := true
 	if err := engine.Move(from, to, movesWhite); err != nil {
-		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
 	from = "d7"
 	to = "d5"
 	movesWhite = false
 	if err := engine.Move(from, to, movesWhite); err != nil {
-		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
 	from = "e1"
 	to = "e2"
 	movesWhite = true
 	if err := engine.Move(from, to, movesWhite); err != nil {
-		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
 	from = "e8"
 	to = "d7"
 	movesWhite = false
 	if err := engine.Move(from, to, movesWhite); err != nil {
-		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 }
 

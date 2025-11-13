@@ -77,5 +77,3 @@ func TestPinnedPieceCanCaptureAttacker(t *testing.T) {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 }
-
-
