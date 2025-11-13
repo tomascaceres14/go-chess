@@ -24,7 +24,7 @@ func castRay(pos position, dx, dy int, b *board, white bool, positions map[posit
 	}
 
 	positions[pos] = true
-	next := position{Row: pos.Row + dx, Col: pos.Col + dy}
+	next := position{row: pos.row + dx, col: pos.col + dy}
 	castRay(next, dx, dy, b, white, positions)
 }
 
@@ -123,17 +123,13 @@ func getFENCastling(g *game) string {
 
 func getFENEnPassant(g *game) string {
 	FENString := "- "
-	player := g.pWhite
-	turn := g.WhiteTurn
-
-	if turn {
-		player = g.pBlack
-	}
+	turn := g.getCurrentTurn()
+	player := g.GetPlayer(!turn)
 
 	pawn := player.pawnJumped
 
 	if pawn != nil {
-		prevSquare := position{Col: pawn.pos.Col, Row: pawn.pos.Row - 1*pawn.direction}
+		prevSquare := position{col: pawn.pos.col, row: pawn.pos.row - 1*pawn.direction}
 		FENString = prevSquare.String() + " "
 	}
 

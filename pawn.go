@@ -19,6 +19,11 @@ func newPawn(pos position, p *player) *pawn {
 		direction: dir,
 	}
 
+	rank := pos.getRank()
+
+	pawn.moved = !(white && rank == 2)
+	pawn.moved = !(!white && rank == 7)
+
 	p.pieces = append(p.pieces, pawn)
 
 	return pawn
@@ -28,10 +33,10 @@ func (p *pawn) visibleSquares(b *board) map[position]bool {
 
 	positions := map[position]bool{}
 
-	front1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col}
-	front2 := position{Row: p.pos.Row + 2*p.direction, Col: p.pos.Col}
-	diag1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col + 1}
-	diag2 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col - 1}
+	front1 := position{row: p.pos.row + 1*p.direction, col: p.pos.col}
+	front2 := position{row: p.pos.row + 2*p.direction, col: p.pos.col}
+	diag1 := position{row: p.pos.row + 1*p.direction, col: p.pos.col + 1}
+	diag2 := position{row: p.pos.row + 1*p.direction, col: p.pos.col - 1}
 
 	if diag1.inBounds() {
 		positions[diag1] = true
@@ -60,16 +65,16 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 
 		piece, occupied := b.getPiece(pos)
 
-		if pos.Col == p.pos.Col {
+		if pos.col == p.pos.col {
 
 			// if pawn moving one square up
-			if pos.Row == p.pos.Row+1*p.direction && !occupied {
+			if pos.row == p.pos.row+1*p.direction && !occupied {
 				legalMoves[pos] = true
 				continue
 			}
 
 			// if pawn is jumping one square
-			if pos.Row == p.pos.Row+2*p.direction && !occupied && !b.IsOccupied(pos) {
+			if pos.row == p.pos.row+2*p.direction && !occupied && !b.IsOccupied(pos) {
 				legalMoves[pos] = true
 				continue
 			}
@@ -80,13 +85,13 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 			legalMoves[pos] = regularCapture
 
 			// check if is in rank of en passant
-			if p.pos.getRow() != 5 && p.pos.getRow() != 4 {
+			if p.pos.getRank() != 5 && p.pos.getRank() != 4 {
 				continue
 			}
 
 			// create en passant position
 			enPassant := pos
-			enPassant.Row = enPassant.Row - 1*p.direction
+			enPassant.row = enPassant.row - 1*p.direction
 
 			// get piece at en passant square. Continue if empty
 			enPassantMovable, enPassantOcc := b.getPiece(enPassant)
@@ -117,7 +122,7 @@ func (p *pawn) move(to position, game *game) movable {
 	p.setMoved(true)
 
 	// Promotion
-	if to.Row == 0 || to.Row == 7 {
+	if to.row == 0 || to.row == 7 {
 		queen := newQueen(to, player)
 		board.insertPiece(queen)
 		queen.setMoved(true)
@@ -125,14 +130,14 @@ func (p *pawn) move(to position, game *game) movable {
 	}
 
 	// En passant
-	if to.Col != from.Col {
-		capturedPos := position{Row: from.Row, Col: to.Col}
+	if to.col != from.col {
+		capturedPos := position{row: from.row, col: to.col}
 		capture, _ = board.getPiece(capturedPos)
 		board.clearSquare(capturedPos)
 		return capture
 	}
 
-	diff := from.Row - to.Row
+	diff := from.row - to.row
 	pawnJumped := diff == 2 || diff == -2
 
 	if pawnJumped {

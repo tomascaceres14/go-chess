@@ -7,7 +7,7 @@ import (
 )
 
 type position struct {
-	Row, Col int
+	row, col int
 }
 
 type direction struct {
@@ -15,7 +15,7 @@ type direction struct {
 }
 
 func (p *position) isValid() bool {
-	return p.Row != -1 && p.Col != -1
+	return p.row != -1 && p.col != -1
 }
 
 func pos(pos string) position {
@@ -36,24 +36,24 @@ func pos(pos string) position {
 	}
 
 	newPos := position{
-		Row: row - 1,
-		Col: int(col[0] - 'a'),
+		row: row - 1,
+		col: int(col[0] - 'a'),
 	}
 	return newPos
 }
 
 func (p position) inBounds() bool {
-	return (0 <= p.Col && p.Col <= 7) && (0 <= p.Row && p.Row <= 7)
+	return (0 <= p.col && p.col <= 7) && (0 <= p.row && p.row <= 7)
 }
 
-func (p position) getCol() string {
-	return string(cols[p.Col])
+func (p position) getFile() string {
+	return string(cols[p.col])
 }
 
-func (p position) getRow() int {
-	return p.Row + 1
+func (p position) getRank() int {
+	return p.row + 1
 }
 
 func (p position) String() string {
-	return fmt.Sprintf("%v%v", string(cols[p.Col]), p.Row+1)
+	return fmt.Sprintf("%v%v", string(cols[p.col]), p.row+1)
 }

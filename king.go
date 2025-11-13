@@ -62,7 +62,7 @@ func (k *king) visibleSquares(b *board) map[position]bool {
 	positions := map[position]bool{}
 
 	for _, v := range k.directions {
-		pos := position{Row: k.pos.Row + v.dx, Col: k.pos.Col + v.dy}
+		pos := position{row: k.pos.row + v.dx, col: k.pos.col + v.dy}
 
 		if !pos.inBounds() {
 			continue
@@ -87,8 +87,8 @@ func (k *king) legalMoves(b *board) map[position]bool {
 	}
 
 	// Initial rook pos hardcoded. Should be obtained at game setup
-	shortCastlePos := position{Row: k.pos.Row, Col: 7}
-	longCastlePos := position{Row: k.pos.Row, Col: 0}
+	shortCastlePos := position{row: k.pos.row, col: 7}
+	longCastlePos := position{row: k.pos.row, col: 0}
 
 	shortRook, shortOcc := b.getPiece(shortCastlePos)
 	longRook, longOcc := b.getPiece(longCastlePos)
@@ -97,8 +97,8 @@ func (k *king) legalMoves(b *board) map[position]bool {
 	canLongCastle := longOcc && !longRook.hasMoved() && b.isRowPathClear(k.pos, longCastlePos)
 
 	// King's castling position is hardcoded. Should make calculation based on initial pos and distance to rook for Chess960
-	legalMoves[position{Row: k.pos.Row, Col: 6}] = canShortCastle
-	legalMoves[position{Row: k.pos.Row, Col: 2}] = canLongCastle
+	legalMoves[position{row: k.pos.row, col: 6}] = canShortCastle
+	legalMoves[position{row: k.pos.row, col: 2}] = canLongCastle
 
 	return legalMoves
 }
@@ -112,7 +112,7 @@ func (k *king) moveWithCastling(to position, game *game) movable {
 	k.setPosition(to)
 	k.setMoved(true)
 
-	diff := prevPos.Col - to.Col
+	diff := prevPos.col - to.col
 	k.moveFunc = k.moveWithoutCastling
 	k.longCastlingOpt = false
 	k.shortCastlingOpt = false

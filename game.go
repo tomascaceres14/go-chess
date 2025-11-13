@@ -395,7 +395,7 @@ func (g *game) setFENStringPos(FENPosition []string) error {
 			}
 
 			letter := string(char)
-			position := position{Row: rowNum, Col: colNum}
+			position := position{row: rowNum, col: colNum}
 			var piece movable
 			switch letter {
 			case "p":
@@ -481,13 +481,13 @@ func (g *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 	}
 
 	capturePosition := pos(FENEnPassant)
-	if capturePosition.Col == -1 && capturePosition.Row == -1 {
+	if capturePosition.col == -1 && capturePosition.row == -1 {
 		return fmt.Errorf("Error reading enpassant target position. Make sure it's the right format and is in bounds of the board.")
 	}
 
-	row := capturePosition.getRow()
+	row := capturePosition.getRank()
 	if row != 6 && row != 3 {
-		return fmt.Errorf("En passant target should be either on rank 6 or 3. Current rank: %d", capturePosition.getRow())
+		return fmt.Errorf("En passant target should be either on rank 6 or 3. Current rank: %d", capturePosition.getRank())
 	}
 
 	// If it's white to play, it means the pawnDirection of the pawn is downwards (black pawn).
@@ -499,7 +499,7 @@ func (g *game) setFENStringEnPassant(FENEnPassant string, turn bool) error {
 		player = g.pBlack
 	}
 
-	pawnPosition := position{Col: capturePosition.Col, Row: capturePosition.Row + 1*pawnDirection}
+	pawnPosition := position{col: capturePosition.col, row: capturePosition.row + 1*pawnDirection}
 
 	piece, ok := g.gameBoard.getPiece(pawnPosition)
 	if !ok {

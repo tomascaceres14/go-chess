@@ -43,7 +43,7 @@ func (m *move) getAlgebraicString() string {
 	if m.capture == nil {
 		takes = ""
 	} else if m.piece.getType() == pawnType {
-		takes = m.from.getCol() + takes
+		takes = m.from.getFile() + takes
 	}
 
 	if m.isCheck {

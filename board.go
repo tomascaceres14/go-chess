@@ -11,13 +11,13 @@ type board struct {
 // Get piece at given pos. Returns piece and wether square is occupied or not.
 // (should refactor, second bool not necessary as piece can be nil, not necessarily zero value)
 func (b *board) getPiece(pos position) (movable, bool) {
-	piece := b.grid[pos.Row][pos.Col]
+	piece := b.grid[pos.row][pos.col]
 	return piece, b.IsOccupied(pos)
 }
 
 // Inserts piece in piece.Pos
 func (b *board) insertPiece(piece movable) {
-	b.grid[piece.getPosition().Row][piece.getPosition().Col] = piece
+	b.grid[piece.getPosition().row][piece.getPosition().col] = piece
 }
 
 func (b *board) InsertPieceList(pieces []movable) {
@@ -28,15 +28,15 @@ func (b *board) InsertPieceList(pieces []movable) {
 
 func (b *board) MovePieceSim(from, to position) {
 	piece, _ := b.getPiece(from)
-	b.grid[from.Row][from.Col] = nil
-	b.grid[to.Row][to.Col] = piece
+	b.grid[from.row][from.col] = nil
+	b.grid[to.row][to.col] = piece
 }
 
 // Moves piece on board. Does not update piece, only relocates in grid
 func (b *board) movePiece(piece movable, to position) movable {
 	capture, _ := b.getPiece(to)
-	b.grid[piece.getPosition().Row][piece.getPosition().Col] = nil
-	b.grid[to.Row][to.Col] = piece
+	b.grid[piece.getPosition().row][piece.getPosition().col] = nil
+	b.grid[to.row][to.col] = piece
 	return capture
 }
 
@@ -71,7 +71,7 @@ func (b *board) findKingPos(white bool) position {
 			p := (*b.grid)[i][j]
 			if p != nil && p.isWhite() == white {
 				if _, ok := p.(*king); ok {
-					return position{Row: i, Col: j}
+					return position{row: i, col: j}
 				}
 			}
 		}
@@ -80,7 +80,7 @@ func (b *board) findKingPos(white bool) position {
 }
 
 func (b *board) IsOccupied(pos position) bool {
-	return b.grid[pos.Row][pos.Col] != nil
+	return b.grid[pos.row][pos.col] != nil
 }
 
 func (b *board) clone() *board {
@@ -97,21 +97,21 @@ func (b *board) clone() *board {
 }
 
 func (b *board) clearSquare(pos position) {
-	b.grid[pos.Row][pos.Col] = nil
+	b.grid[pos.row][pos.col] = nil
 }
 
 func (b *board) isRowPathClear(from, to position) bool {
-	if from.Row != to.Row {
+	if from.row != to.row {
 		return false
 	}
 
 	step := 1
-	if from.Col > to.Col {
+	if from.col > to.col {
 		step = -1
 	}
 
-	for col := from.Col + step; col != to.Col; col += step {
-		if b.IsOccupied(position{Row: from.Row, Col: col}) {
+	for col := from.col + step; col != to.col; col += step {
+		if b.IsOccupied(position{row: from.row, col: col}) {
 			return false
 		}
 	}

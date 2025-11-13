@@ -1,6 +1,9 @@
 package gochess
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func newTestStartingPos() ChessEngine {
 	engine := NewChessEngine()
@@ -51,4 +54,25 @@ func TestFENStringInitialPos(t *testing.T) {
 	if engineFENString != FENString {
 		t.Errorf(`NewGameFENString(). Got %s want %s`, engineFENString, FENString)
 	}
+}
+
+func TestPawnStartingForwardCantJump(t *testing.T) {
+	FENString := "rnbqkbnr/pppp1ppp/8/4p3/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1"
+	testName := "TestPawnStartingForwardCantJump"
+
+	engine := NewChessEngine()
+
+	_, err := engine.NewGameFENString(FENString, "Player_White", "Player_Black")
+	if err != nil {
+		t.Errorf("Error creating game from FENString: %s", err)
+	}
+
+	from := "e5"
+	to := "e3"
+	movesWhite := false
+	if err := engine.Move(from, to, movesWhite); err == nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
+	}
+
+	fmt.Println(engine.game.gameBoard)
 }
