@@ -4,7 +4,7 @@ import "testing"
 
 func TestCantGoOutofBounds(t *testing.T) {
 	testName := "TestCantGoOutofBounds"
-	engine := testStartingPos()
+	engine := newTestStartingPos()
 
 	from := "a1"
 	to := "i1"
@@ -15,7 +15,7 @@ func TestCantGoOutofBounds(t *testing.T) {
 	}
 
 	pos := "rnbqkbn1/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNR w KQq - 0 1"
-	engine = testFENPos(pos)
+	engine = newTestFENPos(pos)
 
 	from = "a1"
 	to = "h9"
@@ -28,7 +28,7 @@ func TestCantGoOutofBounds(t *testing.T) {
 func TestPinnedPieceCantMove(t *testing.T) {
 	testName := "TestPinnedPieceCantMove"
 	pos := "rnbqk1nr/pppp1ppp/8/4p3/1b1P4/2N5/PPP1PPPP/R1BQKBNR w KQkq - 2 3"
-	engine := testFENPos(pos)
+	engine := newTestFENPos(pos)
 
 	from := "c3"
 	to := "d5"

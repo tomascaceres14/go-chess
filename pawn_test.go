@@ -6,7 +6,7 @@ import (
 
 func TestPawnMoveForward(t *testing.T) {
 	testName := "TestPawnMoveForward"
-	engine := testStartingPos()
+	engine := newTestStartingPos()
 
 	from := "e2"
 	to := "e3"
@@ -20,7 +20,7 @@ func TestPawnMoveForward(t *testing.T) {
 
 func TestPawnJump(t *testing.T) {
 	testName := "TestPawnJump"
-	engine := testStartingPos()
+	engine := newTestStartingPos()
 
 	from := "e2"
 	to := "e4"
@@ -46,7 +46,7 @@ func TestPawnJump(t *testing.T) {
 
 func TestPawnCantCaptureForward(t *testing.T) {
 	testName := "TestPawnCantCaptureForward"
-	engine := testStartingPos()
+	engine := newTestStartingPos()
 
 	from := "e2"
 	to := "e4"
@@ -73,7 +73,7 @@ func TestPawnCantCaptureForward(t *testing.T) {
 
 func TestPawnEnPassantLeftOption(t *testing.T) {
 	testName := "TestPawnEnPassantLeftOption"
-	engine := testStartingPos()
+	engine := newTestStartingPos()
 
 	from := "e2"
 	to := "e4"
@@ -114,7 +114,7 @@ func TestPawnEnPassantLeftOption(t *testing.T) {
 
 func TestPawnEnPassantRightOption(t *testing.T) {
 	testName := "TestPawnEnPassantRightOption"
-	engine := testStartingPos()
+	engine := newTestStartingPos()
 
 	from := "e2"
 	to := "e4"
@@ -153,10 +153,30 @@ func TestPawnEnPassantRightOption(t *testing.T) {
 
 }
 
+func TestPawnEnPassantSandwitched(t *testing.T) {
+	testName := "TestPawnEnPassantRightOption"
+	engine := newTestFENPos("rnbqkbnr/1pp1p1pp/p7/3pPp2/3P4/8/PPP2PPP/RNBQKBNR w KQkq f6 0 4")
+
+	from := "e5"
+	to := "d6"
+	movesWhite := true
+	if err := engine.Move(from, to, movesWhite); err == nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
+	}
+
+	from = "e5"
+	to = "f6"
+	movesWhite = true
+	if err := engine.Move(from, to, movesWhite); err != nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
+	}
+
+}
+
 func TestPawnEnPassantFEN(t *testing.T) {
 	testName := "TestPawnEnPassantFEN"
 	pos := "rnbqkbnr/1pp1pppp/p7/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
-	engine := testFENPos(pos)
+	engine := newTestFENPos(pos)
 
 	from := "e5"
 	to := "d6"
@@ -169,7 +189,7 @@ func TestPawnEnPassantFEN(t *testing.T) {
 func TestPawnCantEnPassantNextTurn(t *testing.T) {
 	testName := "TestPawnCantEnPassantNextTurn"
 	pos := "rnbqkbnr/1pp1pppp/p7/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
-	engine := testFENPos(pos)
+	engine := newTestFENPos(pos)
 
 	from := "a2"
 	to := "a3"
@@ -197,7 +217,7 @@ func TestPawnCantEnPassantNextTurn(t *testing.T) {
 func TestPawnCantEnPassantOtherPieces(t *testing.T) {
 	testName := "TestPawnCantEnPassantOtherPieces"
 	pos := "r1bqkbnr/pppppppp/8/3nP3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
-	engine := testFENPos(pos)
+	engine := newTestFENPos(pos)
 
 	from := "e5"
 	to := "d6"
