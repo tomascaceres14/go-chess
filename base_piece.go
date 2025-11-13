@@ -36,6 +36,8 @@ type basePiece struct {
 	moved      bool
 }
 
+type moveFunc func(to position, game *game) movable
+
 func newBasePiece(white bool, value int, pos position, directions []direction) *basePiece {
 	return &basePiece{
 		white:      white,

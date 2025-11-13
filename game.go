@@ -28,6 +28,7 @@ type game struct {
 	halfmoveClock, fullmoveCount int
 	moveHistory                  []move
 	status                       gameStatus
+	castleDir                    int
 }
 
 func newGame(whiteName, blackName string) (*game, error) {
@@ -59,6 +60,7 @@ func newGame(whiteName, blackName string) (*game, error) {
 		status:        playing,
 		fullmoveCount: 1,
 		halfmoveClock: 0,
+		castleDir:     -1,
 	}
 
 	return game, nil

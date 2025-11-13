@@ -4,6 +4,7 @@ type king struct {
 	*basePiece
 	longCastlingOpt, shortCastlingOpt bool
 	castleDir                         int
+	moveFunc                          moveFunc
 }
 
 type castleMove struct {
@@ -49,6 +50,8 @@ func newKing(pos position, p *player) *king {
 		shortCastlingOpt: true,
 		castleDir:        -1,
 	}
+
+	king.moveFunc = king.moveWithCastling
 
 	p.pieces = append(p.pieces, king)
 
@@ -100,35 +103,49 @@ func (k *king) legalMoves(b *board) map[position]bool {
 	return legalMoves
 }
 
-func (k *king) move(to position, game *game) movable {
+func (k *king) moveWithCastling(to position, game *game) movable {
 	prevPos := k.pos
 	board := game.gameBoard
 
 	capture := board.movePiece(k, to)
+
 	k.setPosition(to)
-
-	if k.moved {
-		return capture
-	}
-
 	k.setMoved(true)
 
 	diff := prevPos.Col - to.Col
+	k.moveFunc = k.moveDefault
+	k.longCastlingOpt = false
+	k.shortCastlingOpt = false
 
+	// detect if king is castling
 	if diff != 2 && diff != -2 {
 		return capture
 	}
 
-	k.castleDir = 0
-
+	// positive diff is short castle
 	if diff == 2 && k.isWhite() {
+		k.castleDir = 0
+		rook, err := game.getPlayerPiece(position{Row: k.pos.Row, Col: 0}, k.isWhite())
+		if err != nil {
+			return nil
+		}
+
+		board.movePiece(rook, to)
+	} else {
 		k.castleDir = 1
+		rook, err := game.getPlayerPiece(position{Row: k.pos.Row, Col: 7}, k.isWhite())
+		if err != nil {
+			return nil
+		}
+
+		board.movePiece(rook, to)
 	}
 
-	k.setPosition(to)
-	k.setMoved(true)
-
 	return capture
+}
+
+func (k *king) move(to position, game *game) movable {
+	return k.moveFunc(to, game)
 }
 
 func (k *king) getPosition() position {

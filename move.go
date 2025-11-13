@@ -24,11 +24,15 @@ func (m *move) getAlgebraicString() string {
 		return m.algebraicNotation
 	}
 
-	switch m.castleDir {
-	case 0:
-		return "0-0"
-	case 1:
-		return "0-0-0"
+	if m.piece.getType() == kingType {
+		k, _ := castKing(m.piece)
+		m.castleDir = k.castleDir
+		switch k.castleDir {
+		case 0:
+			return "0-0"
+		case 1:
+			return "0-0-0"
+		}
 	}
 
 	algebraicNotation := m.piece.getAlgebraicString()

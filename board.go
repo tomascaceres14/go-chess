@@ -35,10 +35,10 @@ func (b *board) MovePieceSim(from, to position) {
 }
 
 // Moves piece on board. Does not update piece, only relocates in grid
-func (b *board) movePiece(piece movable, pos position) movable {
-	capture, _ := b.getPiece(pos)
+func (b *board) movePiece(piece movable, to position) movable {
+	capture, _ := b.getPiece(to)
 	b.grid[piece.getPosition().Row][piece.getPosition().Col] = nil
-	b.grid[pos.Row][pos.Col] = piece
+	b.grid[to.Row][to.Col] = piece
 	return capture
 }
 
