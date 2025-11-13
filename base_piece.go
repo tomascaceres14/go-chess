@@ -21,6 +21,7 @@ type movable interface {
 	getValue() int
 	String() string
 	getAlgebraicString() string
+	move(to position, game *game) movable
 	hasMoved() bool
 	setMoved(moved bool)
 	clone() movable
@@ -34,6 +35,8 @@ type basePiece struct {
 	directions []direction
 	moved      bool
 }
+
+type moveFunc func(to position, game *game) movable
 
 func newBasePiece(white bool, value int, pos position, directions []direction) *basePiece {
 	return &basePiece{
@@ -76,6 +79,18 @@ func (bp *basePiece) legalMovesDefault(b *board) map[position]bool {
 
 func (bp *basePiece) legalMoves(b *board) map[position]bool {
 	return bp.legalMovesDefault(b)
+}
+
+func moveDefault(piece movable, to position, game *game) movable {
+	board := game.gameBoard
+	capture := board.movePiece(piece, to)
+	piece.setPosition(to)
+	piece.setMoved(true)
+	return capture
+}
+
+func (bp *basePiece) move(to position, game *game) movable {
+	return moveDefault(bp, to, game)
 }
 
 func (bp *basePiece) getPosition() position {

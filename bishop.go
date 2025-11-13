@@ -22,12 +22,16 @@ func newBishop(pos position, p *player) *bishop {
 	return bishop
 }
 
-func (bp *bishop) visibleSquares(b *board) map[position]bool {
-	return bp.visibleSquaresDefault(b)
+func (b *bishop) visibleSquares(board *board) map[position]bool {
+	return b.visibleSquaresDefault(board)
 }
 
-func (bp *bishop) legalMoves(b *board) map[position]bool {
-	return bp.legalMovesDefault(b)
+func (b *bishop) legalMoves(board *board) map[position]bool {
+	return b.legalMovesDefault(board)
+}
+
+func (b *bishop) move(to position, game *game) movable {
+	return moveDefault(b, to, game)
 }
 
 func (b *bishop) getPosition() position {

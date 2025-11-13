@@ -28,25 +28,55 @@ func (b *board) InsertPieceList(pieces []movable) {
 
 func (b *board) MovePieceSim(from, to position) {
 	piece, _ := b.getPiece(from)
-
-	(*b.grid)[from.Row][from.Col] = nil
-	(*b.grid)[to.Row][to.Col] = piece
-	piece.setPosition(to)
+	b.grid[from.Row][from.Col] = nil
+	b.grid[to.Row][to.Col] = piece
 }
 
-// Moves piece from piece.Pos to pos and returns captured piece
-func (b *board) movePiece(piece movable, pos position) movable {
-	prevPos := piece.getPosition()
-
-	capture, _ := b.getPiece(pos)
-
-	b.grid[prevPos.Row][prevPos.Col] = nil
-	b.grid[pos.Row][pos.Col] = piece
-
-	piece.setPosition(pos)
-	piece.setMoved(true)
-
+// Moves piece on board. Does not update piece, only relocates in grid
+func (b *board) movePiece(piece movable, to position) movable {
+	capture, _ := b.getPiece(to)
+	b.grid[piece.getPosition().Row][piece.getPosition().Col] = nil
+	b.grid[to.Row][to.Col] = piece
 	return capture
+}
+
+func (b *board) isKingInCheck(pos position, color bool) bool {
+	return b.isSquareAttacked(pos, color)
+}
+
+func (b *board) isSquareAttacked(pos position, color bool) bool {
+	return b.attackedByColor(!color)[pos]
+}
+
+// Calculates which squares are attacked by color
+func (b *board) attackedByColor(white bool) map[position]bool {
+	threats := make(map[position]bool)
+	for i := range 8 {
+		for j := range 8 {
+			p := (*b.grid)[i][j]
+			if p != nil && p.isWhite() == white {
+				for sq := range p.visibleSquares(b) {
+					threats[sq] = true
+				}
+			}
+		}
+	}
+	return threats
+}
+
+// Find king by color
+func (b *board) findKingPos(white bool) position {
+	for i := range 8 {
+		for j := range 8 {
+			p := (*b.grid)[i][j]
+			if p != nil && p.isWhite() == white {
+				if _, ok := p.(*king); ok {
+					return position{Row: i, Col: j}
+				}
+			}
+		}
+	}
+	return position{}
 }
 
 func (b *board) IsOccupied(pos position) bool {

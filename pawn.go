@@ -27,6 +27,7 @@ func newPawn(pos position, p *player) *pawn {
 func (p *pawn) visibleSquares(b *board) map[position]bool {
 
 	positions := map[position]bool{}
+
 	front1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col}
 	front2 := position{Row: p.pos.Row + 2*p.direction, Col: p.pos.Col}
 	diag1 := position{Row: p.pos.Row + 1*p.direction, Col: p.pos.Col + 1}
@@ -39,10 +40,11 @@ func (p *pawn) visibleSquares(b *board) map[position]bool {
 	if diag2.inBounds() {
 		positions[diag2] = true
 	}
+	if front1.inBounds() {
+		positions[front1] = true
+	}
 
-	positions[front1] = true
-
-	if !p.moved {
+	if !p.moved && front2.inBounds() {
 		positions[front2] = true
 	}
 
@@ -106,6 +108,41 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 	return legalMoves
 }
 
+func (p *pawn) move(to position, game *game) movable {
+	from := p.pos
+	board := game.gameBoard
+	player := game.GetPlayer(p.white)
+	capture := board.movePiece(p, to)
+	p.setPosition(to)
+	p.setMoved(true)
+
+	// Promotion
+	if to.Row == 0 || to.Row == 7 {
+		queen := newQueen(to, player)
+		board.insertPiece(queen)
+		queen.setMoved(true)
+		return capture
+	}
+
+	// En passant
+	if to.Col != from.Col {
+		capturedPos := position{Row: from.Row, Col: to.Col}
+		capture, _ = board.getPiece(capturedPos)
+		board.clearSquare(capturedPos)
+		return capture
+	}
+
+	diff := from.Row - to.Row
+	pawnJumped := diff == 2 || diff == -2
+
+	if pawnJumped {
+		p.jumped = pawnJumped
+		player.pawnJumped = p
+	}
+
+	return capture
+}
+
 func (p *pawn) getPosition() position {
 	return p.pos
 }
@@ -131,7 +168,7 @@ func (p *pawn) String() string {
 }
 
 func (p *pawn) clone() movable {
-	return &pawn{basePiece: p.basePiece.cloneBase()}
+	return &pawn{basePiece: p.basePiece.cloneBase(), direction: p.direction}
 }
 
 func (p *pawn) getType() pieceType {

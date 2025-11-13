@@ -3,22 +3,24 @@ package gochess
 type king struct {
 	*basePiece
 	longCastlingOpt, shortCastlingOpt bool
+	castleDir                         int
+	moveFunc                          moveFunc
 }
 
 type castleMove struct {
 	rookFrom, rookTo position
-	shortCastle      bool
+	castleDir        int
 }
 
 // Mapping initial available castle square for king (key) and rook from/to movement option (value)
 var castlingPositions = map[position]castleMove{
 	// whites
-	pos("g1"): {rookFrom: pos("h1"), rookTo: pos("f1"), shortCastle: true},
-	pos("c1"): {rookFrom: pos("a1"), rookTo: pos("d1"), shortCastle: false},
+	pos("g1"): {rookFrom: pos("h1"), rookTo: pos("f1"), castleDir: 0},
+	pos("c1"): {rookFrom: pos("a1"), rookTo: pos("d1"), castleDir: 1},
 
 	// blacks
-	pos("g8"): {rookFrom: pos("h8"), rookTo: pos("f8"), shortCastle: true},
-	pos("c8"): {rookFrom: pos("a8"), rookTo: pos("d8"), shortCastle: false},
+	pos("g8"): {rookFrom: pos("h8"), rookTo: pos("f8"), castleDir: 0},
+	pos("c8"): {rookFrom: pos("a8"), rookTo: pos("d8"), castleDir: 1},
 }
 
 func newKing(pos position, p *player) *king {
@@ -46,7 +48,10 @@ func newKing(pos position, p *player) *king {
 		basePiece:        newBasePiece(white, 0, pos, directions),
 		longCastlingOpt:  true,
 		shortCastlingOpt: true,
+		castleDir:        -1,
 	}
+
+	king.moveFunc = king.moveWithCastling
 
 	p.pieces = append(p.pieces, king)
 
@@ -96,6 +101,45 @@ func (k *king) legalMoves(b *board) map[position]bool {
 	legalMoves[position{Row: k.pos.Row, Col: 2}] = canLongCastle
 
 	return legalMoves
+}
+
+func (k *king) moveWithCastling(to position, game *game) movable {
+	prevPos := k.pos
+	board := game.gameBoard
+
+	capture := board.movePiece(k, to)
+
+	k.setPosition(to)
+	k.setMoved(true)
+
+	diff := prevPos.Col - to.Col
+	k.moveFunc = k.moveWithoutCastling
+	k.longCastlingOpt = false
+	k.shortCastlingOpt = false
+
+	// detect if king is castling
+	if diff != 2 && diff != -2 {
+		return capture
+	}
+
+	castleMove, ok := castlingPositions[to]
+	if !ok {
+		return nil
+	}
+
+	rook, _ := game.getPlayerPiece(castleMove.rookFrom, k.isWhite())
+	board.movePiece(rook, castleMove.rookTo)
+	k.castleDir = castleMove.castleDir
+
+	return capture
+}
+
+func (k *king) moveWithoutCastling(to position, game *game) movable {
+	return moveDefault(k, to, game)
+}
+
+func (k *king) move(to position, game *game) movable {
+	return k.moveFunc(to, game)
 }
 
 func (k *king) getPosition() position {

@@ -24,15 +24,15 @@ func main() {
 
 	game := gochess.NewChessEngine()
 
-	id, err := game.NewGameFENString("r3kbnr/pppq1ppp/2n5/3ppb2/3PPB2/2N5/PPPQ1PPP/R3KBNR w KQkq - 6 6", "whites", "blacks")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// id, err := game.NewGame("whites", "blacks")
+	// id, err := game.NewGameFENString("r3kbnr/pppq1ppp/2n5/3ppb2/3PPB2/2N5/PPPQ1PPP/R3KBNR w KQkq - 6 6", "whites", "blacks")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
+
+	id, err := game.NewGame("whites", "blacks")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Println("Match started. ID:", id)
 

@@ -56,6 +56,10 @@ func (n *knight) legalMoves(b *board) map[position]bool {
 	return moves
 }
 
+func (n *knight) move(to position, game *game) movable {
+	return moveDefault(n, to, game)
+}
+
 func (n *knight) getPosition() position {
 	return n.pos
 }

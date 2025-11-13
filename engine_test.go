@@ -2,7 +2,7 @@ package gochess
 
 import "testing"
 
-func testStartingPos() ChessEngine {
+func newTestStartingPos() ChessEngine {
 	engine := NewChessEngine()
 
 	whiteName := "Player_White"
@@ -13,7 +13,7 @@ func testStartingPos() ChessEngine {
 	return *engine
 }
 
-func testFENPos(pos string) ChessEngine {
+func newTestFENPos(pos string) ChessEngine {
 	engine := NewChessEngine()
 
 	whiteName := "Player_White"

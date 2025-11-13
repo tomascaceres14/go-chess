@@ -28,84 +28,27 @@ func castRay(pos position, dx, dy int, b *board, white bool, positions map[posit
 	castRay(next, dx, dy, b, white, positions)
 }
 
-func isMoveSafeToKing(piece movable, to position, g *game) bool {
+func isMoveSafeToKing(piece movable, to position, board *board) bool {
 
 	// Clone board
-	board := g.gameBoard.clone()
+	boardSim := board.clone()
 
 	// Simulate movement on cloned board
-	board.MovePieceSim(piece.getPosition(), to)
+	boardSim.MovePieceSim(piece.getPosition(), to)
 
-	// Calculate threats of opponent but using the individual pieces of the cloned board, not the player.Pieces slice.
-	// The latter would require to also deep copy the whole game.
-	opponentColor := !piece.isWhite()
-	threats := attackedByColor(board, opponentColor)
-
-	// Find king on cloned board
-	kingPos, ok := findKingPos(board, piece.isWhite())
-	if !ok {
-		return false
-	}
-
-	// If king was moved, then 'to' is its safe square
-	if piece == g.GetPlayer(piece.isWhite()).king {
+	var kingPos position
+	if piece.getType() == kingType {
 		kingPos = to
+	} else {
+		kingPos = boardSim.findKingPos(piece.isWhite())
 	}
 
-	return !threats[kingPos]
+	return !boardSim.isKingInCheck(kingPos, piece.isWhite())
 }
 
 // Parse col from matrix index to board column letter
 func getColLetter(col int) string {
 	return string(cols[col])
-}
-
-// Removes a piece from a list of pieces
-func deletePiece(list []movable, piece movable) []movable {
-	for i, v := range list {
-		if v == piece {
-			return append(list[0:i], list[i+1:]...)
-		}
-	}
-
-	return list
-}
-
-// func randomBool() bool {
-// 	return rand.Intn(2) == 0
-// }
-
-// Used for simulating movements
-// Calculate AttaquedSquares but using the board, not the player.Pieces slice
-func attackedByColor(b *board, white bool) map[position]bool {
-	threats := make(map[position]bool)
-	for i := range 8 {
-		for j := range 8 {
-			p := (*b.grid)[i][j]
-			if p != nil && p.isWhite() == white {
-				for sq := range p.visibleSquares(b) {
-					threats[sq] = true
-				}
-			}
-		}
-	}
-	return threats
-}
-
-// Used for simulating movements
-// Find king by color using board
-func findKingPos(b *board, white bool) (position, bool) {
-	for i := range 8 {
-		for j := range 8 {
-			p := (*b.grid)[i][j]
-			if p != nil && p.isWhite() == white {
-				if _, ok := p.(*king); ok {
-					return p.getPosition(), true
-				}
-			}
-		}
-	}
-	return position{}, false
 }
 
 func getFENPosition(g *game) string {
@@ -196,8 +139,6 @@ func getFENEnPassant(g *game) string {
 
 	return FENString
 }
-
-
 
 func colorToString(color bool) string {
 	colorStr := "white"

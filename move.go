@@ -1,47 +1,61 @@
 package gochess
 
 type move struct {
-	PieceCopy         movable
-	From, To          position
-	Capture           movable
-	AlgebraicNotation string
-	IsCheck           bool
+	piece             movable
+	from, to          position
+	capture           movable
+	algebraicNotation string
+	isCheck           bool
+	color             bool
+	castleDir         int
 }
 
-func newMove(piece, capture movable, from, to position, isCheck bool, castleDir int) move {
-	algebraicNotation := piece.getAlgebraicString()
+func (m move) String() string {
+	return m.getAlgebraicString()
+}
+
+func (m *move) getAlgebraicString() string {
+
+	if m.piece == nil {
+		return "-"
+	}
+
+	if m.algebraicNotation != "" {
+		return m.algebraicNotation
+	}
+
+	if m.piece.getType() == kingType {
+		k, _ := castKing(m.piece)
+		m.castleDir = k.castleDir
+		switch k.castleDir {
+		case 0:
+			return "0-0"
+		case 1:
+			return "0-0-0"
+		}
+	}
+
+	algebraicNotation := m.piece.getAlgebraicString()
 
 	takes := "x"
 	check := ""
 
-	if capture == nil {
+	if m.capture == nil {
 		takes = ""
-	} else if piece.getType() == pawnType {
-		takes = from.getCol() + takes
+	} else if m.piece.getType() == pawnType {
+		takes = m.from.getCol() + takes
 	}
 
-	if isCheck {
+	if m.isCheck {
 		check = "+"
 	}
 
-	switch castleDir {
-	case -1:
-		algebraicNotation = algebraicNotation + takes + to.String() + check
-	case 0:
-		algebraicNotation = "0-0"
-	case 1:
-		algebraicNotation = "0-0-0"
-	}
+	m.algebraicNotation = algebraicNotation + takes + m.to.String() + check
 
-	return move{
-		PieceCopy:         piece,
-		Capture:           capture,
-		From:              from,
-		To:                to,
-		AlgebraicNotation: algebraicNotation,
-	}
+	return m.algebraicNotation
+
 }
 
-func (m move) String() string {
-	return m.AlgebraicNotation
+func (m *move) getPiece() movable {
+	return m.piece
 }
