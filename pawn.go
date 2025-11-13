@@ -39,10 +39,11 @@ func (p *pawn) visibleSquares(b *board) map[position]bool {
 	if diag2.inBounds() {
 		positions[diag2] = true
 	}
+	if front1.inBounds() {
+		positions[front1] = true
+	}
 
-	positions[front1] = true
-
-	if !p.moved {
+	if !p.moved && front2.inBounds() {
 		positions[front2] = true
 	}
 
@@ -111,7 +112,6 @@ func (p *pawn) move(to position, game *game) movable {
 	board := game.gameBoard
 	player := game.GetPlayer(p.white)
 	capture := board.movePiece(p, to)
-
 	p.setPosition(to)
 	p.setMoved(true)
 
@@ -141,6 +141,7 @@ func (p *pawn) move(to position, game *game) movable {
 
 	return capture
 }
+
 func (p *pawn) getPosition() position {
 	return p.pos
 }

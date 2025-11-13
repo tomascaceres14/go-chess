@@ -81,16 +81,16 @@ func (bp *basePiece) legalMoves(b *board) map[position]bool {
 	return bp.legalMovesDefault(b)
 }
 
-func (bp *basePiece) moveDefault(to position, game *game) movable {
+func moveDefault(piece movable, to position, game *game) movable {
 	board := game.gameBoard
-	capture := board.movePiece(bp, to)
-	bp.setPosition(to)
-	bp.setMoved(true)
+	capture := board.movePiece(piece, to)
+	piece.setPosition(to)
+	piece.setMoved(true)
 	return capture
 }
 
 func (bp *basePiece) move(to position, game *game) movable {
-	return bp.moveDefault(to, game)
+	return moveDefault(bp, to, game)
 }
 
 func (bp *basePiece) getPosition() position {

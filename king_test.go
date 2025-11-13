@@ -85,5 +85,20 @@ func TestKingCanCastles(t *testing.T) {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}
 
+}
+
+func TestKingCantWalkIntoCheck(t *testing.T) {
+	testName := "TestKingCantWalkIntoCheck"
+	engine := newTestFENPos("rn1qkbnr/ppp1pppp/8/5b2/2B5/2N5/PPPP1PpP/R1BQ1RK1 w kq - 0 6")
+
+	fmt.Println(engine.game.gameBoard)
+
+	from := "g1"
+	to := "h1"
+	movesWhite := true
+	if err := engine.Move(from, to, movesWhite); err == nil {
+		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
+	}
+
 	fmt.Println(engine.game.gameBoard)
 }

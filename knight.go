@@ -57,7 +57,7 @@ func (n *knight) legalMoves(b *board) map[position]bool {
 }
 
 func (n *knight) move(to position, game *game) movable {
-	return n.moveDefault(to, game)
+	return moveDefault(n, to, game)
 }
 
 func (n *knight) getPosition() position {

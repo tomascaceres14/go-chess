@@ -31,7 +31,7 @@ func (b *bishop) legalMoves(board *board) map[position]bool {
 }
 
 func (b *bishop) move(to position, game *game) movable {
-	return b.moveDefault(to, game)
+	return moveDefault(b, to, game)
 }
 
 func (b *bishop) getPosition() position {

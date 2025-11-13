@@ -113,7 +113,7 @@ func (k *king) moveWithCastling(to position, game *game) movable {
 	k.setMoved(true)
 
 	diff := prevPos.Col - to.Col
-	k.moveFunc = k.moveDefault
+	k.moveFunc = k.moveWithoutCastling
 	k.longCastlingOpt = false
 	k.shortCastlingOpt = false
 
@@ -132,6 +132,10 @@ func (k *king) moveWithCastling(to position, game *game) movable {
 	k.castleDir = castleMove.castleDir
 
 	return capture
+}
+
+func (k *king) moveWithoutCastling(to position, game *game) movable {
+	return moveDefault(k, to, game)
 }
 
 func (k *king) move(to position, game *game) movable {

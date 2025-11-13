@@ -265,14 +265,7 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 		fmt.Println("Stalemate pal :(")
 	}
 
-	// Switch turns
-	g.WhiteTurn = !g.WhiteTurn
-
-	if opponent.pawnJumped != nil {
-		opponent.removeJumpFromPawn()
-	}
-
-	g.fullmoveCount++
+	g.switchTurns()
 
 	return nil
 }
@@ -345,6 +338,19 @@ func (g *game) isKingInCheck(color bool) bool {
 
 func (g game) getCurrentTurn() bool {
 	return g.WhiteTurn
+}
+
+func (g *game) switchTurns() {
+
+	g.WhiteTurn = !g.WhiteTurn
+	g.castleDir = -1
+	player := g.GetPlayer(g.WhiteTurn)
+
+	if player.pawnJumped != nil {
+		player.removeJumpFromPawn()
+	}
+
+	g.fullmoveCount++
 }
 
 func (g *game) GetFENString() string {

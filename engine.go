@@ -56,6 +56,8 @@ func (e *ChessEngine) Move(from, to string, pColor bool) error {
 		return err
 	}
 
+	fmt.Println(e.game.gameBoard)
+	fmt.Println(e.game.moveHistory)
 	return nil
 }
 
