@@ -70,7 +70,7 @@ func TestPawnStartingForwardCantJump(t *testing.T) {
 	from := "e5"
 	to := "e3"
 	movesWhite := false
-	if err := engine.Move(from, to, movesWhite); err == nil {
+	if _, err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}
 

@@ -33,7 +33,7 @@ type game struct {
 
 func newGame(whiteName, blackName string) (*game, error) {
 
-	gameBoard := [8][8]movable{}
+	gameBoard := [8][8]Movable{}
 
 	pWhite, err := newPlayerWhite(whiteName)
 	if err != nil {
@@ -282,7 +282,7 @@ func (g *game) GetPlayer(pColor bool) *player {
 }
 
 // Obtains piece at given position if player is owner of piece
-func (g *game) getPlayerPiece(pos position, pColor bool) (movable, error) {
+func (g *game) getPlayerPiece(pos position, pColor bool) (Movable, error) {
 
 	piece, ok := g.gameBoard.getPiece(pos)
 	if !ok {
@@ -386,7 +386,7 @@ func (g *game) setFENStringPos(FENPosition []string) error {
 
 			letter := string(char)
 			position := position{row: rowNum, col: colNum}
-			var piece movable
+			var piece Movable
 			switch letter {
 			case "p":
 				piece = newPawn(position, pBlack)

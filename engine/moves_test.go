@@ -12,7 +12,7 @@ func TestCantGoOutofBounds(t *testing.T) {
 	to := "i1"
 	movesWhite := true
 
-	if err := engine.Move(from, to, movesWhite); err == nil {
+	if _, err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -22,7 +22,7 @@ func TestCantGoOutofBounds(t *testing.T) {
 	from = "a1"
 	to = "h9"
 	movesWhite = true
-	if err := engine.Move(from, to, movesWhite); err == nil {
+	if _, err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 }
@@ -36,7 +36,7 @@ func TestPinnedPieceCantMove(t *testing.T) {
 	to := "d5"
 	movesWhite := true
 
-	if err := engine.Move(from, to, movesWhite); err == nil {
+	if _, err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}
 }
@@ -50,7 +50,7 @@ func TestPinnedPieceCanCaptureAttacker(t *testing.T) {
 	from := "d2"
 	to := "c3"
 	movesWhite := true
-	if err := engine.Move(from, to, movesWhite); err == nil {
+	if _, err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -58,14 +58,14 @@ func TestPinnedPieceCanCaptureAttacker(t *testing.T) {
 	from = "d2"
 	to = "d4"
 	movesWhite = true
-	if err := engine.Move(from, to, movesWhite); err != nil {
+	if _, err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
 	from = "a7"
 	to = "a6"
 	movesWhite = false
-	if err := engine.Move(from, to, movesWhite); err != nil {
+	if _, err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -73,7 +73,7 @@ func TestPinnedPieceCanCaptureAttacker(t *testing.T) {
 	from = "d4"
 	to = "d8"
 	movesWhite = true
-	if err := engine.Move(from, to, movesWhite); err != nil {
+	if _, err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 }

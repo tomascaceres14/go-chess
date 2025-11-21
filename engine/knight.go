@@ -56,7 +56,7 @@ func (n *knight) legalMoves(b *board) map[position]bool {
 	return moves
 }
 
-func (n *knight) move(to position, game *game) movable {
+func (n *knight) move(to position, game *game) Movable {
 	return moveDefault(n, to, game)
 }
 
@@ -82,7 +82,7 @@ func (b *knight) getAlgebraicString() string {
 	return "N"
 }
 
-func (n *knight) clone() movable {
+func (n *knight) clone() Movable {
 	return &knight{basePiece: n.basePiece.cloneBase()}
 }
 

@@ -37,26 +37,26 @@ func (e *ChessEngine) NewGameFENString(FENString string, whiteName, blackName st
 	return game.id, nil
 }
 
-func (e *ChessEngine) Move(from, to string, pColor bool) error {
+func (e *ChessEngine) Move(from, to string, pColor bool) ([8][8]Movable, error) {
 	if e.game == nil {
-		return errors.New("Game not initialized.")
+		return [8][8]Movable{}, errors.New("Game not initialized.")
 	}
 
 	fromPos := pos(from)
 	if !fromPos.isValid() {
-		return fmt.Errorf("%s", "'"+from+"' is an invalid position.")
+		return [8][8]Movable{}, fmt.Errorf("%s", "'"+from+"' is an invalid position.")
 	}
 
 	toPos := pos(to)
 	if !toPos.isValid() {
-		return fmt.Errorf("%s", "'"+to+"' is an invalid position.")
+		return [8][8]Movable{}, fmt.Errorf("%s", "'"+to+"' is an invalid position.")
 	}
 
 	if err := e.game.makeMove(fromPos, toPos, pColor); err != nil {
-		return err
+		return [8][8]Movable{}, err
 	}
 
-	return nil
+	return e.game.gameBoard.GetGrid(), nil
 }
 
 func (e *ChessEngine) GetFENString() string {

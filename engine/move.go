@@ -1,9 +1,9 @@
 package gochess
 
 type move struct {
-	piece             movable
+	piece             Movable
 	from, to          position
-	capture           movable
+	capture           Movable
 	algebraicNotation string
 	isCheck           bool
 	color             bool
@@ -56,6 +56,6 @@ func (m *move) getAlgebraicString() string {
 
 }
 
-func (m *move) getPiece() movable {
+func (m *move) getPiece() Movable {
 	return m.piece
 }

@@ -12,7 +12,7 @@ const (
 	basePieceType
 )
 
-type movable interface {
+type Movable interface {
 	visibleSquares(b *board) map[position]bool
 	legalMoves(b *board) map[position]bool
 	getPosition() position
@@ -21,10 +21,10 @@ type movable interface {
 	getValue() int
 	String() string
 	getAlgebraicString() string
-	move(to position, game *game) movable
+	move(to position, game *game) Movable
 	hasMoved() bool
 	setMoved(moved bool)
-	clone() movable
+	clone() Movable
 	getType() pieceType
 }
 
@@ -36,7 +36,7 @@ type basePiece struct {
 	moved      bool
 }
 
-type moveFunc func(to position, game *game) movable
+type moveFunc func(to position, game *game) Movable
 
 func newBasePiece(white bool, value int, pos position, directions []direction) *basePiece {
 	return &basePiece{
@@ -81,7 +81,7 @@ func (bp *basePiece) legalMoves(b *board) map[position]bool {
 	return bp.legalMovesDefault(b)
 }
 
-func moveDefault(piece movable, to position, game *game) movable {
+func moveDefault(piece Movable, to position, game *game) Movable {
 	board := game.gameBoard
 	capture := board.movePiece(piece, to)
 	piece.setPosition(to)
@@ -89,7 +89,7 @@ func moveDefault(piece movable, to position, game *game) movable {
 	return capture
 }
 
-func (bp *basePiece) move(to position, game *game) movable {
+func (bp *basePiece) move(to position, game *game) Movable {
 	return moveDefault(bp, to, game)
 }
 
@@ -128,7 +128,7 @@ func (bp *basePiece) hasMoved() bool {
 	return bp.moved
 }
 
-func (bp *basePiece) clone() movable {
+func (bp *basePiece) clone() Movable {
 	return bp.cloneBase()
 }
 

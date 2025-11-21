@@ -12,7 +12,7 @@ type player struct {
 	isWhite, isChecked bool
 	points             int
 	king               *king
-	pieces             []movable
+	pieces             []Movable
 	threats            map[position]bool
 }
 
@@ -62,7 +62,7 @@ func (p *player) getKing() *king {
 	return p.king
 }
 
-func (p *player) deletePiece(piece movable) {
+func (p *player) deletePiece(piece Movable) {
 	pieces := p.pieces
 	for i, v := range pieces {
 		if v == piece {

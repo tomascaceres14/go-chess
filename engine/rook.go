@@ -29,7 +29,7 @@ func (r *rook) legalMoves(b *board) map[position]bool {
 	return r.legalMovesDefault(b)
 }
 
-func (r *rook) move(to position, game *game) movable {
+func (r *rook) move(to position, game *game) Movable {
 	from := r.pos
 	board := game.gameBoard
 
@@ -80,7 +80,7 @@ func (b *rook) getAlgebraicString() string {
 	return "R"
 }
 
-func (r *rook) clone() movable {
+func (r *rook) clone() Movable {
 	return &rook{basePiece: r.basePiece.cloneBase()}
 }
 

@@ -11,7 +11,7 @@ func TestKnightForks(t *testing.T) {
 	from := "c4"
 	to := "d6"
 	movesWhite := true
-	if err := engine.Move(from, to, movesWhite); err != nil {
+	if _, err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -19,7 +19,7 @@ func TestKnightForks(t *testing.T) {
 	from = "c8"
 	to = "b8"
 	movesWhite = false
-	if err := engine.Move(from, to, movesWhite); err == nil {
+	if _, err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -27,7 +27,7 @@ func TestKnightForks(t *testing.T) {
 	from = "e7"
 	to = "d6"
 	movesWhite = false
-	if err := engine.Move(from, to, movesWhite); err != nil {
+	if _, err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -35,7 +35,7 @@ func TestKnightForks(t *testing.T) {
 	from = "e4"
 	to = "d6"
 	movesWhite = true
-	if err := engine.Move(from, to, movesWhite); err != nil {
+	if _, err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -43,7 +43,7 @@ func TestKnightForks(t *testing.T) {
 	from = "c8"
 	to = "b8"
 	movesWhite = false
-	if err := engine.Move(from, to, movesWhite); err == nil {
+	if _, err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -51,7 +51,7 @@ func TestKnightForks(t *testing.T) {
 	from = "e8"
 	to = "d8"
 	movesWhite = false
-	if err := engine.Move(from, to, movesWhite); err != nil {
+	if _, err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -59,7 +59,7 @@ func TestKnightForks(t *testing.T) {
 	from = "e8"
 	to = "d8"
 	movesWhite = false
-	if err := engine.Move(from, to, movesWhite); err == nil {
+	if _, err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}
 
@@ -67,7 +67,7 @@ func TestKnightForks(t *testing.T) {
 	from = "d6"
 	to = "c8"
 	movesWhite = true
-	if err := engine.Move(from, to, movesWhite); err != nil {
+	if _, err := engine.Move(from, to, movesWhite); err != nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err = nil, got %v", testName, from, to, movesWhite, err)
 	}
 }

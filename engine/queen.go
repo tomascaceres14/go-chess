@@ -34,7 +34,7 @@ func (q *queen) legalMoves(b *board) map[position]bool {
 	return q.legalMovesDefault(b)
 }
 
-func (q *queen) move(to position, game *game) movable {
+func (q *queen) move(to position, game *game) Movable {
 	return moveDefault(q, to, game)
 }
 
@@ -60,7 +60,7 @@ func (b *queen) getAlgebraicString() string {
 	return "Q"
 }
 
-func (q *queen) clone() movable {
+func (q *queen) clone() Movable {
 	return &queen{basePiece: q.basePiece.cloneBase()}
 }
 

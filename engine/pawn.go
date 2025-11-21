@@ -100,7 +100,7 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 	return legalMoves
 }
 
-func (p *pawn) move(to position, game *game) movable {
+func (p *pawn) move(to position, game *game) Movable {
 
 	from := p.pos
 	board := game.gameBoard
@@ -168,7 +168,7 @@ func (p *pawn) String() string {
 
 }
 
-func (p *pawn) clone() movable {
+func (p *pawn) clone() Movable {
 	return &pawn{basePiece: p.basePiece.cloneBase(), direction: p.direction}
 }
 
@@ -176,7 +176,7 @@ func (p *pawn) getType() pieceType {
 	return pawnType
 }
 
-func castPawn(m movable) (*pawn, bool) {
+func castPawn(m Movable) (*pawn, bool) {
 
 	if m == nil || m.getType() != pawnType {
 		return &pawn{}, false

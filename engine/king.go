@@ -103,7 +103,7 @@ func (k *king) legalMoves(b *board) map[position]bool {
 	return legalMoves
 }
 
-func (k *king) moveWithCastling(to position, game *game) movable {
+func (k *king) moveWithCastling(to position, game *game) Movable {
 	prevPos := k.pos
 	board := game.gameBoard
 
@@ -134,11 +134,11 @@ func (k *king) moveWithCastling(to position, game *game) movable {
 	return capture
 }
 
-func (k *king) moveWithoutCastling(to position, game *game) movable {
+func (k *king) moveWithoutCastling(to position, game *game) Movable {
 	return moveDefault(k, to, game)
 }
 
-func (k *king) move(to position, game *game) movable {
+func (k *king) move(to position, game *game) Movable {
 	return k.moveFunc(to, game)
 }
 
@@ -168,7 +168,7 @@ func (b *king) getAlgebraicString() string {
 	return "K"
 }
 
-func (k *king) clone() movable {
+func (k *king) clone() Movable {
 	return &king{basePiece: k.basePiece.cloneBase()}
 }
 
@@ -176,7 +176,7 @@ func (k *king) getType() pieceType {
 	return kingType
 }
 
-func castKing(piece movable) (*king, bool) {
+func castKing(piece Movable) (*king, bool) {
 	king, ok := piece.(*king)
 	return king, ok
 }

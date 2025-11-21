@@ -9,6 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	gochess "github.com/tomascaceres14/go-chess/engine"
 )
 
 const (
@@ -35,6 +36,7 @@ func CenteredPieceSprite(img *ebiten.Image, x, y float64) *Sprite {
 type Piece struct {
 	*Sprite
 	IsWhite bool
+	piece   gochess.Movable
 }
 
 func NewPiece(img *ebiten.Image, imgX, imgY float64, isWhite bool) *Piece {
@@ -132,6 +134,7 @@ type Game struct {
 	WPlayer            *Player
 	BPlayer            *Player
 	paddingX, paddingY float32
+	board              Board
 }
 
 func (g *Game) Update() error {
@@ -175,6 +178,10 @@ func (g *Game) Update() error {
 	}
 
 	return nil
+}
+
+type Board struct {
+	grid [8][8]*Piece
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
@@ -236,7 +243,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	ebiten.SetWindowSize(1920, 1080)
 	ebiten.SetWindowTitle("Mates")
 
 	g := &Game{}

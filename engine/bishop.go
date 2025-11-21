@@ -30,7 +30,7 @@ func (b *bishop) legalMoves(board *board) map[position]bool {
 	return b.legalMovesDefault(board)
 }
 
-func (b *bishop) move(to position, game *game) movable {
+func (b *bishop) move(to position, game *game) Movable {
 	return moveDefault(b, to, game)
 }
 
@@ -56,7 +56,7 @@ func (b *bishop) getAlgebraicString() string {
 	return "B"
 }
 
-func (b *bishop) clone() movable {
+func (b *bishop) clone() Movable {
 	return &bishop{basePiece: b.basePiece.cloneBase()}
 }
 

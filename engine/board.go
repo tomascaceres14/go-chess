@@ -5,23 +5,23 @@ import (
 )
 
 type board struct {
-	grid            *[8][8]movable
+	grid            *[8][8]Movable
 	enPassantTarget *position
 }
 
 // Get piece at given pos. Returns piece and wether square is occupied or not.
 // (should refactor, second bool not necessary as piece can be nil, not necessarily zero value)
-func (b *board) getPiece(pos position) (movable, bool) {
+func (b *board) getPiece(pos position) (Movable, bool) {
 	piece := b.grid[pos.row][pos.col]
 	return piece, b.IsOccupied(pos)
 }
 
 // Inserts piece in piece.Pos
-func (b *board) insertPiece(piece movable) {
+func (b *board) insertPiece(piece Movable) {
 	b.grid[piece.getPosition().row][piece.getPosition().col] = piece
 }
 
-func (b *board) InsertPieceList(pieces []movable) {
+func (b *board) InsertPieceList(pieces []Movable) {
 	for _, v := range pieces {
 		b.insertPiece(v)
 	}
@@ -34,7 +34,7 @@ func (b *board) MovePieceSim(from, to position) {
 }
 
 // Moves piece on board. Does not update piece, only relocates in grid
-func (b *board) movePiece(piece movable, to position) movable {
+func (b *board) movePiece(piece Movable, to position) Movable {
 	capture, _ := b.getPiece(to)
 	b.grid[piece.getPosition().row][piece.getPosition().col] = nil
 	b.grid[to.row][to.col] = piece
@@ -85,7 +85,7 @@ func (b *board) IsOccupied(pos position) bool {
 }
 
 func (b *board) clone() *board {
-	newGrid := &[8][8]movable{}
+	newGrid := &[8][8]Movable{}
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
 			piece := (*b.grid)[i][j]
@@ -118,6 +118,10 @@ func (b *board) isRowPathClear(from, to position) bool {
 	}
 
 	return true
+}
+
+func (b *board) GetGrid() [8][8]Movable {
+	return *b.grid
 }
 
 func (b *board) String() string {

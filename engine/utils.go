@@ -28,7 +28,7 @@ func castRay(pos position, dx, dy int, b *board, white bool, positions map[posit
 	castRay(next, dx, dy, b, white, positions)
 }
 
-func isMoveSafeToKing(piece movable, to position, board *board) bool {
+func isMoveSafeToKing(piece Movable, to position, board *board) bool {
 
 	// Clone board
 	boardSim := board.clone()
