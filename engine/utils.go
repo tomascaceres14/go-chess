@@ -17,7 +17,7 @@ func castRay(pos Position, dx, dy int, b *Board, white bool, positions map[Posit
 
 	piece, occupied := b.getPiece(pos)
 	if occupied {
-		if piece.isWhite() != white {
+		if piece.IsWhite() != white {
 			positions[pos] = true
 		}
 		return
@@ -37,13 +37,13 @@ func isMoveSafeToKing(piece Movable, to Position, board *Board) bool {
 	boardSim.MovePieceSim(piece.getPosition(), to)
 
 	var kingPos Position
-	if piece.getType() == kingType {
+	if piece.GetType() == KingType {
 		kingPos = to
 	} else {
-		kingPos = boardSim.findKingPos(piece.isWhite())
+		kingPos = boardSim.findKingPos(piece.IsWhite())
 	}
 
-	return !boardSim.isKingInCheck(kingPos, piece.isWhite())
+	return !boardSim.isKingInCheck(kingPos, piece.IsWhite())
 }
 
 // Parse col from matrix index to board column letter

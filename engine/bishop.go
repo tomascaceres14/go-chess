@@ -38,7 +38,7 @@ func (b *bishop) getPosition() Position {
 	return b.pos
 }
 
-func (b *bishop) isWhite() bool {
+func (b *bishop) IsWhite() bool {
 	return b.white
 }
 
@@ -60,6 +60,6 @@ func (b *bishop) clone() Movable {
 	return &bishop{basePiece: b.basePiece.cloneBase()}
 }
 
-func (b *bishop) getType() pieceType {
-	return bishopType
+func (b *bishop) GetType() PieceType {
+	return BishopType
 }

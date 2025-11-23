@@ -70,7 +70,7 @@ func (k *king) visibleSquares(b *Board) map[Position]bool {
 
 		pieceAt, occupied := b.getPiece(pos)
 
-		if !occupied || pieceAt.isWhite() != k.white {
+		if !occupied || pieceAt.IsWhite() != k.white {
 			positions[pos] = true
 			continue
 		}
@@ -127,7 +127,7 @@ func (k *king) moveWithCastling(to Position, game *game) Movable {
 		return nil
 	}
 
-	rook, _ := game.getPlayerPiece(castleMove.rookFrom, k.isWhite())
+	rook, _ := game.getPlayerPiece(castleMove.rookFrom, k.IsWhite())
 	board.movePiece(rook, castleMove.rookTo)
 	k.castleDir = castleMove.castleDir
 
@@ -150,7 +150,7 @@ func (k *king) setPosition(pos Position) {
 	k.pos = pos
 }
 
-func (k *king) isWhite() bool {
+func (k *king) IsWhite() bool {
 	return k.white
 }
 
@@ -172,8 +172,8 @@ func (k *king) clone() Movable {
 	return &king{basePiece: k.basePiece.cloneBase()}
 }
 
-func (k *king) getType() pieceType {
-	return kingType
+func (k *king) GetType() PieceType {
+	return KingType
 }
 
 func castKing(piece Movable) (*king, bool) {

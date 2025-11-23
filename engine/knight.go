@@ -47,7 +47,7 @@ func (n *knight) legalMoves(b *Board) map[Position]bool {
 
 	for k := range threats {
 		piece, occupied := b.getPiece(k)
-		if !occupied || piece.isWhite() != n.white {
+		if !occupied || piece.IsWhite() != n.white {
 			moves[k] = true
 			continue
 		}
@@ -64,7 +64,7 @@ func (n *knight) getPosition() Position {
 	return n.pos
 }
 
-func (n *knight) isWhite() bool {
+func (n *knight) IsWhite() bool {
 	return n.white
 }
 
@@ -86,6 +86,6 @@ func (n *knight) clone() Movable {
 	return &knight{basePiece: n.basePiece.cloneBase()}
 }
 
-func (n *knight) getType() pieceType {
-	return knightType
+func (n *knight) GetType() PieceType {
+	return KnightType
 }

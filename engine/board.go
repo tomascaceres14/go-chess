@@ -4,8 +4,10 @@ import (
 	"fmt"
 )
 
+type Grid *[8][8]Movable
+
 type Board struct {
-	grid            *[8][8]Movable
+	grid            Grid
 	enPassantTarget *Position
 }
 
@@ -55,7 +57,7 @@ func (b *Board) attackedByColor(white bool) map[Position]bool {
 	for i := range 8 {
 		for j := range 8 {
 			p := (*b.grid)[i][j]
-			if p != nil && p.isWhite() == white {
+			if p != nil && p.IsWhite() == white {
 				for sq := range p.visibleSquares(b) {
 					threats[sq] = true
 				}
@@ -70,7 +72,7 @@ func (b *Board) findKingPos(white bool) Position {
 	for i := range 8 {
 		for j := range 8 {
 			p := (*b.grid)[i][j]
-			if p != nil && p.isWhite() == white {
+			if p != nil && p.IsWhite() == white {
 				if _, ok := p.(*king); ok {
 					return Position{row: i, col: j}
 				}
@@ -120,8 +122,8 @@ func (b *Board) isRowPathClear(from, to Position) bool {
 	return true
 }
 
-func (b *Board) GetGrid() [8][8]Movable {
-	return *b.grid
+func (b *Board) GetGrid() *[8][8]Movable {
+	return b.grid
 }
 
 func (b *Board) String() string {

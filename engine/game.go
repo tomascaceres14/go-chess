@@ -296,7 +296,7 @@ func (g *game) getPlayerPiece(pos Position, pColor bool) (Movable, error) {
 	}
 
 	// Validate piece belonging to player
-	if piece.isWhite() != pColor {
+	if piece.IsWhite() != pColor {
 		return nil, fmt.Errorf("Not your piece, %s.", colorToString(pColor))
 	}
 
@@ -507,7 +507,7 @@ func (g *game) setFENStringEnPassant(FENEnPassant string) error {
 		return fmt.Errorf("Piece at position %s is not a pawn.", pawnPosition)
 	}
 
-	if pawn.isWhite() == turn {
+	if pawn.IsWhite() == turn {
 		return fmt.Errorf("Pawn at %s is of same color as player's turn.", pawnPosition)
 	}
 

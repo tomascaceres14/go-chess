@@ -42,7 +42,7 @@ func (q *queen) getPosition() Position {
 	return q.pos
 }
 
-func (q *queen) isWhite() bool {
+func (q *queen) IsWhite() bool {
 	return q.white
 }
 
@@ -64,6 +64,6 @@ func (q *queen) clone() Movable {
 	return &queen{basePiece: q.basePiece.cloneBase()}
 }
 
-func (q *queen) getType() pieceType {
-	return queenType
+func (q *queen) GetType() PieceType {
+	return QueenType
 }

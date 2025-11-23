@@ -62,7 +62,7 @@ func (r *rook) setPosition(pos Position) {
 	r.pos = pos
 }
 
-func (r *rook) isWhite() bool {
+func (r *rook) IsWhite() bool {
 	return r.white
 }
 
@@ -84,6 +84,6 @@ func (r *rook) clone() Movable {
 	return &rook{basePiece: r.basePiece.cloneBase()}
 }
 
-func (r *rook) getType() pieceType {
-	return rookType
+func (r *rook) GetType() PieceType {
+	return RookType
 }

@@ -24,7 +24,7 @@ func (m *move) getAlgebraicString() string {
 		return m.algebraicNotation
 	}
 
-	if m.piece.getType() == kingType {
+	if m.piece.GetType() == KingType {
 		k, _ := castKing(m.piece)
 		m.castleDir = k.castleDir
 		switch k.castleDir {
@@ -42,7 +42,7 @@ func (m *move) getAlgebraicString() string {
 
 	if m.capture == nil {
 		takes = ""
-	} else if m.piece.getType() == pawnType {
+	} else if m.piece.GetType() == PawnType {
 		takes = m.from.getFile() + takes
 	}
 

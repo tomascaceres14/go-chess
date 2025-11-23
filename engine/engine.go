@@ -56,7 +56,7 @@ func (e *ChessEngine) Move(from, to string, pColor bool) ([8][8]Movable, error) 
 		return [8][8]Movable{}, err
 	}
 
-	return e.game.gameBoard.GetGrid(), nil
+	return *e.game.gameBoard.GetGrid(), nil
 }
 
 func (e *ChessEngine) GetFENString() string {

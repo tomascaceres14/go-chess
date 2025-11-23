@@ -1,15 +1,15 @@
 package gochess
 
-type pieceType int
+type PieceType int
 
 const (
-	kingType pieceType = iota
-	queenType
-	rookType
-	bishopType
-	knightType
-	pawnType
-	basePieceType
+	KingType PieceType = iota
+	QueenType
+	RookType
+	BishopType
+	KnightType
+	PawnType
+	BasePieceType
 )
 
 type Movable interface {
@@ -17,7 +17,7 @@ type Movable interface {
 	legalMoves(b *Board) map[Position]bool
 	getPosition() Position
 	setPosition(pos Position)
-	isWhite() bool
+	IsWhite() bool
 	getValue() int
 	String() string
 	getAlgebraicString() string
@@ -25,7 +25,7 @@ type Movable interface {
 	hasMoved() bool
 	setMoved(moved bool)
 	clone() Movable
-	getType() pieceType
+	GetType() PieceType
 }
 
 type basePiece struct {
@@ -68,7 +68,7 @@ func (bp *basePiece) legalMovesDefault(b *Board) map[Position]bool {
 	moves := map[Position]bool{}
 	for k := range threats {
 		piece, occupied := b.getPiece(k)
-		if !occupied || piece.isWhite() != bp.white {
+		if !occupied || piece.IsWhite() != bp.white {
 			moves[k] = true
 			continue
 		}
@@ -105,7 +105,7 @@ func (bp *basePiece) setPosition(pos Position) {
 	bp.moved = true
 }
 
-func (bp *basePiece) isWhite() bool {
+func (bp *basePiece) IsWhite() bool {
 	return bp.white
 }
 
@@ -148,8 +148,8 @@ func (bp *basePiece) cloneBase() *basePiece {
 	return &cp
 }
 
-func (bp *basePiece) getType() pieceType {
-	return basePieceType
+func (bp *basePiece) GetType() PieceType {
+	return BasePieceType
 }
 
 func (bp *basePiece) setMoved(moved bool) {

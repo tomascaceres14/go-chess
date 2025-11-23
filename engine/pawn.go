@@ -86,7 +86,7 @@ func (p *pawn) legalMoves(b *Board) map[Position]bool {
 
 		} else {
 			// capture diagonal
-			regularCapture := occupied && piece.isWhite() != p.white
+			regularCapture := occupied && piece.IsWhite() != p.white
 			EPTarget := b.enPassantTarget
 			enPassantCapture := false
 			if EPTarget != nil {
@@ -151,7 +151,7 @@ func (p *pawn) setPosition(pos Position) {
 	p.pos = pos
 }
 
-func (p *pawn) isWhite() bool {
+func (p *pawn) IsWhite() bool {
 	return p.white
 }
 
@@ -170,13 +170,13 @@ func (p *pawn) clone() Movable {
 	return &pawn{basePiece: p.basePiece.cloneBase(), direction: p.direction}
 }
 
-func (p *pawn) getType() pieceType {
-	return pawnType
+func (p *pawn) GetType() PieceType {
+	return PawnType
 }
 
 func castPawn(m Movable) (*pawn, bool) {
 
-	if m == nil || m.getType() != pawnType {
+	if m == nil || m.GetType() != PawnType {
 		return &pawn{}, false
 	}
 
