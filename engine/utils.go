@@ -9,7 +9,7 @@ const cols = "abcdefgh"
 
 // Recursive function to cast a ray and check for collisions in direction vector {dx, dy}.
 // Returns map of possible positions
-func castRay(pos position, dx, dy int, b *board, white bool, positions map[position]bool) {
+func castRay(pos Position, dx, dy int, b *Board, white bool, positions map[Position]bool) {
 
 	if !pos.inBounds() {
 		return
@@ -24,11 +24,11 @@ func castRay(pos position, dx, dy int, b *board, white bool, positions map[posit
 	}
 
 	positions[pos] = true
-	next := position{row: pos.row + dx, col: pos.col + dy}
+	next := Position{row: pos.row + dx, col: pos.col + dy}
 	castRay(next, dx, dy, b, white, positions)
 }
 
-func isMoveSafeToKing(piece Movable, to position, board *board) bool {
+func isMoveSafeToKing(piece Movable, to Position, board *Board) bool {
 
 	// Clone board
 	boardSim := board.clone()
@@ -36,7 +36,7 @@ func isMoveSafeToKing(piece Movable, to position, board *board) bool {
 	// Simulate movement on cloned board
 	boardSim.MovePieceSim(piece.getPosition(), to)
 
-	var kingPos position
+	var kingPos Position
 	if piece.getType() == kingType {
 		kingPos = to
 	} else {

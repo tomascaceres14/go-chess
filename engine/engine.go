@@ -66,3 +66,7 @@ func (e *ChessEngine) GetFENString() string {
 func (e *ChessEngine) GetTurn() bool {
 	return e.game.WhiteTurn
 }
+
+func (e *ChessEngine) GetBoard() Board {
+	return e.game.gameBoard.clone()
+}

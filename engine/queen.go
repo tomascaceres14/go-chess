@@ -4,7 +4,7 @@ type queen struct {
 	*basePiece
 }
 
-func newQueen(pos position, p *player) *queen {
+func newQueen(pos Position, p *player) *queen {
 	white := p.isWhite
 	directions := []direction{
 		{0, 1},
@@ -26,19 +26,19 @@ func newQueen(pos position, p *player) *queen {
 	return queen
 }
 
-func (q *queen) visibleSquares(b *board) map[position]bool {
+func (q *queen) visibleSquares(b *Board) map[Position]bool {
 	return q.visibleSquaresDefault(b)
 }
 
-func (q *queen) legalMoves(b *board) map[position]bool {
+func (q *queen) legalMoves(b *Board) map[Position]bool {
 	return q.legalMovesDefault(b)
 }
 
-func (q *queen) move(to position, game *game) Movable {
+func (q *queen) move(to Position, game *game) Movable {
 	return moveDefault(q, to, game)
 }
 
-func (q *queen) getPosition() position {
+func (q *queen) getPosition() Position {
 	return q.pos
 }
 

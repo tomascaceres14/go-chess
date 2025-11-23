@@ -13,7 +13,7 @@ type player struct {
 	points             int
 	king               *king
 	pieces             []Movable
-	threats            map[position]bool
+	threats            map[Position]bool
 }
 
 func newPlayer(name string, isWhite bool) (*player, error) {
@@ -39,8 +39,8 @@ func newPlayerBlack(name string) (*player, error) {
 	return p, err
 }
 
-func (p *player) legalMoves(g *game) map[position]bool {
-	moves := make(map[position]bool)
+func (p *player) legalMoves(g *game) map[Position]bool {
+	moves := make(map[Position]bool)
 
 	pieces := p.pieces
 	for _, piece := range pieces {

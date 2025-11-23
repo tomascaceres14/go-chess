@@ -22,7 +22,7 @@ const (
 
 type game struct {
 	id                           string
-	gameBoard                    *board
+	gameBoard                    *Board
 	pWhite, pBlack               *player
 	WhiteTurn                    bool
 	halfmoveClock, fullmoveCount int
@@ -52,7 +52,7 @@ func newGame(whiteName, blackName string) (*game, error) {
 
 	game := &game{
 		id:            id,
-		gameBoard:     &board{grid: &gameBoard},
+		gameBoard:     &Board{grid: &gameBoard},
 		pWhite:        pWhite,
 		pBlack:        pBlack,
 		WhiteTurn:     true,
@@ -216,7 +216,9 @@ func (g *game) validateMove(move *move) error {
 }
 
 // Moves piece in position `from` to position `to` if player is owner of piece
-func (g *game) makeMove(from, to position, pColor bool) error {
+func (g *game) makeMove(from, to Position, pColor bool) error {
+
+	prevEPTarget := g.gameBoard.enPassantTarget
 
 	move := move{
 		from:      from,
@@ -265,6 +267,10 @@ func (g *game) makeMove(from, to position, pColor bool) error {
 		fmt.Println("Stalemate pal :(")
 	}
 
+	if prevEPTarget != nil {
+		g.gameBoard.enPassantTarget = nil
+	}
+
 	g.switchTurns()
 
 	return nil
@@ -282,7 +288,7 @@ func (g *game) GetPlayer(pColor bool) *player {
 }
 
 // Obtains piece at given position if player is owner of piece
-func (g *game) getPlayerPiece(pos position, pColor bool) (Movable, error) {
+func (g *game) getPlayerPiece(pos Position, pColor bool) (Movable, error) {
 
 	piece, ok := g.gameBoard.getPiece(pos)
 	if !ok {
@@ -385,7 +391,7 @@ func (g *game) setFENStringPos(FENPosition []string) error {
 			}
 
 			letter := string(char)
-			position := position{row: rowNum, col: colNum}
+			position := Position{row: rowNum, col: colNum}
 			var piece Movable
 			switch letter {
 			case "p":
@@ -489,7 +495,7 @@ func (g *game) setFENStringEnPassant(FENEnPassant string) error {
 		pawnDirection *= -1
 	}
 
-	pawnPosition := position{col: capturePosition.col, row: capturePosition.row + 1*pawnDirection}
+	pawnPosition := Position{col: capturePosition.col, row: capturePosition.row + 1*pawnDirection}
 
 	piece, ok := g.gameBoard.getPiece(pawnPosition)
 	if !ok {

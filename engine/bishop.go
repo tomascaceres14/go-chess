@@ -4,7 +4,7 @@ type bishop struct {
 	*basePiece
 }
 
-func newBishop(pos position, p *player) *bishop {
+func newBishop(pos Position, p *player) *bishop {
 	white := p.isWhite
 	directions := []direction{
 		{1, 1},
@@ -22,19 +22,19 @@ func newBishop(pos position, p *player) *bishop {
 	return bishop
 }
 
-func (b *bishop) visibleSquares(board *board) map[position]bool {
+func (b *bishop) visibleSquares(board *Board) map[Position]bool {
 	return b.visibleSquaresDefault(board)
 }
 
-func (b *bishop) legalMoves(board *board) map[position]bool {
+func (b *bishop) legalMoves(board *Board) map[Position]bool {
 	return b.legalMovesDefault(board)
 }
 
-func (b *bishop) move(to position, game *game) Movable {
+func (b *bishop) move(to Position, game *game) Movable {
 	return moveDefault(b, to, game)
 }
 
-func (b *bishop) getPosition() position {
+func (b *bishop) getPosition() Position {
 	return b.pos
 }
 

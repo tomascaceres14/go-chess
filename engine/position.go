@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type position struct {
+type Position struct {
 	row, col int
 }
 
@@ -14,12 +14,12 @@ type direction struct {
 	dx, dy int
 }
 
-func (p *position) isValid() bool {
+func (p *Position) isValid() bool {
 	return p.row != -1 && p.col != -1
 }
 
-func pos(pos string) position {
-	nilPos := position{-1, -1}
+func pos(pos string) Position {
+	nilPos := Position{-1, -1}
 
 	if len(pos) != 2 {
 		return nilPos
@@ -35,29 +35,29 @@ func pos(pos string) position {
 		return nilPos
 	}
 
-	newPos := position{
+	newPos := Position{
 		row: row - 1,
 		col: int(col[0] - 'a'),
 	}
 	return newPos
 }
 
-func (p position) inBounds() bool {
+func (p Position) inBounds() bool {
 	return (0 <= p.col && p.col <= 7) && (0 <= p.row && p.row <= 7)
 }
 
-func (p position) getFile() string {
+func (p Position) getFile() string {
 	return string(cols[p.col])
 }
 
-func (p position) getRank() int {
+func (p Position) getRank() int {
 	return p.row + 1
 }
 
-func (p *position) equals(pos position) bool {
+func (p *Position) equals(pos Position) bool {
 	return p.row == pos.row && p.col == pos.col
 }
 
-func (p position) String() string {
+func (p Position) String() string {
 	return fmt.Sprintf("%v%v", string(cols[p.col]), p.row+1)
 }

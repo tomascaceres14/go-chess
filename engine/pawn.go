@@ -1,13 +1,11 @@
 package gochess
 
-import "fmt"
-
 type pawn struct {
 	*basePiece
 	direction int
 }
 
-func newPawn(pos position, p *player) *pawn {
+func newPawn(pos Position, p *player) *pawn {
 
 	white := p.isWhite
 
@@ -37,14 +35,14 @@ func newPawn(pos position, p *player) *pawn {
 	return pawn
 }
 
-func (p *pawn) visibleSquares(b *board) map[position]bool {
+func (p *pawn) visibleSquares(b *Board) map[Position]bool {
 
-	positions := map[position]bool{}
+	positions := map[Position]bool{}
 
-	front1 := position{row: p.pos.row + 1*p.direction, col: p.pos.col}
-	front2 := position{row: p.pos.row + 2*p.direction, col: p.pos.col}
-	diag1 := position{row: p.pos.row + 1*p.direction, col: p.pos.col + 1}
-	diag2 := position{row: p.pos.row + 1*p.direction, col: p.pos.col - 1}
+	front1 := Position{row: p.pos.row + 1*p.direction, col: p.pos.col}
+	front2 := Position{row: p.pos.row + 2*p.direction, col: p.pos.col}
+	diag1 := Position{row: p.pos.row + 1*p.direction, col: p.pos.col + 1}
+	diag2 := Position{row: p.pos.row + 1*p.direction, col: p.pos.col - 1}
 
 	if diag1.inBounds() {
 		positions[diag1] = true
@@ -64,10 +62,10 @@ func (p *pawn) visibleSquares(b *board) map[position]bool {
 	return positions
 }
 
-func (p *pawn) legalMoves(b *board) map[position]bool {
+func (p *pawn) legalMoves(b *Board) map[Position]bool {
 
 	positions := p.visibleSquares(b)
-	legalMoves := map[position]bool{}
+	legalMoves := map[Position]bool{}
 	for pos := range positions {
 
 		piece, occupied := b.getPiece(pos)
@@ -97,10 +95,11 @@ func (p *pawn) legalMoves(b *board) map[position]bool {
 			legalMoves[pos] = regularCapture || enPassantCapture
 		}
 	}
+
 	return legalMoves
 }
 
-func (p *pawn) move(to position, game *game) Movable {
+func (p *pawn) move(to Position, game *game) Movable {
 
 	from := p.pos
 	board := game.gameBoard
@@ -113,7 +112,7 @@ func (p *pawn) move(to position, game *game) Movable {
 
 		diff := from.row - to.row
 		if diff == 2 || diff == -2 {
-			mid := position{row: to.row - 1*p.direction, col: from.col}
+			mid := Position{row: to.row - 1*p.direction, col: from.col}
 			board.enPassantTarget = &mid
 		}
 
@@ -134,8 +133,7 @@ func (p *pawn) move(to position, game *game) Movable {
 	// En passant
 	EPTarget := board.enPassantTarget
 	if EPTarget != nil && EPTarget.equals(to) {
-		fmt.Println("capturing enpassant from", from, "to", to)
-		capturedPos := position{row: from.row - 1*p.direction, col: to.col}
+		capturedPos := Position{row: from.row - 1*p.direction, col: to.col}
 		capture, _ = board.getPiece(capturedPos)
 		board.clearSquare(capturedPos)
 		board.enPassantTarget = nil
@@ -145,11 +143,11 @@ func (p *pawn) move(to position, game *game) Movable {
 	return capture
 }
 
-func (p *pawn) getPosition() position {
+func (p *pawn) getPosition() Position {
 	return p.pos
 }
 
-func (p *pawn) setPosition(pos position) {
+func (p *pawn) setPosition(pos Position) {
 	p.pos = pos
 }
 

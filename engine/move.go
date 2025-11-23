@@ -2,7 +2,7 @@ package gochess
 
 type move struct {
 	piece             Movable
-	from, to          position
+	from, to          Position
 	capture           Movable
 	algebraicNotation string
 	isCheck           bool

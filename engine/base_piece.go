@@ -13,15 +13,15 @@ const (
 )
 
 type Movable interface {
-	visibleSquares(b *board) map[position]bool
-	legalMoves(b *board) map[position]bool
-	getPosition() position
-	setPosition(pos position)
+	visibleSquares(b *Board) map[Position]bool
+	legalMoves(b *Board) map[Position]bool
+	getPosition() Position
+	setPosition(pos Position)
 	isWhite() bool
 	getValue() int
 	String() string
 	getAlgebraicString() string
-	move(to position, game *game) Movable
+	move(to Position, game *game) Movable
 	hasMoved() bool
 	setMoved(moved bool)
 	clone() Movable
@@ -31,14 +31,14 @@ type Movable interface {
 type basePiece struct {
 	white      bool
 	value      int
-	pos        position
+	pos        Position
 	directions []direction
 	moved      bool
 }
 
-type moveFunc func(to position, game *game) Movable
+type moveFunc func(to Position, game *game) Movable
 
-func newBasePiece(white bool, value int, pos position, directions []direction) *basePiece {
+func newBasePiece(white bool, value int, pos Position, directions []direction) *basePiece {
 	return &basePiece{
 		white:      white,
 		value:      value,
@@ -48,24 +48,24 @@ func newBasePiece(white bool, value int, pos position, directions []direction) *
 	}
 }
 
-func (bp *basePiece) visibleSquaresDefault(b *board) map[position]bool {
-	positions := map[position]bool{}
+func (bp *basePiece) visibleSquaresDefault(b *Board) map[Position]bool {
+	positions := map[Position]bool{}
 
 	for _, v := range bp.directions {
-		dir := position{row: bp.pos.row + v.dx, col: bp.pos.col + v.dy}
+		dir := Position{row: bp.pos.row + v.dx, col: bp.pos.col + v.dy}
 		castRay(dir, v.dx, v.dy, b, bp.white, positions)
 	}
 
 	return positions
 }
 
-func (bp *basePiece) visibleSquares(b *board) map[position]bool {
+func (bp *basePiece) visibleSquares(b *Board) map[Position]bool {
 	return bp.visibleSquaresDefault(b)
 }
 
-func (bp *basePiece) legalMovesDefault(b *board) map[position]bool {
+func (bp *basePiece) legalMovesDefault(b *Board) map[Position]bool {
 	threats := bp.visibleSquaresDefault(b)
-	moves := map[position]bool{}
+	moves := map[Position]bool{}
 	for k := range threats {
 		piece, occupied := b.getPiece(k)
 		if !occupied || piece.isWhite() != bp.white {
@@ -77,27 +77,30 @@ func (bp *basePiece) legalMovesDefault(b *board) map[position]bool {
 	return moves
 }
 
-func (bp *basePiece) legalMoves(b *board) map[position]bool {
+func (bp *basePiece) legalMoves(b *Board) map[Position]bool {
 	return bp.legalMovesDefault(b)
 }
 
-func moveDefault(piece Movable, to position, game *game) Movable {
+func moveDefault(piece Movable, to Position, game *game) Movable {
 	board := game.gameBoard
+
 	capture := board.movePiece(piece, to)
 	piece.setPosition(to)
 	piece.setMoved(true)
+
+	board.enPassantTarget = nil
 	return capture
 }
 
-func (bp *basePiece) move(to position, game *game) Movable {
+func (bp *basePiece) move(to Position, game *game) Movable {
 	return moveDefault(bp, to, game)
 }
 
-func (bp *basePiece) getPosition() position {
+func (bp *basePiece) getPosition() Position {
 	return bp.pos
 }
 
-func (bp *basePiece) setPosition(pos position) {
+func (bp *basePiece) setPosition(pos Position) {
 	bp.pos = pos
 	bp.moved = true
 }

@@ -1,7 +1,6 @@
 package gochess
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -73,6 +72,4 @@ func TestPawnStartingForwardCantJump(t *testing.T) {
 	if _, err := engine.Move(from, to, movesWhite); err == nil {
 		t.Errorf("%s: %s -> %s moving white %v. Expected err, got %v", testName, from, to, movesWhite, err)
 	}
-
-	fmt.Println(engine.game.gameBoard)
 }

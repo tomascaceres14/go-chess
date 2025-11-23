@@ -4,7 +4,7 @@ type rook struct {
 	*basePiece
 }
 
-func newRook(pos position, p *player) *rook {
+func newRook(pos Position, p *player) *rook {
 	white := p.isWhite
 	directions := []direction{
 		{0, 1},
@@ -21,15 +21,15 @@ func newRook(pos position, p *player) *rook {
 	return rook
 }
 
-func (r *rook) visibleSquares(b *board) map[position]bool {
+func (r *rook) visibleSquares(b *Board) map[Position]bool {
 	return r.visibleSquaresDefault(b)
 }
 
-func (r *rook) legalMoves(b *board) map[position]bool {
+func (r *rook) legalMoves(b *Board) map[Position]bool {
 	return r.legalMovesDefault(b)
 }
 
-func (r *rook) move(to position, game *game) Movable {
+func (r *rook) move(to Position, game *game) Movable {
 	from := r.pos
 	board := game.gameBoard
 
@@ -54,11 +54,11 @@ func (r *rook) move(to position, game *game) Movable {
 	return capture
 }
 
-func (r *rook) getPosition() position {
+func (r *rook) getPosition() Position {
 	return r.pos
 }
 
-func (r *rook) setPosition(pos position) {
+func (r *rook) setPosition(pos Position) {
 	r.pos = pos
 }
 
