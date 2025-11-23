@@ -125,7 +125,9 @@ func newGameFENString(FENString string, whiteName, blackName string) (*game, err
 	}
 
 	FENSplit := strings.Split(FENString, " ")
+
 	if len(FENSplit) != 6 {
+
 		return nil, errors.New("Error reading FEN String: Incorrect format. FEN string should contain 6 tramos")
 	}
 

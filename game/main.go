@@ -24,23 +24,14 @@ type Sprite struct {
 
 type Piece struct {
 	*Sprite
-	pieceType gochess.PieceType
-}
-
-type Player struct {
-	Pieces []*Piece
+	PieceType gochess.PieceType
+	Color     bool
 }
 
 func (g Game) GetPiece(pieceType gochess.PieceType, color bool) *Piece {
 
-	player := g.WPlayer
-
-	if !color {
-		player = g.BPlayer
-	}
-
-	for _, v := range player.Pieces {
-		if v.pieceType == pieceType {
+	for _, v := range g.Pieces {
+		if v.PieceType == pieceType && color == v.Color {
 			return v
 		}
 
@@ -50,8 +41,7 @@ func (g Game) GetPiece(pieceType gochess.PieceType, color bool) *Piece {
 }
 
 type Game struct {
-	WPlayer            *Player
-	BPlayer            *Player
+	Pieces             []*Piece
 	PaddingX, PaddingY float32
 	WSquare, BSquare   *ebiten.Image
 	Board              gochess.Grid
@@ -84,9 +74,11 @@ func NewPiece(img *ebiten.Image, imgX, imgY float64) *Piece {
 	}
 }
 
-func NewPiece2(img *ebiten.Image) *Piece {
+func NewPiece2(color bool, pieceType gochess.PieceType, img *ebiten.Image) *Piece {
 	return &Piece{
-		Sprite: CenteredPieceSprite2(img),
+		Sprite:    CenteredPieceSprite2(img),
+		Color:     color,
+		PieceType: pieceType,
 	}
 }
 
@@ -97,7 +89,7 @@ func PieceSubImg(img *ebiten.Image, x0, y0, x1, y1 int) *ebiten.Image {
 	).(*ebiten.Image)
 }
 
-func NewPawn(img *ebiten.Image, x, y float64) *Piece {
+func NewPawn(color bool, img *ebiten.Image) *Piece {
 
 	X0 := 278
 	Y0 := 136
@@ -106,13 +98,12 @@ func NewPawn(img *ebiten.Image, x, y float64) *Piece {
 
 	subImg := PieceSubImg(img, X0, Y0, X1, Y1)
 
-	p := NewPiece2(subImg)
-	p.pieceType = gochess.PawnType
+	p := NewPiece2(color, gochess.PawnType, subImg)
 
 	return p
 }
 
-func NewBishop(isWhite bool, img *ebiten.Image, x, y float64) *Piece {
+func NewBishop(color bool, img *ebiten.Image) *Piece {
 
 	X0 := 127
 	Y0 := 2
@@ -121,14 +112,13 @@ func NewBishop(isWhite bool, img *ebiten.Image, x, y float64) *Piece {
 
 	subImg := PieceSubImg(img, X0, Y0, X1, Y1)
 
-	p := NewPiece(subImg, x, y)
-	p.pieceType = gochess.BishopType
+	p := NewPiece2(color, gochess.BishopType, subImg)
 
 	return p
 
 }
 
-func NewKnight(isWhite bool, img *ebiten.Image, x, y float64) *Piece {
+func NewKnight(color bool, img *ebiten.Image) *Piece {
 
 	X0 := 129
 	Y0 := 140
@@ -137,14 +127,13 @@ func NewKnight(isWhite bool, img *ebiten.Image, x, y float64) *Piece {
 
 	subImg := PieceSubImg(img, X0, Y0, X1, Y1)
 
-	p := NewPiece(subImg, x, y)
-	p.pieceType = gochess.KnightType
+	p := NewPiece2(color, gochess.KnightType, subImg)
 
 	return p
 
 }
 
-func NewRook(isWhite bool, img *ebiten.Image, x, y float64) *Piece {
+func NewRook(color bool, img *ebiten.Image) *Piece {
 
 	x0 := 0
 	y0 := 0
@@ -152,26 +141,24 @@ func NewRook(isWhite bool, img *ebiten.Image, x, y float64) *Piece {
 	y1 := 117
 
 	subImg := PieceSubImg(img, x0, y0, x1, y1)
-	p := NewPiece(subImg, x, y)
-	p.pieceType = gochess.RookType
+	p := NewPiece2(color, gochess.RookType, subImg)
 
 	return p
 }
 
-func NewQueen(isWhite bool, img *ebiten.Image, x, y float64) *Piece {
+func NewQueen(color bool, img *ebiten.Image) *Piece {
 	X0 := 3
 	Y0 := 136
 	X1 := 79
 	Y1 := 256
 
 	subImg := PieceSubImg(img, X0, Y0, X1, Y1)
-	p := NewPiece(subImg, x, y)
-	p.pieceType = gochess.QueenType
+	p := NewPiece2(color, gochess.QueenType, subImg)
 
 	return p
 }
 
-func NewKing(isWhite bool, img *ebiten.Image, x, y float64) *Piece {
+func NewKing(color bool, img *ebiten.Image) *Piece {
 	X0 := 279
 	Y0 := 0
 	X1 := 356
@@ -179,8 +166,7 @@ func NewKing(isWhite bool, img *ebiten.Image, x, y float64) *Piece {
 
 	subImg := PieceSubImg(img, X0, Y0, X1, Y1)
 
-	p := NewPiece(subImg, x, y)
-	p.pieceType = gochess.KingType
+	p := NewPiece2(color, gochess.KingType, subImg)
 
 	return p
 }
@@ -251,52 +237,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// TODO: pls make func to generate automatically positions based on algebraic notation.
-	// This burns my eyes.
-	wPlayer := &Player{
-		Pieces: []*Piece{
-			NewRook(true, whitePieces, float64(g.PaddingX), float64(g.PaddingY)+tileSize*7),
-			NewKnight(true, whitePieces, float64(g.PaddingX)+tileSize, float64(g.PaddingY)+tileSize*7),
-			NewBishop(true, whitePieces, float64(g.PaddingX)+tileSize*2, float64(g.PaddingY)+tileSize*7),
-			NewQueen(true, whitePieces, float64(g.PaddingX)+tileSize*3, float64(g.PaddingY)+tileSize*7),
-			NewKing(true, whitePieces, float64(g.PaddingX)+tileSize*4, float64(g.PaddingY)+tileSize*7),
-			NewBishop(true, whitePieces, float64(g.PaddingX)+tileSize*5, float64(g.PaddingY)+tileSize*7),
-			NewKnight(true, whitePieces, float64(g.PaddingX)+tileSize*6, float64(g.PaddingY)+tileSize*7),
-			NewRook(true, whitePieces, float64(g.PaddingX)+tileSize*7, float64(g.PaddingY)+tileSize*7),
-			NewPawn(whitePieces, float64(g.PaddingX), float64(g.PaddingY)+tileSize*6),
-			NewPawn(whitePieces, float64(g.PaddingX)+tileSize, float64(g.PaddingY)+tileSize*6),
-			NewPawn(whitePieces, float64(g.PaddingX)+tileSize*2, float64(g.PaddingY)+tileSize*6),
-			NewPawn(whitePieces, float64(g.PaddingX)+tileSize*3, float64(g.PaddingY)+tileSize*6),
-			NewPawn(whitePieces, float64(g.PaddingX)+tileSize*4, float64(g.PaddingY)+tileSize*6),
-			NewPawn(whitePieces, float64(g.PaddingX)+tileSize*5, float64(g.PaddingY)+tileSize*6),
-			NewPawn(whitePieces, float64(g.PaddingX)+tileSize*6, float64(g.PaddingY)+tileSize*6),
-			NewPawn(whitePieces, float64(g.PaddingX)+tileSize*7, float64(g.PaddingY)+tileSize*6),
-		},
+	g.Pieces = []*Piece{
+		NewRook(true, whitePieces),
+		NewKnight(true, whitePieces),
+		NewBishop(true, whitePieces),
+		NewQueen(true, whitePieces),
+		NewKing(true, whitePieces),
+		NewPawn(true, whitePieces),
+		NewRook(false, blackPieces),
+		NewKnight(false, blackPieces),
+		NewBishop(false, blackPieces),
+		NewQueen(false, blackPieces),
+		NewKing(false, blackPieces),
+		NewPawn(false, blackPieces),
 	}
-
-	bPlayer := &Player{
-		Pieces: []*Piece{
-			NewRook(false, blackPieces, float64(g.PaddingX), float64(g.PaddingY)),
-			NewKnight(false, blackPieces, float64(g.PaddingX)+tileSize, float64(g.PaddingY)),
-			NewBishop(false, blackPieces, float64(g.PaddingX)+tileSize*2, float64(g.PaddingY)),
-			NewQueen(false, blackPieces, float64(g.PaddingX)+tileSize*3, float64(g.PaddingY)),
-			NewKing(false, blackPieces, float64(g.PaddingX)+tileSize*4, float64(g.PaddingY)),
-			NewBishop(false, blackPieces, float64(g.PaddingX)+tileSize*5, float64(g.PaddingY)),
-			NewKnight(false, blackPieces, float64(g.PaddingX)+tileSize*6, float64(g.PaddingY)),
-			NewRook(false, blackPieces, float64(g.PaddingX)+tileSize*7, float64(g.PaddingY)),
-			NewPawn(blackPieces, float64(g.PaddingX), float64(g.PaddingY)+tileSize),
-			NewPawn(blackPieces, float64(g.PaddingX)+tileSize, float64(g.PaddingY)+tileSize),
-			NewPawn(blackPieces, float64(g.PaddingX)+tileSize*2, float64(g.PaddingY)+tileSize),
-			NewPawn(blackPieces, float64(g.PaddingX)+tileSize*3, float64(g.PaddingY)+tileSize),
-			NewPawn(blackPieces, float64(g.PaddingX)+tileSize*4, float64(g.PaddingY)+tileSize),
-			NewPawn(blackPieces, float64(g.PaddingX)+tileSize*5, float64(g.PaddingY)+tileSize),
-			NewPawn(blackPieces, float64(g.PaddingX)+tileSize*6, float64(g.PaddingY)+tileSize),
-			NewPawn(blackPieces, float64(g.PaddingX)+tileSize*7, float64(g.PaddingY)+tileSize),
-		},
-	}
-
-	g.WPlayer = wPlayer
-	g.BPlayer = bPlayer
 
 	wSquare := ebiten.NewImage(tileSize, tileSize)
 	wSquare.Fill(color.RGBA{100, 215, 255, 255})
@@ -307,7 +261,7 @@ func main() {
 	g.BSquare = bSquare
 
 	engine := gochess.NewChessEngine()
-	id, err := engine.NewGame("white", "black")
+	id, err := engine.NewGameFENString("white", "black", "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQ1RK1 b kq - 2 5")
 	if err != nil {
 		log.Fatal(err.Error())
 	}

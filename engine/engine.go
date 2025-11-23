@@ -25,7 +25,7 @@ func (e *ChessEngine) NewGame(whiteName, blackName string) (string, error) {
 	return game.id, nil
 }
 
-func (e *ChessEngine) NewGameFENString(FENString string, whiteName, blackName string) (string, error) {
+func (e *ChessEngine) NewGameFENString(whiteName, blackName string, FENString string) (string, error) {
 
 	game, err := newGameFENString(FENString, whiteName, blackName)
 	if err != nil {
