@@ -1,6 +1,6 @@
 # Go Chess
 
-** A custom from-scratch implementation of a chess engine written in Go. **
+**A custom from-scratch implementation of a chess engine written in Go.**
 
 This project was born from a mix of curiosity and passion for coding and chess (and the Go programming language, obviously).
 
