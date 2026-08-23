@@ -23,9 +23,7 @@ A graphical chess game built using Ebitengine to showcase the chess working engi
 ---
 
 ### The learning process
-I felt the need to challenge myself, to dive into unknown territory and see what I could come up to. At the beginning, I wasn't very sure how regular chess engines work, so I started with what was the most intuitive for me at the time: OOP and a 2D matrix containing the pieces.
-After some time, I decided to do some research, only to realize that this isn't how a regular chess engine is made. The 2D Matrix datastructure, although intuitive, it's not the most efficient nor performant option. But I was already long into development, so I left it as it was.
-
+I wanted to challenge myself by exploring unfamiliar territory and building a chess engine from scratch. I started with an object-oriented design using a 2D matrix to represent the board and pieces, as it was the most intuitive approach for modeling the game logic.
 Anyway, it still works pretty well and response fairly fast so it's not a big issue.
 
 Feel free to clone/fork the repo and give it a try :)
