@@ -26,7 +26,7 @@ type Game struct {
 	pWhite, pBlack               *player
 	whiteTurn                    bool
 	halfmoveClock, fullmoveCount int
-	moveHistory                  []move
+	moveHistory                  []Move
 	status                       gameStatus
 	castleDir                    int
 }
@@ -56,7 +56,7 @@ func newGame(whiteName, blackName string) (*Game, error) {
 		pWhite:        pWhite,
 		pBlack:        pBlack,
 		whiteTurn:     true,
-		moveHistory:   []move{},
+		moveHistory:   []Move{},
 		status:        playing,
 		fullmoveCount: 1,
 		halfmoveClock: 0,
@@ -180,7 +180,7 @@ func NewGameFENString(FENString string, whiteName, blackName string) (*Game, err
 	return game, nil
 }
 
-func (g *Game) validateMove(move *move) error {
+func (g *Game) validateMove(move *Move) error {
 	color := move.color
 	from := move.from
 	to := move.to
@@ -232,7 +232,7 @@ func (g *Game) Move(from, to string, pColor bool) error {
 
 	prevEnPassantTarget := g.gameBoard.enPassantTarget
 
-	move := move{
+	move := Move{
 		from:      fromPos,
 		to:        toPos,
 		color:     pColor,

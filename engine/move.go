@@ -1,6 +1,6 @@
 package gochess
 
-type move struct {
+type Move struct {
 	piece             Movable
 	from, to          Position
 	capture           Movable
@@ -10,11 +10,11 @@ type move struct {
 	castleDir         int
 }
 
-func (m move) String() string {
+func (m Move) String() string {
 	return m.getAlgebraicString()
 }
 
-func (m *move) getAlgebraicString() string {
+func (m *Move) getAlgebraicString() string {
 
 	if m.piece == nil {
 		return "-"
@@ -56,6 +56,6 @@ func (m *move) getAlgebraicString() string {
 
 }
 
-func (m *move) getPiece() Movable {
+func (m *Move) getPiece() Movable {
 	return m.piece
 }
