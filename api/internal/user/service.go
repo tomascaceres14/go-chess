@@ -1,9 +1,25 @@
 package user
 
-import "context"
+import (
+	"context"
+	"errors"
+	"fmt"
+)
+
+var (
+	ErrUsernameTooShort   = errors.New("Username must be at least 6 characters long")
+	ErrPasswordTooShort   = errors.New("Password must be at least 8 characters long")
+	ErrPasswordsDontMatch = errors.New("Passwords do not match")
+)
 
 type Service struct {
 	repo Repository
+}
+
+func NewService(repo Repository) *Service {
+	return &Service{
+		repo: repo,
+	}
 }
 
 func (s *Service) Register(ctx context.Context, register RegisterUser) (*User, error) {
@@ -20,6 +36,13 @@ func (s *Service) Register(ctx context.Context, register RegisterUser) (*User, e
 		return nil, err
 	}
 
-	s.repo.Save(ctx, user)
-	return nil, nil
+	if err := s.repo.Save(ctx, user); err != nil {
+		return nil, fmt.Errorf("Repository error: %w", err)
+	}
+
+	return user, nil
+}
+
+func (s *Service) GetAll(ctx context.Context) []*User {
+	return s.repo.GetAll(ctx)
 }
