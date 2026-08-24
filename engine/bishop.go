@@ -30,7 +30,7 @@ func (b *bishop) legalMoves(board *Board) map[Position]bool {
 	return b.legalMovesDefault(board)
 }
 
-func (b *bishop) move(to Position, game *game) Movable {
+func (b *bishop) move(to Position, game *Game) Movable {
 	return moveDefault(b, to, game)
 }
 

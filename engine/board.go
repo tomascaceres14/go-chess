@@ -4,10 +4,10 @@ import (
 	"fmt"
 )
 
-type Grid *[8][8]Movable
+type Grid [8][8]Movable
 
 type Board struct {
-	grid            Grid
+	grid            *Grid
 	enPassantTarget *Position
 }
 
@@ -87,7 +87,7 @@ func (b *Board) IsOccupied(pos Position) bool {
 }
 
 func (b *Board) clone() Board {
-	newGrid := &[8][8]Movable{}
+	newGrid := &Grid{}
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
 			piece := (*b.grid)[i][j]
@@ -96,7 +96,7 @@ func (b *Board) clone() Board {
 			}
 		}
 	}
-	return Board{grid: newGrid}
+	return Board{grid: newGrid, enPassantTarget: b.enPassantTarget}
 }
 
 func (b *Board) clearSquare(pos Position) {
@@ -122,7 +122,7 @@ func (b *Board) isRowPathClear(from, to Position) bool {
 	return true
 }
 
-func (b *Board) GetGrid() *[8][8]Movable {
+func (b *Board) GetGrid() *Grid {
 	return b.grid
 }
 

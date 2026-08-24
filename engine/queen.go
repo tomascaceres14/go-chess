@@ -34,7 +34,7 @@ func (q *queen) legalMoves(b *Board) map[Position]bool {
 	return q.legalMovesDefault(b)
 }
 
-func (q *queen) move(to Position, game *game) Movable {
+func (q *queen) move(to Position, game *Game) Movable {
 	return moveDefault(q, to, game)
 }
 

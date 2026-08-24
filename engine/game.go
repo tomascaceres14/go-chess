@@ -20,20 +20,20 @@ const (
 	draw
 )
 
-type game struct {
+type Game struct {
 	id                           string
 	gameBoard                    *Board
 	pWhite, pBlack               *player
-	WhiteTurn                    bool
+	whiteTurn                    bool
 	halfmoveClock, fullmoveCount int
 	moveHistory                  []move
 	status                       gameStatus
 	castleDir                    int
 }
 
-func newGame(whiteName, blackName string) (*game, error) {
+func newGame(whiteName, blackName string) (*Game, error) {
 
-	gameBoard := [8][8]Movable{}
+	gameBoard := Grid{}
 
 	pWhite, err := newPlayerWhite(whiteName)
 	if err != nil {
@@ -50,12 +50,12 @@ func newGame(whiteName, blackName string) (*game, error) {
 	timestamp := now.Format("20060201150405")
 	id := whiteName + "_" + blackName + "_" + timestamp
 
-	game := &game{
+	game := &Game{
 		id:            id,
 		gameBoard:     &Board{grid: &gameBoard},
 		pWhite:        pWhite,
 		pBlack:        pBlack,
-		WhiteTurn:     true,
+		whiteTurn:     true,
 		moveHistory:   []move{},
 		status:        playing,
 		fullmoveCount: 1,
@@ -67,7 +67,7 @@ func newGame(whiteName, blackName string) (*game, error) {
 }
 
 // Generates a new board with classic chess configuration
-func newGameClassic(whiteName, blackName string) (*game, error) {
+func NewGameClassic(whiteName, blackName string) (*Game, error) {
 
 	game, err := newGame(whiteName, blackName)
 	if err != nil {
@@ -117,7 +117,7 @@ func newGameClassic(whiteName, blackName string) (*game, error) {
 	return game, nil
 }
 
-func newGameFENString(FENString string, whiteName, blackName string) (*game, error) {
+func NewGameFENString(FENString string, whiteName, blackName string) (*Game, error) {
 
 	game, err := newGame(whiteName, blackName)
 	if err != nil {
@@ -145,7 +145,7 @@ func newGameFENString(FENString string, whiteName, blackName string) (*game, err
 		return nil, errors.New("Incorrect format for turn. Should be 1 character, either 'b' or 'w'.")
 	}
 
-	game.WhiteTurn = FENTurn == "w"
+	game.whiteTurn = FENTurn == "w"
 
 	FENCastling := FENSplit[2]
 	if err := game.setFENStringCastling(FENCastling); err != nil {
@@ -180,13 +180,13 @@ func newGameFENString(FENString string, whiteName, blackName string) (*game, err
 	return game, nil
 }
 
-func (g *game) validateMove(move *move) error {
+func (g *Game) validateMove(move *move) error {
 	color := move.color
 	from := move.from
 	to := move.to
 
 	// Check turn to play
-	if g.WhiteTurn != color {
+	if g.whiteTurn != color {
 		return fmt.Errorf("Not your turn, %s.", colorToString(color))
 	}
 
@@ -217,14 +217,24 @@ func (g *game) validateMove(move *move) error {
 	return nil
 }
 
-// Moves piece in position `from` to position `to` if player is owner of piece
-func (g *game) makeMove(from, to Position, pColor bool) error {
+// Moves piece in position `from` to position `to` for player pColor
+func (g *Game) Move(from, to string, pColor bool) error {
 
-	prevEPTarget := g.gameBoard.enPassantTarget
+	fromPos := pos(from)
+	if !fromPos.isValid() {
+		return fmt.Errorf("'%s' is an invalid position.", from)
+	}
+
+	toPos := pos(to)
+	if !toPos.isValid() {
+		return fmt.Errorf("'%s' is an invalid position.", to)
+	}
+
+	prevEnPassantTarget := g.gameBoard.enPassantTarget
 
 	move := move{
-		from:      from,
-		to:        to,
+		from:      fromPos,
+		to:        toPos,
 		color:     pColor,
 		castleDir: -1,
 	}
@@ -236,11 +246,11 @@ func (g *game) makeMove(from, to Position, pColor bool) error {
 	piece := move.getPiece()
 
 	// make move and return captured piece, if any
-	capture := piece.move(to, g)
+	capture := piece.move(toPos, g)
 
 	// Obtain player and opponent
 	player := g.GetPlayer(pColor)
-	opponent := g.GetPlayerOpponent(player.isWhite)
+	opponent := g.GetPlayerOpponent(pColor)
 
 	// if piece was captured
 	if capture != nil {
@@ -269,7 +279,7 @@ func (g *game) makeMove(from, to Position, pColor bool) error {
 		fmt.Println("Stalemate pal :(")
 	}
 
-	if prevEPTarget != nil {
+	if prevEnPassantTarget != nil {
 		g.gameBoard.enPassantTarget = nil
 	}
 
@@ -279,7 +289,7 @@ func (g *game) makeMove(from, to Position, pColor bool) error {
 }
 
 // Returns pointer to player based on color
-func (g *game) GetPlayer(pColor bool) *player {
+func (g *Game) GetPlayer(pColor bool) *player {
 	player := g.pWhite
 
 	if !pColor {
@@ -290,7 +300,7 @@ func (g *game) GetPlayer(pColor bool) *player {
 }
 
 // Obtains piece at given position if player is owner of piece
-func (g *game) getPlayerPiece(pos Position, pColor bool) (Movable, error) {
+func (g *Game) getPlayerPiece(pos Position, pColor bool) (Movable, error) {
 
 	piece, ok := g.gameBoard.getPiece(pos)
 	if !ok {
@@ -306,7 +316,7 @@ func (g *game) getPlayerPiece(pos Position, pColor bool) (Movable, error) {
 }
 
 // Returns pointer to player based on color
-func (g *game) GetPlayerCopy(white bool) player {
+func (g *Game) GetPlayerCopy(white bool) player {
 	player := g.pWhite
 
 	if !white {
@@ -317,7 +327,7 @@ func (g *game) GetPlayerCopy(white bool) player {
 }
 
 // Returns pointer to player based on player
-func (g *game) GetPlayerOpponent(pColor bool) *player {
+func (g *Game) GetPlayerOpponent(pColor bool) *player {
 	opponent := g.pBlack
 
 	if !pColor {
@@ -328,7 +338,7 @@ func (g *game) GetPlayerOpponent(pColor bool) *player {
 }
 
 // Returns pointer to player based on player
-func (g *game) GetPlayerOpponentCopy(white bool) player {
+func (g *Game) GetPlayerOpponentCopy(white bool) player {
 	opponent := g.pBlack
 
 	if !white {
@@ -338,26 +348,26 @@ func (g *game) GetPlayerOpponentCopy(white bool) player {
 	return *opponent
 }
 
-func (g *game) isKingInCheck(color bool) bool {
+func (g *Game) isKingInCheck(color bool) bool {
 	player := g.GetPlayer(color)
 	kingPos := player.getKing().getPosition()
 	return g.gameBoard.isKingInCheck(kingPos, color)
 }
 
-func (g *game) switchTurns() {
+func (g *Game) switchTurns() {
 
-	g.WhiteTurn = !g.WhiteTurn
+	g.whiteTurn = !g.whiteTurn
 	g.castleDir = -1
 	g.fullmoveCount++
 }
 
-func (g *game) GetFENString() string {
+func (g *Game) GetFENString() string {
 
 	FENString := getFENPosition(g)
 
 	// Define turn of player
 	turn := " w "
-	if !g.WhiteTurn {
+	if !g.whiteTurn {
 		turn = " b "
 	}
 
@@ -370,7 +380,15 @@ func (g *game) GetFENString() string {
 	return FENString
 }
 
-func (g *game) setFENStringPos(FENPosition []string) error {
+func (g *Game) GetID() string {
+	return g.id
+}
+
+func (g *Game) WhiteTurn() bool {
+	return g.whiteTurn
+}
+
+func (g *Game) setFENStringPos(FENPosition []string) error {
 
 	pWhite := g.pWhite
 	pBlack := g.pBlack
@@ -435,7 +453,7 @@ func (g *game) setFENStringPos(FENPosition []string) error {
 	return nil
 }
 
-func (g *game) setFENStringCastling(FENCastling string) error {
+func (g *Game) setFENStringCastling(FENCastling string) error {
 
 	pWhite := g.pWhite
 	pBlack := g.pBlack
@@ -472,13 +490,13 @@ func (g *game) setFENStringCastling(FENCastling string) error {
 	return nil
 }
 
-func (g *game) setFENStringEnPassant(FENEnPassant string) error {
+func (g *Game) setFENStringEnPassant(FENEnPassant string) error {
 
 	if FENEnPassant == "-" {
 		return nil
 	}
 
-	turn := g.WhiteTurn
+	turn := g.whiteTurn
 
 	capturePosition := pos(FENEnPassant)
 	if capturePosition.col == -1 && capturePosition.row == -1 {
@@ -518,7 +536,7 @@ func (g *game) setFENStringEnPassant(FENEnPassant string) error {
 	return nil
 }
 
-func (g *game) setHalfmoveClock(halfmoveClock int) error {
+func (g *Game) setHalfmoveClock(halfmoveClock int) error {
 
 	if 0 > halfmoveClock || halfmoveClock > 50 {
 		return fmt.Errorf("Halfmove clock should be a number between 0 and 50. Got: %d", halfmoveClock)
@@ -529,7 +547,7 @@ func (g *game) setHalfmoveClock(halfmoveClock int) error {
 	return nil
 }
 
-func (g *game) setFullmoveCount(fullmoveCount int) error {
+func (g *Game) setFullmoveCount(fullmoveCount int) error {
 
 	if 1 > fullmoveCount {
 		return fmt.Errorf("Halfmove clock should be a number greater than 1. Got: %d", fullmoveCount)
@@ -538,4 +556,8 @@ func (g *game) setFullmoveCount(fullmoveCount int) error {
 	g.fullmoveCount = fullmoveCount
 
 	return nil
+}
+
+func (g *Game) String() string {
+	return fmt.Sprintf("ID: %s.\tWhite Turn: %v.\tMove history: %v.\n%s", g.id, g.whiteTurn, g.moveHistory, g.gameBoard)
 }

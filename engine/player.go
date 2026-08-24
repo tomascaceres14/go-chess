@@ -39,13 +39,14 @@ func newPlayerBlack(name string) (*player, error) {
 	return p, err
 }
 
-func (p *player) legalMoves(g *game) map[Position]bool {
+func (p *player) legalMoves(g *Game) map[Position]bool {
 	moves := make(map[Position]bool)
 
 	pieces := p.pieces
 	for _, piece := range pieces {
 		for pos := range piece.legalMoves(g.gameBoard) {
 			if isMoveSafeToKing(piece, pos, g.gameBoard) {
+				fmt.Println(piece, piece.getPosition(), pos)
 				moves[pos] = true
 			}
 		}
@@ -54,7 +55,7 @@ func (p *player) legalMoves(g *game) map[Position]bool {
 	return moves
 }
 
-func (p *player) hasLegalMoves(g *game) bool {
+func (p *player) hasLegalMoves(g *Game) bool {
 	return len(p.legalMoves(g)) > 0
 }
 

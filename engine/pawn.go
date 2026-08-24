@@ -66,40 +66,44 @@ func (p *pawn) legalMoves(b *Board) map[Position]bool {
 
 	positions := p.visibleSquares(b)
 	legalMoves := map[Position]bool{}
-	for pos := range positions {
+	for position := range positions {
 
-		piece, occupied := b.getPiece(pos)
+		piece, occupied := b.getPiece(position)
 
-		if pos.col == p.pos.col {
+		if position.col == p.pos.col {
 
 			// if pawn moving one square up
-			if pos.row == p.pos.row+1*p.direction && !occupied {
-				legalMoves[pos] = true
+			if position.row == p.pos.row+1*p.direction && !occupied {
+				legalMoves[position] = true
 				continue
 			}
 
 			// if pawn is jumping
-			if pos.row == p.pos.row+2*p.direction && !occupied && !b.IsOccupied(pos) {
-				legalMoves[pos] = true
+			if position.row == p.pos.row+2*p.direction && !occupied && !b.IsOccupied(position) {
+				legalMoves[position] = true
 				continue
 			}
 
 		} else {
 			// capture diagonal
 			regularCapture := occupied && piece.IsWhite() != p.white
+
 			EPTarget := b.enPassantTarget
 			enPassantCapture := false
 			if EPTarget != nil {
-				enPassantCapture = b.enPassantTarget.equals(pos)
+				enPassantCapture = b.enPassantTarget.equals(position)
 			}
-			legalMoves[pos] = regularCapture || enPassantCapture
+
+			if regularCapture || enPassantCapture {
+				legalMoves[position] = true
+			}
 		}
 	}
 
 	return legalMoves
 }
 
-func (p *pawn) move(to Position, game *game) Movable {
+func (p *pawn) move(to Position, game *Game) Movable {
 
 	from := p.pos
 	board := game.gameBoard

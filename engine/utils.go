@@ -43,7 +43,7 @@ func isMoveSafeToKing(piece Movable, to Position, board *Board) bool {
 		kingPos = boardSim.findKingPos(piece.IsWhite())
 	}
 
-	return !boardSim.isKingInCheck(kingPos, piece.IsWhite())
+	return !boardSim.isSquareAttacked(kingPos, piece.IsWhite())
 }
 
 // Parse col from matrix index to board column letter
@@ -51,7 +51,7 @@ func getColLetter(col int) string {
 	return string(cols[col])
 }
 
-func getFENPosition(g *game) string {
+func getFENPosition(g *Game) string {
 	FENString := ""
 	grid := g.gameBoard.grid
 
@@ -92,7 +92,7 @@ func getFENPosition(g *game) string {
 	return FENString
 }
 
-func getFENCastling(g *game) string {
+func getFENCastling(g *Game) string {
 	FENString := ""
 
 	wKing := g.pWhite.king
@@ -121,7 +121,7 @@ func getFENCastling(g *game) string {
 	return FENString + " "
 }
 
-func getFENEnPassant(g *game) string {
+func getFENEnPassant(g *Game) string {
 	FENString := "- "
 
 	EPTarget := g.gameBoard.enPassantTarget

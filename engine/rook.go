@@ -29,7 +29,7 @@ func (r *rook) legalMoves(b *Board) map[Position]bool {
 	return r.legalMovesDefault(b)
 }
 
-func (r *rook) move(to Position, game *game) Movable {
+func (r *rook) move(to Position, game *Game) Movable {
 	from := r.pos
 	board := game.gameBoard
 
