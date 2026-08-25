@@ -27,7 +27,6 @@ type Match struct {
 	Result      string
 	listeners   map[string]chan GameResponse
 	CommandsCh  chan GameCommand
-	ResponsesCh chan GameResponse
 	MoveHistory []gochess.Move
 }
 
@@ -37,24 +36,14 @@ type Repository interface {
 }
 
 func NewMatch(userID string, colour bool) *Match {
-
-	whiteID := userID
-	blackID := ""
-
-	if !colour {
-		whiteID = ""
-		blackID = userID
-	}
-
 	return &Match{
 		ID:          uuid.NewString(),
-		OwnerID:     whiteID,
-		OpponentID:  blackID,
+		OwnerID:     userID,
+		OpponentID:  "",
 		OwnerWhite:  colour,
 		Status:      StatusPending,
 		listeners:   make(map[string]chan GameResponse),
 		CommandsCh:  make(chan GameCommand, 2),
-		ResponsesCh: make(chan GameResponse, 2),
 		MoveHistory: make([]gochess.Move, 0),
 	}
 }
