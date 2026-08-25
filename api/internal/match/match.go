@@ -93,7 +93,7 @@ func (m *Match) Start() error {
 		m.sendMessage(GameResponse{
 			Command: MatchBeginStatus,
 			Valid:   true,
-			Grid:    game.String(),
+			Grid:    game.GetFlattenString(),
 		})
 
 		for {
@@ -127,7 +127,7 @@ func (m *Match) Start() error {
 					}
 
 					// Refresh game grid and respond
-					response.Grid = game.String()
+					response.Grid = game.GetFlattenString()
 					m.sendMessage(response)
 				}
 			case <-context.Background().Done():

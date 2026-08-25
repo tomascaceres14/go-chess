@@ -24,9 +24,9 @@ type GameCommand struct {
 }
 
 type GameResponse struct {
-	UserID  string `json:"user_id"`
-	Command string `json:"cmd"`
-	Valid   bool   `json:"valid"`
-	Error   string `json:"error"`
-	Grid    string `json:"grid"`
+	UserID  string   `json:"user_id"`
+	Command string   `json:"cmd"`
+	Valid   bool     `json:"valid"`
+	Error   string   `json:"error"`
+	Grid    []string `json:"grid"`
 }
