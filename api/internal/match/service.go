@@ -6,10 +6,11 @@ import (
 )
 
 var (
-	ErrMatchAlreadyExists = errors.New("Match already exists")
-	ErrMatchNotFound      = errors.New("Match not found")
-	ErrOwnerNotConnected  = errors.New("Owner not yet connected")
-	ErrMatchFull          = errors.New("Match is full")
+	ErrMatchAlreadyExists   = errors.New("Match already exists")
+	ErrMatchNotFound        = errors.New("Match not found")
+	ErrOwnerNotConnected    = errors.New("Owner not yet connected")
+	ErrMatchFull            = errors.New("Match is full")
+	ErrUserAlreadyConnected = errors.New("User already connected")
 )
 
 type Service struct {
@@ -26,7 +27,7 @@ func NewService(r Repository) *Service {
 
 func (s *Service) StartNewMatch(ctx context.Context, userID string, whites bool) (*Match, error) {
 	match := NewMatch(userID, whites)
-	if err := s.matchManager.Add(match); err != nil {
+	if err := s.matchManager.AddMatch(match); err != nil {
 		return nil, err
 	}
 	return match, nil
@@ -36,8 +37,8 @@ func (s *Service) GetByID(ctx context.Context, id string) (*Match, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *Service) AssignPlayerToMatch(ctx context.Context, gameID, userID string) (*Match, error) {
-	match, err := s.matchManager.Get(gameID)
+func (s *Service) AddPlayerToMatch(ctx context.Context, matchID, userID string) (chan GameResponse, error) {
+	match, err := s.matchManager.GetMatch(matchID)
 	if err != nil {
 		return nil, err
 	}
@@ -45,18 +46,30 @@ func (s *Service) AssignPlayerToMatch(ctx context.Context, gameID, userID string
 	switch match.Status {
 	case StatusPending:
 		if userID == match.OwnerID {
-			s.matchManager.SetStatus(gameID, StatusMatchmaking)
+			s.matchManager.SetStatus(matchID, StatusMatchmaking)
 		} else {
 			return nil, ErrOwnerNotConnected
 		}
 	case StatusMatchmaking:
-		s.matchManager.SetOpponentID(gameID, userID)
-		if err := match.Start(ctx); err != nil {
+		s.matchManager.SetOpponentID(matchID, userID)
+		if err := match.Start(); err != nil {
 			return nil, err
 		}
-	default:
-		return nil, ErrMatchFull
 	}
 
-	return match, nil
+	ch, err := s.matchManager.AddListener(matchID, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return ch, nil
+}
+
+func (s *Service) GetCommandsCh(gameID, userID string) (chan GameCommand, error) {
+	match, err := s.matchManager.GetMatch(gameID)
+	if err != nil {
+		return nil, err
+	}
+
+	return match.CommandsCh, nil
 }

@@ -54,7 +54,7 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 	gameID := r.PathValue("gameID")
 	userID := r.URL.Query().Get("userID")
 
-	m, err := h.svc.AssignPlayerToMatch(r.Context(), gameID, userID)
+	responseCh, err := h.svc.AddPlayerToMatch(r.Context(), gameID, userID)
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrMatchNotFound):
@@ -65,32 +65,42 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	commandsCh, err := h.svc.GetCommandsCh(gameID, userID)
+	if err != nil {
+		utils.HTTPJsonError(w, r, err.Error(), err, http.StatusBadRequest)
+		return
+	}
+
 	conn, err := websocket.Upgrade(w, r)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
 	defer conn.Close()
 
-	for {
-		conn.WriteJSON(GameResponse{
-			Command: MatchWaitingStatus,
-			Valid:   true,
-		})
+	conn.WriteJSON(GameResponse{
+		Command: MatchWaitingStatus,
+		Valid:   true,
+	})
 
-		go func() {
-			for msg := range m.ResponsesCh {
-				if err := conn.WriteJSON(msg); err != nil {
-					log.Println(err)
-					return
-				}
+	// Redirects incoming match messages to user
+	go func() {
+		for msg := range responseCh {
+			if err := conn.WriteJSON(msg); err != nil {
+				log.Printf("Error writing WS message: %v", err)
+				return
 			}
-		}()
+		}
+	}()
 
+	// Reads incoming user messages and redirects to match
+	for {
 		var command GameCommand
 		if err := conn.ReadJSON(&command); err != nil {
-			log.Println(err)
+			log.Printf("Error reading WS message: %v", err)
+			return
 		}
-		m.CommandsCh <- command
+		commandsCh <- command
 	}
 }

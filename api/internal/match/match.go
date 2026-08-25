@@ -25,6 +25,7 @@ type Match struct {
 	OpponentID  string
 	Status      string
 	Result      string
+	listeners   map[string]chan GameResponse
 	CommandsCh  chan GameCommand
 	ResponsesCh chan GameResponse
 	MoveHistory []gochess.Move
@@ -51,13 +52,28 @@ func NewMatch(userID string, colour bool) *Match {
 		OpponentID:  blackID,
 		OwnerWhite:  colour,
 		Status:      StatusPending,
+		listeners:   make(map[string]chan GameResponse),
 		CommandsCh:  make(chan GameCommand, 2),
 		ResponsesCh: make(chan GameResponse, 2),
 		MoveHistory: make([]gochess.Move, 0),
 	}
 }
 
-func (m *Match) Start(ctx context.Context) error {
+func (m *Match) fanout(msg GameResponse) {
+	for _, ch := range m.listeners {
+		ch <- msg
+	}
+}
+
+func (m *Match) sendMessage(msg GameResponse) {
+	if msg.UserID == "" {
+		m.fanout(msg)
+		return
+	}
+	m.listeners[msg.UserID] <- msg
+}
+
+func (m *Match) Start() error {
 	white := m.OwnerID
 	black := m.OpponentID
 
@@ -74,19 +90,15 @@ func (m *Match) Start(ctx context.Context) error {
 	go func() {
 
 		// Send game begin signal
-		m.ResponsesCh <- GameResponse{
+		m.sendMessage(GameResponse{
 			Command: MatchBeginStatus,
 			Valid:   true,
 			Grid:    game.GetGrid(),
-		}
+		})
 
 		for {
 			select {
 
-			// Listen context for graceful shutdown
-			case <-ctx.Done():
-				log.Printf("Graceful shutdown of match %s", m.ID)
-				return
 			// Recieve user messages
 			case msg := <-m.CommandsCh:
 				switch msg.Command {
@@ -113,7 +125,7 @@ func (m *Match) Start(ctx context.Context) error {
 					}
 
 					log.Println(response, game.GetGrid())
-					m.ResponsesCh <- response
+					m.sendMessage(response)
 				}
 			}
 		}
