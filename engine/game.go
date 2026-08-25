@@ -392,6 +392,23 @@ func (g *Game) WhiteTurn() bool {
 	return g.whiteTurn
 }
 
+func (g *Game) GetFlattenString() []string {
+	res := make([]string, 64)
+
+	index := 0
+	for row := 7; row >= 0; row-- {
+		for col := 0; col < 8; col++ {
+			p := g.gameBoard.grid[row][col]
+			if p != nil {
+				res[index] = p.String()
+			}
+			index++
+		}
+	}
+
+	return res
+}
+
 func (g *Game) setFENStringPos(FENPosition []string) error {
 
 	pWhite := g.pWhite
