@@ -1,8 +1,7 @@
 package match
 
 const (
-	MovePieceCmd           = "match.cmd.move"
-	UnsubscribeListenerCmd = "match.listener.unsubscribe"
+	MovePieceCmd = "match.cmd.move"
 
 	MatchBeginStatus   = "match.status.begin"
 	MatchWaitingStatus = "match.status.waiting"

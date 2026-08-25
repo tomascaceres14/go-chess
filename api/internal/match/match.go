@@ -95,8 +95,6 @@ func (m *Match) Start() error {
 			// Recieve user messages
 			case msg := <-m.CommandsCh:
 				switch msg.Command {
-				case UnsubscribeListenerCmd:
-
 				case MovePieceCmd:
 
 					color := m.OwnerWhite
