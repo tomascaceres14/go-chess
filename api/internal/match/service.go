@@ -13,20 +13,20 @@ var (
 )
 
 type Service struct {
-	repo       Repository
-	matchMaker *MatchManager
+	repo         Repository
+	matchManager *MatchManager
 }
 
 func NewService(r Repository) *Service {
 	return &Service{
-		repo:       r,
-		matchMaker: NewMatchmaker(),
+		repo:         r,
+		matchManager: NewMatchmaker(),
 	}
 }
 
 func (s *Service) StartNewMatch(ctx context.Context, userID string, whites bool) (*Match, error) {
 	match := NewMatch(userID, whites)
-	if err := s.matchMaker.Add(match); err != nil {
+	if err := s.matchManager.Add(match); err != nil {
 		return nil, err
 	}
 	return match, nil
@@ -37,7 +37,7 @@ func (s *Service) GetByID(ctx context.Context, id string) (*Match, error) {
 }
 
 func (s *Service) AssignPlayerToMatch(ctx context.Context, gameID, userID string) (*Match, error) {
-	match, err := s.matchMaker.Get(gameID)
+	match, err := s.matchManager.Get(gameID)
 	if err != nil {
 		return nil, err
 	}
@@ -45,13 +45,15 @@ func (s *Service) AssignPlayerToMatch(ctx context.Context, gameID, userID string
 	switch match.Status {
 	case StatusPending:
 		if userID == match.OwnerID {
-			s.matchMaker.SetStatus(gameID, StatusMatchmaking)
+			s.matchManager.SetStatus(gameID, StatusMatchmaking)
 		} else {
 			return nil, ErrOwnerNotConnected
 		}
 	case StatusMatchmaking:
-		s.matchMaker.SetOpponentID(gameID, userID)
-		s.matchMaker.SetStatus(gameID, StatusOngoing)
+		s.matchManager.SetOpponentID(gameID, userID)
+		if err := match.Start(ctx); err != nil {
+			return nil, err
+		}
 	default:
 		return nil, ErrMatchFull
 	}

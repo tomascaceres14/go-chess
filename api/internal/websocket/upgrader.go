@@ -12,10 +12,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-type ConnectionManager struct {
-}
-
-func (cm *ConnectionManager) Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
+func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return nil, err

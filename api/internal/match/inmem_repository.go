@@ -15,9 +15,9 @@ func NewMemoryRepository() *MemoryRepository {
 	}
 }
 
-func (r *MemoryRepository) Save(ctx context.Context, Match *Match) error {
-	r.Matches[Match.ID] = Match
-	return nil
+func (r *MemoryRepository) Save(ctx context.Context, m *Match) (*Match, error) {
+	r.Matches[m.ID] = m
+	return m, nil
 }
 
 func (r *MemoryRepository) GetByID(ctx context.Context, id string) (*Match, error) {

@@ -51,6 +51,8 @@ func NewMatch(userID string, colour bool) *Match {
 		OpponentID:  blackID,
 		OwnerWhite:  colour,
 		Status:      StatusPending,
+		CommandsCh:  make(chan GameCommand, 2),
+		ResponsesCh: make(chan GameResponse, 2),
 		MoveHistory: make([]gochess.Move, 0),
 	}
 }
@@ -63,17 +65,29 @@ func (m *Match) Start(ctx context.Context) error {
 		white = m.OpponentID
 		black = m.OwnerID
 	}
+
 	game, err := gochess.NewGameClassic(white, black)
 	if err != nil {
 		return err
 	}
 
 	go func() {
+
+		// Send game begin signal
+		m.ResponsesCh <- GameResponse{
+			Command: MatchBeginStatus,
+			Valid:   true,
+			Grid:    game.GetGrid(),
+		}
+
 		for {
 			select {
+
+			// Listen context for graceful shutdown
 			case <-ctx.Done():
 				log.Printf("Graceful shutdown of match %s", m.ID)
-				break
+				return
+			// Recieve user messages
 			case msg := <-m.CommandsCh:
 				switch msg.Command {
 				case MovePieceCmd:
@@ -84,19 +98,22 @@ func (m *Match) Start(ctx context.Context) error {
 
 					err := game.Move(msg.Move.From, msg.Move.To, color)
 
-					// Nil error, movement is approved. Empty userID means send to both players
+					// Nil error, movement is approved. Empty userID sends message to both players
 					if err != nil {
 						log.Println(err)
 					} else {
 						msg.UserID = ""
 					}
 
-					response := &GameResponse{
-						UserID: msg.UserID,
-						Cmd:    msg.Command,
-						Valid:  err != nil,
-						Error:  err,
+					response := GameResponse{
+						UserID:  msg.UserID,
+						Command: msg.Command,
+						Valid:   err != nil,
+						Error:   err,
 					}
+
+					log.Println(response, game.GetGrid())
+					m.ResponsesCh <- response
 				}
 			}
 		}

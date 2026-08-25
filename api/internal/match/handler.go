@@ -22,31 +22,18 @@ func NewHandler(svc *Service) *Handler {
 }
 
 func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("userID")
-	colour := r.URL.Query().Get("colour")
+	var params NewMatchParams
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		utils.HTTPJsonError(w, r, "Error decoding body", err, http.StatusBadRequest)
+		return
+	}
 
-	if userID == "" {
+	if params.UserID == "" {
 		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
 		return
 	}
 
-	if colour == "" {
-		utils.HTTPJsonError(w, r, "Must provide chosen color: 1 for Whites, 0 for Blacks", nil, http.StatusBadRequest)
-		return
-	}
-
-	var whites bool
-	switch colour {
-	case "1":
-		whites = true
-	case "0":
-		whites = false
-	default:
-		utils.HTTPJsonError(w, r, "Incorrect colour option: 1 for Whites, 0 for Blacks", nil, http.StatusBadRequest)
-		return
-	}
-
-	match, err := h.svc.StartNewMatch(r.Context(), userID, whites)
+	match, err := h.svc.StartNewMatch(r.Context(), params.UserID, params.Whites)
 	if err != nil {
 		utils.HTTPJsonError(w, r, "Error creating match", err, http.StatusInternalServerError)
 		return
@@ -63,11 +50,11 @@ func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
 }
 
 // localhost:80/ws/game/{gameID} Bearer: Authorization token
-func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request, manager *websocket.ConnectionManager) {
+func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 	gameID := r.PathValue("gameID")
 	userID := r.URL.Query().Get("userID")
 
-	match, err := h.svc.AssignPlayerToMatch(r.Context(), gameID, userID)
+	m, err := h.svc.AssignPlayerToMatch(r.Context(), gameID, userID)
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrMatchNotFound):
@@ -78,7 +65,7 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request, ma
 		return
 	}
 
-	conn, err := manager.Upgrade(w, r)
+	conn, err := websocket.Upgrade(w, r)
 	if err != nil {
 		log.Println(err)
 		return
@@ -86,16 +73,24 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request, ma
 	defer conn.Close()
 
 	for {
-		if match.Status != StatusOngoing {
-			continue
-		}
+		conn.WriteJSON(GameResponse{
+			Command: MatchWaitingStatus,
+			Valid:   true,
+		})
+
+		go func() {
+			for msg := range m.ResponsesCh {
+				if err := conn.WriteJSON(msg); err != nil {
+					log.Println(err)
+					return
+				}
+			}
+		}()
 
 		var command GameCommand
 		if err := conn.ReadJSON(&command); err != nil {
 			log.Println(err)
-			return
 		}
-
-		command.UserID = userID
+		m.CommandsCh <- command
 	}
 }
