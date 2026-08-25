@@ -384,6 +384,10 @@ func (g *Game) GetID() string {
 	return g.id
 }
 
+func (g *Game) GetGrid() *Grid {
+	return g.gameBoard.grid
+}
+
 func (g *Game) WhiteTurn() bool {
 	return g.whiteTurn
 }
