@@ -52,9 +52,7 @@ func (s *Service) AddUserToMatch(ctx context.Context, matchID, userID string) (c
 		}
 	case StatusMatchmaking:
 		s.matchManager.SetOpponentID(matchID, userID)
-		if err := match.Start(); err != nil {
-			return nil, err
-		}
+		go match.Start()
 	}
 
 	ch, err := s.matchManager.AddListener(matchID, userID)

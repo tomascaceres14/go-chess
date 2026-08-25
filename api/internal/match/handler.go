@@ -77,7 +77,6 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-
 	defer conn.Close()
 
 	conn.WriteJSON(GameResponse{
@@ -102,6 +101,9 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Error reading WS message: %v", err)
 			return
 		}
+
+		// Workaround so user can't fake identity. Will be replaced by id present in token
+		// once JWT is implemented.
 		command.UserID = userID
 		commandsCh <- command
 	}

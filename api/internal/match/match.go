@@ -63,7 +63,7 @@ func (m *Match) RemoveListener(userID string) {
 	delete(m.listeners, userID)
 }
 
-func (m *Match) Start() error {
+func (m *Match) Start() {
 
 	// Define players colors. For now I'll just leave it like this, although
 	// I'm not sure if the engine should receive player's names and assign them to each team or
@@ -76,62 +76,57 @@ func (m *Match) Start() error {
 		black = m.OwnerID
 	}
 
-	game, err := gochess.NewGameClassic(white, black)
-	if err != nil {
-		return err
-	}
+	// Ignoring error until refactoring. No need to provide white and black ids or names
+	game, _ := gochess.NewGameClassic(white, black)
 
-	go func() {
+	defer m.CloseChannels()
 
-		// Send game begin signal
-		m.sendMessage(GameResponse{
-			Command: MatchBeginStatus,
-			Valid:   true,
-			Grid:    game.GetFlattenString(),
-		})
+	// Send game begin signal
+	m.sendMessage(GameResponse{
+		Command: MatchBeginStatus,
+		Valid:   true,
+		Grid:    game.GetFlattenString(),
+	})
 
-		for {
-			select {
-			// Recieve user messages
-			case msg := <-m.CommandsCh:
-				switch msg.Command {
-				case MovePieceCmd:
+	for {
+		select {
+		// Recieve user messages
+		case msg := <-m.CommandsCh:
+			switch msg.Command {
+			case MovePieceCmd:
 
-					color := m.OwnerWhite
-					if msg.UserID == m.OpponentID {
-						color = !color
-					}
-
-					// Prepare initial message
-					response := GameResponse{
-						UserID:  msg.UserID,
-						Command: msg.Command,
-						Valid:   false,
-					}
-
-					// Execute move
-					err := game.Move(msg.Move.From, msg.Move.To, color)
-
-					// Adjust response based on error
-					if err != nil {
-						log.Println(err)
-						response.Error = err.Error()
-					} else {
-						response.UserID = ""
-						response.Valid = true
-					}
-
-					// Refresh game grid and respond
-					response.Grid = game.GetFlattenString()
-					m.sendMessage(response)
+				color := m.OwnerWhite
+				if msg.UserID == m.OpponentID {
+					color = !color
 				}
-			case <-context.Background().Done():
 
+				// Prepare initial message
+				response := GameResponse{
+					UserID:  msg.UserID,
+					Command: msg.Command,
+					Valid:   false,
+				}
+
+				// Execute move
+				err := game.Move(msg.Move.From, msg.Move.To, color)
+
+				// Adjust response based on error
+				if err != nil {
+					log.Println(err)
+					response.Error = err.Error()
+				} else {
+					response.UserID = ""
+					response.Valid = true
+				}
+
+				// Refresh game grid and respond
+				response.Grid = game.GetFlattenString()
+				m.sendMessage(response)
 			}
-		}
-	}()
+		case <-context.Background().Done():
 
-	return nil
+		}
+	}
 }
 
 func (m *Match) fanout(msg GameResponse) {
@@ -146,4 +141,10 @@ func (m *Match) sendMessage(msg GameResponse) {
 		return
 	}
 	m.listeners[msg.UserID] <- msg
+}
+
+func (m *Match) CloseChannels() {
+	for _, ch := range m.listeners {
+		close(ch)
+	}
 }
