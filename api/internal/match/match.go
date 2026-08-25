@@ -3,6 +3,7 @@ package match
 import (
 	"context"
 	"log"
+	"sync"
 
 	"github.com/google/uuid"
 	gochess "github.com/tomascaceres14/go-chess/engine"
@@ -20,14 +21,15 @@ var (
 
 type Match struct {
 	ID          string
-	OwnerWhite  bool
 	OwnerID     string
 	OpponentID  string
 	Status      string
 	Result      string
+	OwnerWhite  bool
 	listeners   map[string]chan GameResponse
 	CommandsCh  chan GameCommand
 	MoveHistory []gochess.Move
+	mu          sync.RWMutex
 }
 
 type Repository interface {
@@ -48,21 +50,24 @@ func NewMatch(userID string, colour bool) *Match {
 	}
 }
 
-func (m *Match) fanout(msg GameResponse) {
-	for _, ch := range m.listeners {
-		ch <- msg
-	}
-}
+func (m *Match) RemoveListener(userID string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
-func (m *Match) sendMessage(msg GameResponse) {
-	if msg.UserID == "" {
-		m.fanout(msg)
+	ch, ok := m.listeners[userID]
+	if !ok {
 		return
 	}
-	m.listeners[msg.UserID] <- msg
+
+	close(ch)
+	delete(m.listeners, userID)
 }
 
 func (m *Match) Start() error {
+
+	// Define players colors. For now I'll just leave it like this, although
+	// I'm not sure if the engine should receive player's names and assign them to each team or
+	// just initialize the game and let the server handle the user->color relation
 	white := m.OwnerID
 	black := m.OpponentID
 
@@ -90,7 +95,10 @@ func (m *Match) Start() error {
 			// Recieve user messages
 			case msg := <-m.CommandsCh:
 				switch msg.Command {
+				case UnsubscribeListenerCmd:
+
 				case MovePieceCmd:
+
 					color := m.OwnerWhite
 					if msg.UserID == m.OpponentID {
 						color = !color
@@ -126,4 +134,18 @@ func (m *Match) Start() error {
 	}()
 
 	return nil
+}
+
+func (m *Match) fanout(msg GameResponse) {
+	for _, ch := range m.listeners {
+		ch <- msg
+	}
+}
+
+func (m *Match) sendMessage(msg GameResponse) {
+	if msg.UserID == "" {
+		m.fanout(msg)
+		return
+	}
+	m.listeners[msg.UserID] <- msg
 }

@@ -51,21 +51,22 @@ func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
 
 // localhost:80/ws/game/{gameID} Bearer: Authorization token
 func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
-	gameID := r.PathValue("gameID")
+	matchID := r.PathValue("gameID")
 	userID := r.URL.Query().Get("userID")
 
-	responseCh, err := h.svc.AddPlayerToMatch(r.Context(), gameID, userID)
+	responseCh, err := h.svc.AddUserToMatch(r.Context(), matchID, userID)
 	if err != nil {
 		switch {
-		case errors.Is(err, ErrMatchNotFound):
+		case errors.Is(err, ErrMatchNotFound), errors.Is(err, ErrOwnerNotConnected):
 			utils.HTTPJsonError(w, r, err.Error(), err, http.StatusBadRequest)
 		default:
 			utils.HTTPJsonError(w, r, "Internal server error", err, http.StatusInternalServerError)
 		}
 		return
 	}
+	defer h.svc.RemoveUserFromMatch(matchID, userID)
 
-	commandsCh, err := h.svc.GetCommandsCh(gameID, userID)
+	commandsCh, err := h.svc.GetCommandsCh(matchID, userID)
 	if err != nil {
 		utils.HTTPJsonError(w, r, err.Error(), err, http.StatusBadRequest)
 		return

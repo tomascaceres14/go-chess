@@ -37,7 +37,7 @@ func (s *Service) GetByID(ctx context.Context, id string) (*Match, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *Service) AddPlayerToMatch(ctx context.Context, matchID, userID string) (chan GameResponse, error) {
+func (s *Service) AddUserToMatch(ctx context.Context, matchID, userID string) (chan GameResponse, error) {
 	match, err := s.matchManager.GetMatch(matchID)
 	if err != nil {
 		return nil, err
@@ -63,6 +63,10 @@ func (s *Service) AddPlayerToMatch(ctx context.Context, matchID, userID string) 
 	}
 
 	return ch, nil
+}
+
+func (s *Service) RemoveUserFromMatch(matchID, userID string) {
+	s.matchManager.RemoveListener(matchID, userID)
 }
 
 func (s *Service) GetCommandsCh(gameID, userID string) (chan GameCommand, error) {

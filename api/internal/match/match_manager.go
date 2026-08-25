@@ -94,3 +94,14 @@ func (mm *MatchManager) AddListener(matchID, userID string) (chan GameResponse, 
 	match.listeners[userID] = ch
 	return ch, nil
 }
+
+func (mm *MatchManager) RemoveListener(matchID, userID string) {
+	log.Printf("Removing listener %s for match %s", userID, matchID)
+
+	match, err := mm.GetMatch(matchID)
+	if err != nil {
+		return
+	}
+
+	match.RemoveListener(userID)
+}
