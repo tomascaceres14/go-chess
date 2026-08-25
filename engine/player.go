@@ -46,7 +46,6 @@ func (p *player) legalMoves(g *Game) map[Position]bool {
 	for _, piece := range pieces {
 		for pos := range piece.legalMoves(g.gameBoard) {
 			if isMoveSafeToKing(piece, pos, g.gameBoard) {
-				fmt.Println(piece, piece.getPosition(), pos)
 				moves[pos] = true
 			}
 		}

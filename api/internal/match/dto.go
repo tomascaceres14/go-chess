@@ -1,7 +1,5 @@
 package match
 
-import gochess "github.com/tomascaceres14/go-chess/engine"
-
 const (
 	MovePieceCmd = "match.cmd.move"
 
@@ -26,9 +24,9 @@ type GameCommand struct {
 }
 
 type GameResponse struct {
-	UserID  string        `json:"user_id"`
-	Command string        `json:"cmd"`
-	Valid   bool          `json:"valid"`
-	Error   error         `json:"error,omitempty"`
-	Grid    *gochess.Grid `json:"grid"`
+	UserID  string `json:"user_id"`
+	Command string `json:"cmd"`
+	Valid   bool   `json:"valid"`
+	Error   string `json:"error"`
+	Grid    string `json:"grid"`
 }

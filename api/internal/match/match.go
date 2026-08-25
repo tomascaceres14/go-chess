@@ -93,12 +93,11 @@ func (m *Match) Start() error {
 		m.sendMessage(GameResponse{
 			Command: MatchBeginStatus,
 			Valid:   true,
-			Grid:    game.GetGrid(),
+			Grid:    game.String(),
 		})
 
 		for {
 			select {
-
 			// Recieve user messages
 			case msg := <-m.CommandsCh:
 				switch msg.Command {
@@ -108,25 +107,31 @@ func (m *Match) Start() error {
 						color = !color
 					}
 
-					err := game.Move(msg.Move.From, msg.Move.To, color)
-
-					// Nil error, movement is approved. Empty userID sends message to both players
-					if err != nil {
-						log.Println(err)
-					} else {
-						msg.UserID = ""
-					}
-
+					// Prepare initial message
 					response := GameResponse{
 						UserID:  msg.UserID,
 						Command: msg.Command,
-						Valid:   err != nil,
-						Error:   err,
+						Valid:   false,
 					}
 
-					log.Println(response, game.GetGrid())
+					// Execute move
+					err := game.Move(msg.Move.From, msg.Move.To, color)
+
+					// Adjust response based on error
+					if err != nil {
+						log.Println(err)
+						response.Error = err.Error()
+					} else {
+						response.UserID = ""
+						response.Valid = true
+					}
+
+					// Refresh game grid and respond
+					response.Grid = game.String()
 					m.sendMessage(response)
 				}
+			case <-context.Background().Done():
+
 			}
 		}
 	}()

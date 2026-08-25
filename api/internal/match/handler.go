@@ -101,6 +101,7 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Error reading WS message: %v", err)
 			return
 		}
+		command.UserID = userID
 		commandsCh <- command
 	}
 }
