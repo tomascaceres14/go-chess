@@ -2,8 +2,6 @@ package match
 
 import (
 	"context"
-	"maps"
-	"slices"
 )
 
 // TESTING PURPOSES ONLY
@@ -22,11 +20,10 @@ func (r *MemoryRepository) Save(ctx context.Context, Match *Match) error {
 	return nil
 }
 
-func (r *MemoryRepository) GetAll(ctx context.Context) []*Match {
-	matches := slices.Collect(maps.Values(r.Matches))
-	if len(matches) == 0 {
-		return []*Match{}
+func (r *MemoryRepository) GetByID(ctx context.Context, id string) (*Match, error) {
+	m, ok := r.Matches[id]
+	if !ok {
+		return nil, ErrMatchNotFound
 	}
-
-	return matches
+	return m, nil
 }

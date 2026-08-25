@@ -67,7 +67,7 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request, ma
 	gameID := r.PathValue("gameID")
 	userID := r.URL.Query().Get("userID")
 
-	game, err := h.svc.matchMaker.Get(gameID)
+	match, err := h.svc.AssignPlayerToMatch(r.Context(), gameID, userID)
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrMatchNotFound):
@@ -75,22 +75,6 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request, ma
 		default:
 			utils.HTTPJsonError(w, r, "Internal server error", err, http.StatusInternalServerError)
 		}
-		return
-	}
-
-	switch game.Status {
-	case StatusPending:
-		if userID == game.OwnerID {
-			h.svc.matchMaker.UpdateStatus(gameID, StatusMatchmaking)
-		} else {
-			utils.HTTPJsonError(w, r, "Owner not yet connected", nil, http.StatusConflict)
-			return
-		}
-	case StatusMatchmaking:
-		h.svc.matchMaker.AssignOpponent(gameID, userID)
-		h.svc.matchMaker.UpdateStatus(gameID, StatusOngoing)
-	default:
-		utils.HTTPJsonError(w, r, "Game finalized", nil, http.StatusConflict)
 		return
 	}
 
@@ -102,19 +86,16 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request, ma
 	defer conn.Close()
 
 	for {
-		if game.Status != StatusOngoing {
+		if match.Status != StatusOngoing {
 			continue
 		}
-		
-		messageType, p, err := conn.ReadMessage()
-		if err != nil {
+
+		var command GameCommand
+		if err := conn.ReadJSON(&command); err != nil {
 			log.Println(err)
 			return
 		}
 
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
-		}
+		command.UserID = userID
 	}
 }

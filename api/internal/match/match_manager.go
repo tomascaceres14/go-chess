@@ -4,18 +4,18 @@ import (
 	"sync"
 )
 
-type MatchMaker struct {
+type MatchManager struct {
 	matches map[string]*Match
 	mu      sync.RWMutex
 }
 
-func NewMatchmaker() *MatchMaker {
-	return &MatchMaker{
+func NewMatchmaker() *MatchManager {
+	return &MatchManager{
 		matches: make(map[string]*Match),
 	}
 }
 
-func (mm *MatchMaker) Add(match *Match) error {
+func (mm *MatchManager) Add(match *Match) error {
 	mm.mu.Lock()
 	defer mm.mu.Unlock()
 
@@ -29,7 +29,7 @@ func (mm *MatchMaker) Add(match *Match) error {
 	return nil
 }
 
-func (mm *MatchMaker) Get(id string) (*Match, error) {
+func (mm *MatchManager) Get(id string) (*Match, error) {
 	mm.mu.RLock()
 	defer mm.mu.RUnlock()
 
@@ -40,7 +40,7 @@ func (mm *MatchMaker) Get(id string) (*Match, error) {
 	return match, nil
 }
 
-func (mm *MatchMaker) UpdateStatus(id string, status string) (*Match, bool) {
+func (mm *MatchManager) SetStatus(id string, status string) (*Match, bool) {
 	mm.mu.RLock()
 	defer mm.mu.RUnlock()
 
@@ -50,7 +50,7 @@ func (mm *MatchMaker) UpdateStatus(id string, status string) (*Match, bool) {
 	return match, ok
 }
 
-func (mm *MatchMaker) AssignOpponent(id, userID string) error {
+func (mm *MatchManager) SetOpponentID(id, userID string) error {
 	match, err := mm.Get(id)
 	if err != nil {
 		return err
