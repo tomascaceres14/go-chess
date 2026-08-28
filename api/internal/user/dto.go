@@ -6,6 +6,11 @@ type RegisterUser struct {
 	RepeatPassword string `json:"repeat_password"`
 }
 
+type UserCredentials struct {
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 func (u RegisterUser) Validate() error {
 	if len(u.Username) < 6 {
 		return ErrUsernameTooShort

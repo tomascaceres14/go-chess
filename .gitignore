@@ -18,3 +18,5 @@ backend/*.db
 
 # MacOS
 .DS_Store
+
+.env

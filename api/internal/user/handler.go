@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 
+	"github.com/tomascaceres14/go-chess/api/internal/middleware"
 	"github.com/tomascaceres14/go-chess/api/utils"
 )
 
@@ -40,7 +42,18 @@ func (h *Handler) HandleUserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := json.Marshal(user)
+	jwtAuth := middleware.NewJWTAuth(os.Getenv("JWT_SIGNING_KEY"))
+
+	token, err := jwtAuth.NewToken(user.ID)
+	if err != nil {
+		utils.HTTPJsonError(w, r, "Error signing token", err, http.StatusBadRequest)
+		return
+	}
+
+	response, err := json.Marshal(UserCredentials{
+		Token: token,
+	})
+
 	if err != nil {
 		utils.HTTPJsonError(w, r, "Error encoding json", err, http.StatusInternalServerError)
 		return
