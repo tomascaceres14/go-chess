@@ -3,10 +3,11 @@ package user
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 
-	"github.com/tomascaceres14/go-chess/api/internal/middleware"
+	"github.com/tomascaceres14/go-chess/api/internal/auth"
 	"github.com/tomascaceres14/go-chess/api/utils"
 )
 
@@ -42,22 +43,19 @@ func (h *Handler) HandleUserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtAuth := middleware.NewJWTAuth(os.Getenv("JWT_SIGNING_KEY"))
+	sKey := os.Getenv("JWT_SIGNING_KEY")
+	jwtAuth, err := auth.NewJWTTokenProvider(sKey, "go-chess")
+	if err != nil {
+		utils.HTTPJsonError(w, r, "Internal server error", err, http.StatusInternalServerError)
+		return
+	}
 
-	token, err := jwtAuth.NewToken(user.ID)
+	token, err := jwtAuth.NewUserCredentials(user.ID)
 	if err != nil {
 		utils.HTTPJsonError(w, r, "Error signing token", err, http.StatusBadRequest)
 		return
 	}
+	fmt.Println("validtoken: ", jwtAuth.ValidateToken(token.Token))
 
-	response, err := json.Marshal(UserCredentials{
-		Token: token,
-	})
-
-	if err != nil {
-		utils.HTTPJsonError(w, r, "Error encoding json", err, http.StatusInternalServerError)
-		return
-	}
-
-	utils.HTTPJsonResponse(w, response, http.StatusCreated)
+	utils.HTTPJsonResponse(w, token, http.StatusCreated)
 }

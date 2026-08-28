@@ -6,8 +6,6 @@ import (
 
 	"github.com/tomascaceres14/go-chess/api/internal/match"
 	"github.com/tomascaceres14/go-chess/api/internal/user"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {

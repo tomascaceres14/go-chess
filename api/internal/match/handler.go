@@ -39,14 +39,19 @@ func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wsPath := fmt.Sprintf("/ws/game/%s", match.ID)
+	data := map[string]any{
+		"ws_path": fmt.Sprintf("/ws/game/%s", match.ID),
+		"token":   "token123_owner123",
+	}
+	response, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("Error formatting json response: %v", err)
+		return
+	}
+	w.WriteHeader(201)
+	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(w).Encode(
-		map[string]any{
-			"ws_path": wsPath,
-			"token":   "token123_owner123",
-		},
-	)
+	json.NewEncoder(w).Encode(response)
 }
 
 // localhost:80/ws/game/{gameID} Bearer: Authorization token
