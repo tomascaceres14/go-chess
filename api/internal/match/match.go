@@ -65,9 +65,6 @@ func (m *Match) RemoveListener(userID string) {
 
 func (m *Match) Start() {
 
-	// Define players colors. For now I'll just leave it like this, although
-	// I'm not sure if the engine should receive player's names and assign them to each team or
-	// just initialize the game and let the server handle the user->color relation
 	white := m.OwnerID
 	black := m.OpponentID
 
@@ -103,8 +100,6 @@ func (m *Match) Start() {
 				}
 
 				// Execute move
-				// TODO: Adapt Move() func to receive player name and validate based on that,
-				// not on color trying to move.
 				err := game.MovePlayer(msg.Move.From, msg.Move.To, msg.UserID)
 
 				// Adjust response based on error
