@@ -3,7 +3,6 @@ package match
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -40,18 +39,21 @@ func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := map[string]any{
-		"ws_path": fmt.Sprintf("/ws/game/%s", match.ID),
-		"token":   "token123_owner123",
+	response := map[string]string{
+		"match_id": match.ID,
 	}
 
 	utils.HTTPJsonResponse(w, response, http.StatusCreated)
 }
 
-// localhost:80/ws/game/{gameID} Bearer: Authorization token
 func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 	matchID := r.PathValue("gameID")
-	userID := r.URL.Query().Get("userID")
+	userID := r.Context().Value("userID").(string)
+
+	if userID == "" {
+		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
+		return
+	}
 
 	responseCh, err := h.svc.AddUserToMatch(r.Context(), matchID, userID)
 	if err != nil {

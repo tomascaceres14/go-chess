@@ -50,7 +50,7 @@ func main() {
 	sv.HandleFunc("GET /users", userHandler.HandleGetUsers)
 	sv.HandleFunc("POST /users", userHandler.HandleUserRegister)
 	sv.HandleFunc("POST /matches", mw.Use(matchHandler.HandleNewMatch, mw.JWTAuth))
-	sv.HandleFunc("GET /ws/game/{gameID}", matchHandler.HandleGameWebSocket)
+	sv.HandleFunc("GET /ws/match/{gameID}", mw.Use(matchHandler.HandleGameWebSocket, mw.JWTAuth))
 
 	log.Printf("Server listening on port :80")
 	if err := http.ListenAndServe(":80", sv); err != nil {
