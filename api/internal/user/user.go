@@ -15,6 +15,8 @@ type User struct {
 type Repository interface {
 	Save(ctx context.Context, user *User) error
 	GetAll(ctx context.Context) []*User
+	GetByID(ctx context.Context, id string) *User
+	ExistsByID(ctx context.Context, id string) bool
 }
 
 func NewUser(username, hashedPassword string) (*User, error) {

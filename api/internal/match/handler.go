@@ -22,36 +22,30 @@ func NewHandler(svc *Service) *Handler {
 }
 
 func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(string)
+	if userID == "" {
+		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
+		return
+	}
+
 	var params NewMatchParams
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		utils.HTTPJsonError(w, r, "Error decoding body", err, http.StatusBadRequest)
 		return
 	}
 
-	if params.UserID == "" {
-		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
-		return
-	}
-
-	match, err := h.svc.StartNewMatch(r.Context(), params.UserID, params.Whites)
+	match, err := h.svc.StartNewMatch(r.Context(), userID, params.Whites)
 	if err != nil {
 		utils.HTTPJsonError(w, r, "Error creating match", err, http.StatusInternalServerError)
 		return
 	}
 
-	data := map[string]any{
+	response := map[string]any{
 		"ws_path": fmt.Sprintf("/ws/game/%s", match.ID),
 		"token":   "token123_owner123",
 	}
-	response, err := json.Marshal(data)
-	if err != nil {
-		log.Printf("Error formatting json response: %v", err)
-		return
-	}
-	w.WriteHeader(201)
-	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(w).Encode(response)
+	utils.HTTPJsonResponse(w, response, http.StatusCreated)
 }
 
 // localhost:80/ws/game/{gameID} Bearer: Authorization token

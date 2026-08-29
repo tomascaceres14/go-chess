@@ -3,21 +3,21 @@ package user
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/tomascaceres14/go-chess/api/internal/auth"
 	"github.com/tomascaceres14/go-chess/api/utils"
 )
 
 type Handler struct {
-	svc *Service
+	svc           *Service
+	tokenProvider auth.TokenProvider
 }
 
-func NewHandler(svc *Service) *Handler {
+func NewHandler(svc *Service, tokenProvider auth.TokenProvider) *Handler {
 	return &Handler{
-		svc: svc,
+		svc:           svc,
+		tokenProvider: tokenProvider,
 	}
 }
 
@@ -43,19 +43,11 @@ func (h *Handler) HandleUserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sKey := os.Getenv("JWT_SIGNING_KEY")
-	jwtAuth, err := auth.NewJWTTokenProvider(sKey, "go-chess")
-	if err != nil {
-		utils.HTTPJsonError(w, r, "Internal server error", err, http.StatusInternalServerError)
-		return
-	}
-
-	token, err := jwtAuth.NewUserCredentials(user.ID)
+	token, err := h.tokenProvider.NewUserCredentials(user.ID)
 	if err != nil {
 		utils.HTTPJsonError(w, r, "Error signing token", err, http.StatusBadRequest)
 		return
 	}
-	fmt.Println("validtoken: ", jwtAuth.ValidateToken(token.Token))
 
 	utils.HTTPJsonResponse(w, token, http.StatusCreated)
 }

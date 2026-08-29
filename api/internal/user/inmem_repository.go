@@ -29,3 +29,12 @@ func (r *MemoryRepository) GetAll(ctx context.Context) []*User {
 
 	return users
 }
+
+func (r *MemoryRepository) GetByID(ctx context.Context, id string) *User {
+	return r.users[id]
+}
+
+func (r *MemoryRepository) ExistsByID(ctx context.Context, id string) bool {
+	_, ok := r.users[id]
+	return ok
+}

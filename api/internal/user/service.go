@@ -46,3 +46,11 @@ func (s *Service) Register(ctx context.Context, register RegisterUser) (*User, e
 func (s *Service) GetAll(ctx context.Context) []*User {
 	return s.repo.GetAll(ctx)
 }
+
+func (s *Service) GetByID(ctx context.Context, id string) *User {
+	return s.repo.GetByID(ctx, id)
+}
+
+func (s *Service) ExistsByID(ctx context.Context, id string) bool {
+	return s.repo.ExistsByID(ctx, id)
+}

@@ -3,33 +3,53 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/tomascaceres14/go-chess/api/internal/auth"
 	"github.com/tomascaceres14/go-chess/api/internal/match"
 	"github.com/tomascaceres14/go-chess/api/internal/middleware"
 	"github.com/tomascaceres14/go-chess/api/internal/user"
+)
+
+var (
+	sKey    = os.Getenv("JWT_SIGNING_KEY")
+	appName = "go-chess"
 )
 
 func main() {
 
 	sv := http.NewServeMux()
 
+	// Auth
+	tokenProvider, err := auth.NewJWTTokenProvider(sKey, appName)
+	if err != nil {
+		log.Fatalf("Error creating Token Provider: %v", err)
+	}
+
 	// Users
 	userRepository := user.NewMemoryRepository()
 	userService := user.NewService(userRepository)
-	userHandler := user.NewHandler(userService)
+	userHandler := user.NewHandler(userService, tokenProvider)
 
 	// Matches
 	matchRepository := match.NewMemoryRepository()
 	matchService := match.NewService(matchRepository)
 	matchHandler := match.NewHandler(matchService)
 
+	// Middleware
+	mw := middleware.Middleware{
+		TokenProvider: tokenProvider,
+		UserService:   userService,
+	}
+
 	sv.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello world!"))
 	})
 
 	sv.HandleFunc("GET /users", userHandler.HandleGetUsers)
-	sv.HandleFunc("POST /users", middleware.Use(userHandler.HandleUserRegister, middleware.Mid1, middleware.Mid2, middleware.Mid3))
-	sv.HandleFunc("POST /matches", matchHandler.HandleNewMatch)
+	sv.HandleFunc("POST /users", userHandler.HandleUserRegister)
+	sv.HandleFunc("POST /matches", mw.Use(matchHandler.HandleNewMatch, mw.JWTAuth))
 	sv.HandleFunc("GET /ws/game/{gameID}", matchHandler.HandleGameWebSocket)
 
 	log.Printf("Server listening on port :80")

@@ -1,9 +1,6 @@
 package auth
 
 import (
-	"encoding/base64"
-	"fmt"
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,7 +14,7 @@ type AccessCredentials struct {
 // Interfaced for future integrations with OAuth / third-party auth provider
 type TokenProvider interface {
 	NewUserCredentials(id string) (*AccessCredentials, error)
-	ValidateToken(token string) bool
+	ValidateToken(token string) (*jwt.Token, error)
 }
 
 // Custom JWT implementation
@@ -28,10 +25,7 @@ type JWTTokenProvider struct {
 
 func NewJWTTokenProvider(signingKey string, iss string) (*JWTTokenProvider, error) {
 
-	key, err := base64.StdEncoding.DecodeString(signingKey)
-	if err != nil {
-		return nil, err
-	}
+	key := []byte(signingKey)
 	return &JWTTokenProvider{
 		signingKey: key,
 		iss:        iss,
@@ -55,9 +49,8 @@ func (j *JWTTokenProvider) NewUserCredentials(id string) (*AccessCredentials, er
 	}, nil
 }
 
-func (j *JWTTokenProvider) ValidateToken(token string) bool {
-
-	t, err := jwt.ParseWithClaims(
+func (j *JWTTokenProvider) ValidateToken(token string) (*jwt.Token, error) {
+	return jwt.ParseWithClaims(
 		token,
 		&jwt.MapClaims{},
 		func(t *jwt.Token) (any, error) {
@@ -65,21 +58,6 @@ func (j *JWTTokenProvider) ValidateToken(token string) bool {
 		},
 		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}), jwt.WithIssuer(j.iss), jwt.WithExpirationRequired(),
 	)
-
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-
-	userID, err := t.Claims.GetSubject()
-	if err != nil {
-		log.Println("Error, ", err.Error())
-		return false
-	}
-
-	fmt.Println("uid", userID)
-
-	return true
 }
 
 func (j *JWTTokenProvider) newAccessToken(id string) (string, error) {

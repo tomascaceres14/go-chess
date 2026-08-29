@@ -8,8 +8,7 @@ const (
 )
 
 type NewMatchParams struct {
-	UserID string `json:"user_id"`
-	Whites bool   `json:"whites"`
+	Whites bool `json:"whites"`
 }
 
 type Move struct {
