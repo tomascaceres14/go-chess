@@ -3,6 +3,7 @@ package match
 import (
 	"context"
 	"errors"
+	"log"
 )
 
 var (
@@ -46,11 +47,13 @@ func (s *Service) AddUserToMatch(ctx context.Context, matchID, userID string) (c
 	switch match.Status {
 	case StatusPending:
 		if userID == match.OwnerID {
+			log.Printf("Owner for match %s connected. Changing status", matchID)
 			s.matchManager.SetStatus(matchID, StatusMatchmaking)
 		} else {
 			return nil, ErrOwnerNotConnected
 		}
 	case StatusMatchmaking:
+		log.Printf("Opponent found for match %s. Game starts.", matchID)
 		s.matchManager.SetOpponentID(matchID, userID)
 		go match.Start()
 	}

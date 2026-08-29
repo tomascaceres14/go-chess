@@ -47,7 +47,7 @@ func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
-	matchID := r.PathValue("gameID")
+	matchID := r.PathValue("matchID")
 	userID := r.Context().Value("userID").(string)
 
 	if userID == "" {
@@ -60,6 +60,8 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, ErrMatchNotFound), errors.Is(err, ErrOwnerNotConnected):
 			utils.HTTPJsonError(w, r, err.Error(), err, http.StatusBadRequest)
+		case errors.Is(err, ErrUserAlreadyConnected):
+			utils.HTTPJsonError(w, r, err.Error(), err, http.StatusConflict)
 		default:
 			utils.HTTPJsonError(w, r, "Internal server error", err, http.StatusInternalServerError)
 		}

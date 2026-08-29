@@ -20,9 +20,10 @@ type Handler struct {
 	tokenProvider token.TokenProvider
 }
 
-func NewHandler(svc *Service) *Handler {
+func NewHandler(svc *Service, tokenProvider token.TokenProvider) *Handler {
 	return &Handler{
-		svc: svc,
+		svc:           svc,
+		tokenProvider: tokenProvider,
 	}
 }
 

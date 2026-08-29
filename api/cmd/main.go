@@ -41,7 +41,7 @@ func main() {
 
 	// Auth
 	authService := auth.NewService(userService)
-	authHandler := auth.NewHandler(authService)
+	authHandler := auth.NewHandler(authService, tokenProvider)
 
 	// Middleware
 	mw := middleware.Middleware{
@@ -64,7 +64,7 @@ func main() {
 	sv.HandleFunc("POST /matches", mw.Use(matchHandler.HandleNewMatch, mw.JWTAuth))
 
 	// WS
-	sv.HandleFunc("GET /ws/match/{gameID}", mw.Use(matchHandler.HandleGameWebSocket, mw.JWTAuth))
+	sv.HandleFunc("GET /ws/match/{matchID}", mw.Use(matchHandler.HandleGameWebSocket, mw.JWTAuth))
 
 	log.Printf("Server listening on port %s", portHTTP)
 	if err := http.ListenAndServe(portHTTP, sv); err != nil {

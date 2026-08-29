@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -17,6 +18,7 @@ var (
 
 func (m *Middleware) JWTAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("[AUTH CHECK] %s: In progress", r.Pattern)
 
 		// Get Authorization header
 		authHeader := r.Header.Get("Authorization")
@@ -54,6 +56,7 @@ func (m *Middleware) JWTAuth(next http.HandlerFunc) http.HandlerFunc {
 			id,
 		)
 
+		log.Printf("[AUTH CHECK] %s: OK. UserID: %s", r.Pattern, id)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }

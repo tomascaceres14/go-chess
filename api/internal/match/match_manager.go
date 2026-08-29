@@ -84,8 +84,7 @@ func (mm *MatchManager) AddListener(matchID, userID string) (chan GameResponse, 
 	if err != nil {
 		return nil, err
 	}
-	listener, ok := match.listeners[userID]
-	log.Println("AddListener listener ch", listener, ok, userID)
+	_, ok := match.listeners[userID]
 	if ok {
 		return nil, ErrUserAlreadyConnected
 	}
