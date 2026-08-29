@@ -37,12 +37,12 @@ type Repository interface {
 	GetByID(ctx context.Context, id string) (*Match, error)
 }
 
-func NewMatch(userID string, colour bool) *Match {
+func NewMatch(userID string, color bool) *Match {
 	return &Match{
 		ID:          uuid.NewString(),
 		OwnerID:     userID,
 		OpponentID:  "",
-		OwnerWhite:  colour,
+		OwnerWhite:  color,
 		Status:      StatusPending,
 		listeners:   make(map[string]chan GameResponse),
 		CommandsCh:  make(chan GameCommand, 2),
@@ -95,11 +95,6 @@ func (m *Match) Start() {
 			switch msg.Command {
 			case MovePieceCmd:
 
-				color := m.OwnerWhite
-				if msg.UserID == m.OpponentID {
-					color = !color
-				}
-
 				// Prepare initial message
 				response := GameResponse{
 					UserID:  msg.UserID,
@@ -108,7 +103,9 @@ func (m *Match) Start() {
 				}
 
 				// Execute move
-				err := game.Move(msg.Move.From, msg.Move.To, color)
+				// TODO: Adapt Move() func to receive player name and validate based on that,
+				// not on color trying to move.
+				err := game.MovePlayer(msg.Move.From, msg.Move.To, msg.UserID)
 
 				// Adjust response based on error
 				if err != nil {

@@ -217,6 +217,11 @@ func (g *Game) validateMove(move *Move) error {
 	return nil
 }
 
+func (g *Game) MovePlayer(from, to, pName string) error {
+	color := pName == g.pWhite.name
+	return g.Move(from, to, color)
+}
+
 // Moves piece in position `from` to position `to` for player pColor
 func (g *Game) Move(from, to string, pColor bool) error {
 
