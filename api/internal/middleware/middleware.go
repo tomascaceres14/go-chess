@@ -3,12 +3,12 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/tomascaceres14/go-chess/api/internal/auth"
+	"github.com/tomascaceres14/go-chess/api/internal/token"
 	"github.com/tomascaceres14/go-chess/api/internal/user"
 )
 
 type Middleware struct {
-	TokenProvider auth.TokenProvider
+	TokenProvider token.TokenProvider
 	UserService   *user.Service
 }
 

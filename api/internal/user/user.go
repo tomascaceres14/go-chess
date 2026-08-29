@@ -20,11 +20,6 @@ type Repository interface {
 }
 
 func NewUser(username, hashedPassword string) (*User, error) {
-
-	if username == "" {
-		return nil, ErrUsernameTooShort
-	}
-
 	return &User{
 		ID:             uuid.NewString(),
 		Username:       username,

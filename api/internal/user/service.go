@@ -2,14 +2,7 @@ package user
 
 import (
 	"context"
-	"errors"
 	"fmt"
-)
-
-var (
-	ErrUsernameTooShort   = errors.New("Username must be at least 6 characters long")
-	ErrPasswordTooShort   = errors.New("Password must be at least 8 characters long")
-	ErrPasswordsDontMatch = errors.New("Passwords do not match")
 )
 
 type Service struct {
@@ -22,16 +15,8 @@ func NewService(repo Repository) *Service {
 	}
 }
 
-func (s *Service) Register(ctx context.Context, register RegisterUser) (*User, error) {
-	if err := register.Validate(); err != nil {
-		return nil, err
-	}
-
-	if register.Password != register.RepeatPassword {
-		return nil, ErrPasswordsDontMatch
-	}
-
-	user, err := NewUser(register.Username, register.Password)
+func (s *Service) CreateUser(ctx context.Context, username, hashedPassword string) (*User, error) {
+	user, err := NewUser(username, hashedPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -53,4 +38,19 @@ func (s *Service) GetByID(ctx context.Context, id string) *User {
 
 func (s *Service) ExistsByID(ctx context.Context, id string) bool {
 	return s.repo.ExistsByID(ctx, id)
+}
+
+func (s *Service) GetByUsername(ctx context.Context, username string) (*User, error) {
+	users := s.repo.GetAll(ctx)
+	if len(users) > 0 {
+		return nil, ErrUserNotFound
+	}
+
+	for _, u := range users {
+		if u.Username == username {
+			return u, nil
+		}
+	}
+
+	return nil, ErrUserNotFound
 }
