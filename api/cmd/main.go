@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/tomascaceres14/go-chess/api/internal/match"
+	"github.com/tomascaceres14/go-chess/api/internal/middleware"
 	"github.com/tomascaceres14/go-chess/api/internal/user"
 )
 
@@ -27,7 +28,7 @@ func main() {
 	})
 
 	sv.HandleFunc("GET /users", userHandler.HandleGetUsers)
-	sv.HandleFunc("POST /users", userHandler.HandleUserRegister)
+	sv.HandleFunc("POST /users", middleware.Use(userHandler.HandleUserRegister, middleware.Mid1, middleware.Mid2, middleware.Mid3))
 	sv.HandleFunc("POST /matches", matchHandler.HandleNewMatch)
 	sv.HandleFunc("GET /ws/game/{gameID}", matchHandler.HandleGameWebSocket)
 

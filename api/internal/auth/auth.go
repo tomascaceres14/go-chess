@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/base64"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -64,12 +65,19 @@ func (j *JWTTokenProvider) ValidateToken(token string) bool {
 		},
 		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}), jwt.WithIssuer(j.iss), jwt.WithExpirationRequired(),
 	)
+
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
 
-	fmt.Println(t.Claims)
+	userID, err := t.Claims.GetSubject()
+	if err != nil {
+		log.Println("Error, ", err.Error())
+		return false
+	}
+
+	fmt.Println("uid", userID)
 
 	return true
 }
