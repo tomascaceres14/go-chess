@@ -5,13 +5,14 @@
 package generated
 
 import (
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Match struct {
-	ID          pgtype.UUID        `json:"id"`
-	OwnerID     pgtype.UUID        `json:"owner_id"`
-	OpponentID  pgtype.UUID        `json:"opponent_id"`
+	ID          uuid.UUID          `json:"id"`
+	OwnerID     uuid.UUID          `json:"owner_id"`
+	OpponentID  uuid.UUID          `json:"opponent_id"`
 	Status      string             `json:"status"`
 	Result      string             `json:"result"`
 	OwnerWhite  bool               `json:"owner_white"`
@@ -20,8 +21,8 @@ type Match struct {
 }
 
 type User struct {
-	ID             pgtype.UUID        `json:"id"`
-	Username       pgtype.Text        `json:"username"`
+	ID             uuid.UUID          `json:"id"`
+	Username       string             `json:"username"`
 	HashedPassword pgtype.Text        `json:"hashed_password"`
 	CreatedAt      pgtype.Timestamptz `json:"created_at"`
 }

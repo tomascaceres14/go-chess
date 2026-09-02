@@ -5,7 +5,6 @@ import (
 	"log"
 	"sync"
 
-	"github.com/google/uuid"
 	gochess "github.com/tomascaceres14/go-chess/engine"
 )
 
@@ -39,7 +38,6 @@ type Repository interface {
 
 func NewMatch(userID string, color bool) *Match {
 	return &Match{
-		ID:          uuid.NewString(),
 		OwnerID:     userID,
 		OpponentID:  "",
 		OwnerWhite:  color,

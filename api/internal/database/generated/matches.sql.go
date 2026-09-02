@@ -8,7 +8,7 @@ package generated
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const createMatch = `-- name: CreateMatch :one
@@ -20,15 +20,15 @@ INSERT INTO matches (
 `
 
 type CreateMatchParams struct {
-	OwnerID     pgtype.UUID `json:"owner_id"`
-	OpponentID  pgtype.UUID `json:"opponent_id"`
-	Status      string      `json:"status"`
-	Result      string      `json:"result"`
-	OwnerWhite  bool        `json:"owner_white"`
-	MoveHistory []string    `json:"move_history"`
+	OwnerID     uuid.UUID `json:"owner_id"`
+	OpponentID  uuid.UUID `json:"opponent_id"`
+	Status      string    `json:"status"`
+	Result      string    `json:"result"`
+	OwnerWhite  bool      `json:"owner_white"`
+	MoveHistory []string  `json:"move_history"`
 }
 
-func (q *Queries) CreateMatch(ctx context.Context, arg CreateMatchParams) (pgtype.UUID, error) {
+func (q *Queries) CreateMatch(ctx context.Context, arg CreateMatchParams) (uuid.UUID, error) {
 	row := q.db.QueryRow(ctx, createMatch,
 		arg.OwnerID,
 		arg.OpponentID,
@@ -37,7 +37,27 @@ func (q *Queries) CreateMatch(ctx context.Context, arg CreateMatchParams) (pgtyp
 		arg.OwnerWhite,
 		arg.MoveHistory,
 	)
-	var id pgtype.UUID
+	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
+}
+
+const getMatchByID = `-- name: GetMatchByID :one
+SELECT id, owner_id, opponent_id, status, result, owner_white, move_history, created_at FROM matches WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetMatchByID(ctx context.Context, id uuid.UUID) (Match, error) {
+	row := q.db.QueryRow(ctx, getMatchByID, id)
+	var i Match
+	err := row.Scan(
+		&i.ID,
+		&i.OwnerID,
+		&i.OpponentID,
+		&i.Status,
+		&i.Result,
+		&i.OwnerWhite,
+		&i.MoveHistory,
+		&i.CreatedAt,
+	)
+	return i, err
 }

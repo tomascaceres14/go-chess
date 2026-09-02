@@ -4,3 +4,6 @@ INSERT INTO matches (
 ) VALUES (
     $1, $2, $3, $4, $5, $6
 ) RETURNING id;
+
+-- name: GetMatchByID :one
+SELECT * FROM matches WHERE id = $1 LIMIT 1;

@@ -8,6 +8,7 @@ package generated
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -20,13 +21,13 @@ INSERT INTO users (
 `
 
 type CreateUserParams struct {
-	Username       pgtype.Text `json:"username"`
+	Username       string      `json:"username"`
 	HashedPassword pgtype.Text `json:"hashed_password"`
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (pgtype.UUID, error) {
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (uuid.UUID, error) {
 	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.HashedPassword)
-	var id pgtype.UUID
+	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
 }
@@ -37,7 +38,7 @@ SELECT EXISTS (
 )
 `
 
-func (q *Queries) ExistsUserByID(ctx context.Context, id pgtype.UUID) (bool, error) {
+func (q *Queries) ExistsUserByID(ctx context.Context, id uuid.UUID) (bool, error) {
 	row := q.db.QueryRow(ctx, existsUserByID, id)
 	var exists bool
 	err := row.Scan(&exists)
@@ -48,7 +49,7 @@ const getUserByID = `-- name: GetUserByID :one
 SELECT id, username, hashed_password, created_at FROM users WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error) {
+func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(

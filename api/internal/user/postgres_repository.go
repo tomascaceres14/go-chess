@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"log"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -23,12 +22,8 @@ func NewPostgresRepository(db *generated.Queries) *PostgresRepository {
 }
 
 func (r *PostgresRepository) Save(ctx context.Context, user *User) (*User, error) {
-	log.Printf("CREATING USER: %v", user)
 	uid, err := r.db.CreateUser(ctx, generated.CreateUserParams{
-		Username: pgtype.Text{
-			String: user.Username,
-			Valid:  true,
-		},
+		Username: user.Username,
 		HashedPassword: pgtype.Text{
 			String: user.HashedPassword,
 			Valid:  true,
@@ -50,7 +45,7 @@ func (r *PostgresRepository) GetAll(ctx context.Context) ([]*User, error) {
 	for i, u := range usersDB {
 		users[i] = &User{
 			ID:             u.ID.String(),
-			Username:       u.Username.String,
+			Username:       u.Username,
 			HashedPassword: u.HashedPassword.String,
 		}
 	}
@@ -59,23 +54,31 @@ func (r *PostgresRepository) GetAll(ctx context.Context) ([]*User, error) {
 }
 
 func (r *PostgresRepository) GetByID(ctx context.Context, id string) (*User, error) {
-	u, err := r.db.GetUserByID(ctx, pgtype.UUID{
-		Bytes: uuid.MustParse(id),
-	})
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	u, err := r.db.GetUserByID(ctx, userID)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &User{
-		Username:       u.Username.String,
+		Username:       u.Username,
 		HashedPassword: u.HashedPassword.String,
 	}, nil
 }
 
+// Silent bug, should return err
 func (r *PostgresRepository) ExistsByID(ctx context.Context, id string) bool {
-	exists, _ := r.db.ExistsUserByID(ctx, pgtype.UUID{
-		Bytes: uuid.MustParse(id),
-	})
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		return false
+	}
+
+	exists, _ := r.db.ExistsUserByID(ctx, userID)
+
 	return exists
 }
