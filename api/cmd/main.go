@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/jackc/pgx/v5"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/tomascaceres14/go-chess/api/internal/auth"
+	"github.com/tomascaceres14/go-chess/api/internal/database/generated"
 	"github.com/tomascaceres14/go-chess/api/internal/match"
 	"github.com/tomascaceres14/go-chess/api/internal/middleware"
 	"github.com/tomascaceres14/go-chess/api/internal/token"
@@ -14,12 +17,24 @@ import (
 )
 
 var (
-	sKey     = os.Getenv("JWT_SIGNING_KEY")
-	portHTTP = os.Getenv("PORT_HTTP")
-	appName  = "go-chess"
+	sKey        = os.Getenv("JWT_SIGNING_KEY")
+	portHTTP    = os.Getenv("PORT_HTTP")
+	appName     = "go-chess"
+	databaseUrl = os.Getenv("DATABASE_URL")
 )
 
 func main() {
+
+	ctx := context.Background()
+
+	conn, err := pgx.Connect(ctx, databaseUrl)
+	if err != nil {
+		log.Fatalf("Error connecting to PostgreSQL: %v", err)
+	}
+
+	defer conn.Close(ctx)
+
+	queries := generated.New(conn)
 
 	sv := http.NewServeMux()
 
@@ -30,7 +45,8 @@ func main() {
 	}
 
 	// Users
-	userRepository := user.NewMemoryRepository()
+	//userRepository := user.NewMemoryRepository()
+	userRepository := user.NewPostgresRepository(queries)
 	userService := user.NewService(userRepository)
 	userHandler := user.NewHandler(userService, tokenProvider)
 

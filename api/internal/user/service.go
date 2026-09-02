@@ -21,19 +21,23 @@ func (s *Service) CreateUser(ctx context.Context, username, hashedPassword strin
 		return nil, err
 	}
 
-	if err := s.repo.Save(ctx, user); err != nil {
+	if user, err = s.repo.Save(ctx, user); err != nil {
 		return nil, fmt.Errorf("Repository error: %w", err)
 	}
 
 	return user, nil
 }
 
-func (s *Service) GetAll(ctx context.Context) []*User {
+func (s *Service) GetAll(ctx context.Context) ([]*User, error) {
 	return s.repo.GetAll(ctx)
 }
 
-func (s *Service) GetByID(ctx context.Context, id string) *User {
-	return s.repo.GetByID(ctx, id)
+func (s *Service) GetByID(ctx context.Context, id string) (*User, error) {
+	u, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
 }
 
 func (s *Service) ExistsByID(ctx context.Context, id string) bool {
@@ -41,7 +45,10 @@ func (s *Service) ExistsByID(ctx context.Context, id string) bool {
 }
 
 func (s *Service) GetByUsername(ctx context.Context, username string) (*User, error) {
-	users := s.repo.GetAll(ctx)
+	users, err := s.repo.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
 	if len(users) > 0 {
 		return nil, ErrUserNotFound
 	}

@@ -2,8 +2,6 @@ package user
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 type User struct {
@@ -13,15 +11,14 @@ type User struct {
 }
 
 type Repository interface {
-	Save(ctx context.Context, user *User) error
-	GetAll(ctx context.Context) []*User
-	GetByID(ctx context.Context, id string) *User
+	Save(ctx context.Context, user *User) (*User, error)
+	GetAll(ctx context.Context) ([]*User, error)
+	GetByID(ctx context.Context, id string) (*User, error)
 	ExistsByID(ctx context.Context, id string) bool
 }
 
 func NewUser(username, hashedPassword string) (*User, error) {
 	return &User{
-		ID:             uuid.NewString(),
 		Username:       username,
 		HashedPassword: hashedPassword,
 	}, nil

@@ -25,5 +25,9 @@ func NewHandler(svc *Service, tokenProvider token.TokenProvider) *Handler {
 }
 
 func (h *Handler) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
-	utils.HTTPJsonResponse(w, h.svc.GetAll(r.Context()), http.StatusOK)
+	users, err := h.svc.GetAll(r.Context())
+	if err != nil {
+		utils.HTTPJsonError(w, r, "Error fetching users.", err, http.StatusInternalServerError)
+	}
+	utils.HTTPJsonResponse(w, users, http.StatusOK)
 }
