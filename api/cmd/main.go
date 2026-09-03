@@ -44,16 +44,17 @@ func main() {
 		log.Fatalf("Error creating Token Provider: %v", err)
 	}
 
+	// Matches
+	//matchRepository := match.NewMemoryRepository()
+	matchRepository := match.NewPostgresRepository(queries)
+	matchService := match.NewService(matchRepository)
+	matchHandler := match.NewHandler(matchService)
+
 	// Users
 	//userRepository := user.NewMemoryRepository()
 	userRepository := user.NewPostgresRepository(queries)
-	userService := user.NewService(userRepository)
+	userService := user.NewService(userRepository, matchService)
 	userHandler := user.NewHandler(userService, tokenProvider)
-
-	// Matches
-	matchRepository := match.NewMemoryRepository()
-	matchService := match.NewService(matchRepository)
-	matchHandler := match.NewHandler(matchService)
 
 	// Auth
 	authService := auth.NewService(userService)
@@ -75,9 +76,11 @@ func main() {
 
 	// Users
 	sv.HandleFunc("GET /users", userHandler.HandleGetUsers)
+	sv.HandleFunc("GET /users/matches", mw.Use(matchHandler.HandleGetMatchesByUser, mw.JWTAuth))
 
 	// Matches
 	sv.HandleFunc("POST /matches", mw.Use(matchHandler.HandleNewMatch, mw.JWTAuth))
+	sv.HandleFunc("GET /matches", mw.Use(matchHandler.HandleGetMatchesByUser, mw.JWTAuth))
 
 	// WS
 	sv.HandleFunc("GET /ws/match/{matchID}", mw.Use(matchHandler.HandleGameWebSocket, mw.JWTAuth))

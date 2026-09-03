@@ -12,12 +12,12 @@ import (
 type Match struct {
 	ID          uuid.UUID          `json:"id"`
 	OwnerID     uuid.UUID          `json:"owner_id"`
-	OpponentID  uuid.UUID          `json:"opponent_id"`
+	OpponentID  pgtype.UUID        `json:"opponent_id"`
 	Status      string             `json:"status"`
-	Result      string             `json:"result"`
 	OwnerWhite  bool               `json:"owner_white"`
 	MoveHistory []string           `json:"move_history"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	Fen         pgtype.Text        `json:"fen"`
 }
 
 type User struct {

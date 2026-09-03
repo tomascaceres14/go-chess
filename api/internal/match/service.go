@@ -27,7 +27,12 @@ func NewService(r Repository) *Service {
 }
 
 func (s *Service) StartNewMatch(ctx context.Context, userID string, whites bool) (*Match, error) {
-	match := NewMatch(userID, whites)
+
+	match, err := s.repo.Save(ctx, NewMatch(userID, whites))
+	if err != nil {
+		return nil, err
+	}
+
 	if err := s.matchManager.AddMatch(match); err != nil {
 		return nil, err
 	}
@@ -49,12 +54,18 @@ func (s *Service) AddUserToMatch(ctx context.Context, matchID, userID string) (c
 		if userID == match.OwnerID {
 			log.Printf("Owner for match %s connected. Changing status", matchID)
 			s.matchManager.SetStatus(matchID, StatusMatchmaking)
+			s.repo.SetStatus(ctx, matchID, StatusMatchmaking)
 		} else {
 			return nil, ErrOwnerNotConnected
 		}
+
 	case StatusMatchmaking:
-		log.Printf("Opponent found for match %s. Game starts.", matchID)
+		log.Printf("Opponent found for match %s.", matchID)
 		s.matchManager.SetOpponentID(matchID, userID)
+		if err := s.repo.SetStatusAndOpponent(ctx, matchID, userID, StatusPlaying); err != nil {
+			return nil, err
+		}
+
 		go match.Start()
 	}
 
@@ -77,4 +88,12 @@ func (s *Service) GetCommandsCh(gameID, userID string) (chan GameCommand, error)
 	}
 
 	return match.CommandsCh, nil
+}
+
+func (s *Service) GetMatchesByUserID(ctx context.Context, userID string) ([]*Match, error) {
+	return s.repo.GetMatchesByUserID(ctx, userID)
+}
+
+func (s *Service) FinalizeMatch(ctx context.Context, matchID, status, FEN string, moveHistory []string) error {
+	return s.repo.FinalizeMatch(ctx, matchID, status, FEN, moveHistory)
 }

@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    username VARCHAR(20) NOT NULL,
+    username VARCHAR(20) NOT NULL UNIQUE,
     hashed_password VARCHAR(60),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

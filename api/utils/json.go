@@ -11,7 +11,7 @@ type HTTPError struct {
 }
 
 func HTTPJsonError(w http.ResponseWriter, r *http.Request, msg string, err error, status int) {
-	log.Printf("--- ERROR %s | Status: %d |Err: %v", r.Pattern, status, err)
+	log.Printf("--- ERROR %s | Status: %d | Err: %v", r.Pattern, status, err)
 
 	HTTPJsonResponse(
 		w,

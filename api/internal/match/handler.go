@@ -20,42 +20,18 @@ func NewHandler(svc *Service) *Handler {
 	}
 }
 
-func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(string)
-	if userID == "" {
-		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
-		return
-	}
-
-	var params NewMatchParams
-	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
-		utils.HTTPJsonError(w, r, "Error decoding body", err, http.StatusBadRequest)
-		return
-	}
-
-	match, err := h.svc.StartNewMatch(r.Context(), userID, params.Whites)
-	if err != nil {
-		utils.HTTPJsonError(w, r, "Error creating match", err, http.StatusInternalServerError)
-		return
-	}
-
-	response := map[string]string{
-		"match_id": match.ID,
-	}
-
-	utils.HTTPJsonResponse(w, response, http.StatusCreated)
-}
-
 func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	matchID := r.PathValue("matchID")
-	userID := r.Context().Value("userID").(string)
+	userID := ctx.Value("userID").(string)
 
 	if userID == "" {
 		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
 		return
 	}
 
-	responseCh, err := h.svc.AddUserToMatch(r.Context(), matchID, userID)
+	responseCh, err := h.svc.AddUserToMatch(ctx, matchID, userID)
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrMatchNotFound), errors.Is(err, ErrOwnerNotConnected):
@@ -90,8 +66,15 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 	// Redirects incoming match messages to user
 	go func() {
 		for msg := range responseCh {
+
 			if err := conn.WriteJSON(msg); err != nil {
 				log.Printf("Error writing WS message: %v", err)
+				return
+			}
+
+			if msg.Command == MatchEndCmd {
+				log.Printf("Match ID: %s finalized.", matchID)
+				h.svc.FinalizeMatch(ctx, matchID, msg.Status, msg.Data["FEN"].(string), msg.Grid)
 				return
 			}
 		}
@@ -105,9 +88,47 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Workaround so user can't fake identity. Will be replaced by id present in token
-		// once JWT is implemented.
 		command.UserID = userID
 		commandsCh <- command
 	}
+}
+
+func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(string)
+	if userID == "" {
+		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
+		return
+	}
+
+	var params NewMatchParams
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		utils.HTTPJsonError(w, r, "Error decoding body", err, http.StatusBadRequest)
+		return
+	}
+
+	match, err := h.svc.StartNewMatch(r.Context(), userID, params.Whites)
+	if err != nil {
+		utils.HTTPJsonError(w, r, "Error creating match", err, http.StatusInternalServerError)
+		return
+	}
+
+	utils.HTTPJsonResponse(w, map[string]string{
+		"match_id": match.ID,
+	}, http.StatusCreated)
+}
+
+func (h *Handler) HandleGetMatchesByUser(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(string)
+	if userID == "" {
+		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
+		return
+	}
+
+	matches, err := h.svc.GetMatchesByUserID(r.Context(), userID)
+	if err != nil {
+		utils.HTTPJsonError(w, r, "Error fetching user match", err, http.StatusInternalServerError)
+		return
+	}
+
+	utils.HTTPJsonResponse(w, MatchListToDTO(matches), http.StatusOK)
 }

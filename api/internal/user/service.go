@@ -2,16 +2,21 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
+	"github.com/tomascaceres14/go-chess/api/internal/match"
 )
 
 type Service struct {
-	repo Repository
+	repo     Repository
+	matchSvc *match.Service
 }
 
-func NewService(repo Repository) *Service {
+func NewService(repo Repository, svc *match.Service) *Service {
 	return &Service{
-		repo: repo,
+		repo:     repo,
+		matchSvc: svc,
 	}
 }
 
@@ -45,12 +50,14 @@ func (s *Service) ExistsByID(ctx context.Context, id string) bool {
 }
 
 func (s *Service) GetByUsername(ctx context.Context, username string) (*User, error) {
+
 	users, err := s.repo.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if len(users) > 0 {
-		return nil, ErrUserNotFound
+
+	if len(users) == 0 {
+		return nil, errors.New("No users.")
 	}
 
 	for _, u := range users {
