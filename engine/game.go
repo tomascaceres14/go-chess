@@ -10,14 +10,12 @@ import (
 	"unicode"
 )
 
-type gameStatus int
-
-const (
-	aborted gameStatus = iota
-	playing
-	whiteWins
-	blackWins
-	draw
+var (
+	StatusPlaying   = "PLAYING"
+	StatusAborted   = "ABORTED"
+	StatusDraw      = "DRAW"
+	StatusWhiteWins = "WHITE_WINS"
+	StatusBlackWins = "BLACK_WINS"
 )
 
 type Game struct {
@@ -27,7 +25,7 @@ type Game struct {
 	whiteTurn                    bool
 	halfmoveClock, fullmoveCount int
 	moveHistory                  []Move
-	status                       gameStatus
+	status                       string
 	castleDir                    int
 }
 
@@ -57,7 +55,7 @@ func newGame(whiteName, blackName string) (*Game, error) {
 		pBlack:        pBlack,
 		whiteTurn:     true,
 		moveHistory:   []Move{},
-		status:        playing,
+		status:        StatusPlaying,
 		fullmoveCount: 1,
 		halfmoveClock: 0,
 		castleDir:     -1,
@@ -225,6 +223,10 @@ func (g *Game) MovePlayer(from, to, pName string) error {
 // Moves piece in position `from` to position `to` for player pColor
 func (g *Game) Move(from, to string, pColor bool) error {
 
+	if g.status != StatusPlaying {
+		return errors.New("Match not being played")
+	}
+
 	fromPos := pos(from)
 	if !fromPos.isValid() {
 		return fmt.Errorf("'%s' is an invalid position.", from)
@@ -277,11 +279,17 @@ func (g *Game) Move(from, to string, pColor bool) error {
 	if !opponent.hasLegalMoves(g) {
 		if opponent.isChecked {
 			fmt.Println("CHECKMATE!!!", player.name, "WINS")
+			g.status = StatusWhiteWins
+			if !pColor {
+				g.status = StatusBlackWins
+			}
 		} else {
 			fmt.Println("Stalemate pal :(")
+			g.status = StatusDraw
 		}
 	} else if len(player.pieces) == 1 && len(opponent.pieces) == 1 {
 		fmt.Println("Stalemate pal :(")
+		g.status = StatusDraw
 	}
 
 	if prevEnPassantTarget != nil {
@@ -586,4 +594,8 @@ func (g *Game) setFullmoveCount(fullmoveCount int) error {
 
 func (g *Game) String() string {
 	return fmt.Sprintf("ID: %s.\tWhite Turn: %v.\tMove history: %v.\n%s", g.id, g.whiteTurn, g.moveHistory, g.gameBoard)
+}
+
+func (g *Game) Status() string {
+	return g.status
 }
