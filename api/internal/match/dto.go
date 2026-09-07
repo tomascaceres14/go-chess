@@ -24,31 +24,33 @@ type GameCommand struct {
 }
 
 type GameResponse struct {
-	UserID  string         `json:"user_id,omitempty"`
-	Command string         `json:"cmd"`
-	Valid   bool           `json:"valid"`
-	Status  string         `json:"status"`
-	Data    map[string]any `json:"data,omitempty"`
-	Error   string         `json:"error,omitempty"`
-	Grid    []string       `json:"grid,omitempty"`
+	UserID  string `json:"user_id,omitempty"`
+	Command string `json:"cmd"`
+	Valid   bool   `json:"valid"`
+	Status  string `json:"status"`
+	Fen     string `json:"fen"`
+	Error   string `json:"error,omitempty"`
 }
 
 type MatchDTO struct {
-	ID         string `json:"id"`
-	OwnerID    string `json:"owner_id"`
-	OpponentID string `json:"opponent_id"`
-	Status     string `json:"status"`
-	OwnerWhite bool   `json:"owner_white"`
-	Grid       []string
+	ID          string   `json:"id"`
+	OwnerID     string   `json:"owner_id"`
+	OpponentID  string   `json:"opponent_id"`
+	Status      string   `json:"status"`
+	OwnerWhite  bool     `json:"owner_white"`
+	FEN         string   `json:"fen"`
+	MoveHistory []string `json:"move_history"`
 }
 
 func MatchToDTO(m *Match) *MatchDTO {
 	return &MatchDTO{
-		ID:         m.ID,
-		OwnerID:    m.OwnerID,
-		OpponentID: m.OpponentID,
-		Status:     m.Status,
-		OwnerWhite: m.OwnerWhite,
+		ID:          m.ID,
+		OwnerID:     m.OwnerID,
+		OpponentID:  m.OpponentID,
+		Status:      m.Status,
+		OwnerWhite:  m.OwnerWhite,
+		FEN:         m.FEN,
+		MoveHistory: m.MoveHistory,
 	}
 }
 

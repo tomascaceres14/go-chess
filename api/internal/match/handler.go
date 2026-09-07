@@ -74,7 +74,7 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 
 			if msg.Command == MatchEndCmd {
 				log.Printf("Match ID: %s finalized.", matchID)
-				h.svc.FinalizeMatch(ctx, matchID, msg.Status, msg.Data["FEN"].(string), msg.Grid)
+				h.svc.FinalizeMatch(ctx, matchID, msg.Status, msg.Fen)
 				return
 			}
 		}

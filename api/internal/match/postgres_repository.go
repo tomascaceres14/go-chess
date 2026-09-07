@@ -125,11 +125,13 @@ func (r *PostgresRepository) SetStatusAndOpponent(ctx context.Context, matchID, 
 
 func ParseMatchDB(m *generated.Match) *Match {
 	return &Match{
-		ID:         m.ID.String(),
-		OwnerID:    m.OwnerID.String(),
-		OpponentID: m.OpponentID.String(),
-		Status:     m.Status,
-		OwnerWhite: m.OwnerWhite,
+		ID:          m.ID.String(),
+		OwnerID:     m.OwnerID.String(),
+		OpponentID:  m.OpponentID.String(),
+		Status:      m.Status,
+		OwnerWhite:  m.OwnerWhite,
+		FEN:         m.Fen.String,
+		MoveHistory: m.MoveHistory,
 	}
 }
 

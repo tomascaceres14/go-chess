@@ -149,8 +149,15 @@ func (s *Service) GetMatchesByUserID(ctx context.Context, userID string) ([]*Mat
 	return s.repo.GetMatchesByUserID(ctx, userID)
 }
 
-func (s *Service) FinalizeMatch(ctx context.Context, matchID, status, FEN string, moveHistory []string) error {
-	return s.repo.FinalizeMatch(ctx, matchID, status, FEN, moveHistory)
+func (s *Service) FinalizeMatch(ctx context.Context, matchID, status, FEN string) error {
+
+	// Retrieve match
+	m, err := s.matchManager.GetMatch(matchID)
+	if err != nil {
+		return err
+	}
+
+	return s.repo.FinalizeMatch(ctx, matchID, status, FEN, m.MoveHistory)
 }
 
 func (s *Service) GetLiveMatches(ctx context.Context) []*Match {

@@ -28,6 +28,7 @@ type Match struct {
 	CommandsCh  chan GameCommand
 	MoveHistory []string
 	mu          sync.RWMutex
+	FEN         string
 }
 
 type Repository interface {
@@ -75,7 +76,9 @@ func (m *Match) Start() {
 	}
 
 	// Ignoring error until refactoring. No need to provide white and black ids or names
-	game, _ := gochess.NewGameClassic(white, black)
+	//game, _ := gochess.NewGameClassic(white, black)
+	game, _ := gochess.NewGameFENString("rnbqkbnr/pppp1ppp/8/4p3/5PP1/8/PPPPP2P/RNBQKBNR b KQkq g3 0 2", white, black)
+	m.FEN = game.GetFENString()
 
 	defer m.CloseChannels()
 
@@ -83,7 +86,7 @@ func (m *Match) Start() {
 	m.sendMessage(GameResponse{
 		Command: MatchBeginStatus,
 		Valid:   true,
-		Grid:    game.GetFlattenString(),
+		Fen:     game.GetFENString(),
 	})
 
 	for {
@@ -115,14 +118,12 @@ func (m *Match) Start() {
 				// Refresh game grid
 				response.UserID = ""
 				response.Valid = true
-				response.Grid = game.GetFlattenString()
+				response.Fen = game.GetFENString()
 
 				if game.Status() != gochess.StatusPlaying {
 					response.Command = MatchEndCmd
 					response.Status = game.Status()
-					response.Data = map[string]any{
-						"FEN": game.GetFENString(),
-					}
+					m.MoveHistory = game.MoveHistory()
 					m.sendMessage(response)
 					return
 				}
