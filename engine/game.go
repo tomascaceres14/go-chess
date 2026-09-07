@@ -599,3 +599,11 @@ func (g *Game) String() string {
 func (g *Game) Status() string {
 	return g.status
 }
+
+func (g *Game) MoveHistory() []string {
+	result := make([]string, len(g.moveHistory))
+	for i, v := range g.moveHistory {
+		result[i] = v.String()
+	}
+	return result
+}
