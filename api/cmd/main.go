@@ -80,7 +80,7 @@ func main() {
 
 	// Matches
 	sv.HandleFunc("POST /matches", mw.Use(matchHandler.HandleNewMatch, mw.JWTAuth))
-	sv.HandleFunc("GET /matches", mw.Use(matchHandler.HandleGetMatchesByUser, mw.JWTAuth))
+	sv.HandleFunc("GET /matches/live", matchHandler.GetLiveMatches)
 
 	// WS
 	sv.HandleFunc("GET /ws/match/{matchID}", mw.Use(matchHandler.HandleGameWebSocket, mw.JWTAuth))

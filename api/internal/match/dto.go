@@ -39,6 +39,7 @@ type MatchDTO struct {
 	OpponentID string `json:"opponent_id"`
 	Status     string `json:"status"`
 	OwnerWhite bool   `json:"owner_white"`
+	Grid       []string
 }
 
 func MatchToDTO(m *Match) *MatchDTO {

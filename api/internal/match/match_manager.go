@@ -2,6 +2,8 @@ package match
 
 import (
 	"log"
+	"maps"
+	"slices"
 	"sync"
 )
 
@@ -41,14 +43,34 @@ func (mm *MatchManager) GetMatch(id string) (*Match, error) {
 	return match, nil
 }
 
-func (mm *MatchManager) SetStatus(id string, status string) (*Match, bool) {
+func (mm *MatchManager) GetStatus(id string) (string, error) {
+	m, err := mm.GetMatch(id)
+	if err != nil {
+		return "", err
+	}
+
+	log.Println("read locked")
+	defer log.Println("read unlocked")
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	log.Println("reading")
+	return m.Status, nil
+}
+
+func (mm *MatchManager) SetStatus(id string, status string) error {
 	mm.mu.RLock()
-	defer mm.mu.RUnlock()
+	match, err := mm.GetMatch(id)
+	if err != nil {
+		return err
+	}
+	mm.mu.RUnlock()
 
-	match, ok := mm.matches[id]
+	log.Println("locking set")
+	match.mu.Lock()
 	match.Status = status
-
-	return match, ok
+	match.mu.Unlock()
+	log.Println("unlocking set")
+	return nil
 }
 
 func (mm *MatchManager) SetOpponentID(id, userID string) error {
@@ -103,4 +125,11 @@ func (mm *MatchManager) RemoveListener(matchID, userID string) {
 	}
 
 	match.RemoveListener(userID)
+}
+
+func (mm *MatchManager) GetMatches() []*Match {
+	mm.mu.RLock()
+	defer mm.mu.RUnlock()
+
+	return slices.Collect(maps.Values(mm.matches))
 }

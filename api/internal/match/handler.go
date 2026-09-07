@@ -132,3 +132,8 @@ func (h *Handler) HandleGetMatchesByUser(w http.ResponseWriter, r *http.Request)
 
 	utils.HTTPJsonResponse(w, MatchListToDTO(matches), http.StatusOK)
 }
+
+func (h *Handler) GetLiveMatches(w http.ResponseWriter, r *http.Request) {
+	matches := h.svc.GetLiveMatches(r.Context())
+	utils.HTTPJsonResponse(w, MatchListToDTO(matches), 200)
+}
