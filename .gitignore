@@ -20,3 +20,5 @@ backend/*.db
 .DS_Store
 
 .env
+
+tareas.txt
