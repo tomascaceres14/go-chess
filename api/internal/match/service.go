@@ -62,7 +62,7 @@ func (s *Service) AssignOwner(ctx context.Context, matchID, userID string) error
 	}
 
 	m.mu.RLock()
-	if userID != m.OwnerID {
+	if userID != m.WhitesID {
 		return ErrOwnerNotConnected
 	}
 	m.mu.RUnlock()

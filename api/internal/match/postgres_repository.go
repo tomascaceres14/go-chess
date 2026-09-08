@@ -23,13 +23,13 @@ func NewPostgresRepository(db *generated.Queries) *PostgresRepository {
 
 func (r *PostgresRepository) Save(ctx context.Context, m *Match) (*Match, error) {
 
-	ownerID, err := uuid.Parse(m.OwnerID)
+	whitesID, err := uuid.Parse(m.WhitesID)
 	if err != nil {
 		return nil, err
 	}
 
 	id, err := r.db.CreateMatch(ctx, generated.CreateMatchParams{
-		OwnerID:     ownerID,
+		WhitesID:    whitesID,
 		Status:      m.Status,
 		OwnerWhite:  m.OwnerWhite,
 		MoveHistory: m.MoveHistory,
@@ -56,8 +56,8 @@ func (r *PostgresRepository) GetByID(ctx context.Context, id string) (*Match, er
 
 	return &Match{
 		ID:          m.ID.String(),
-		OwnerID:     m.OwnerID.String(),
-		OpponentID:  m.OpponentID.String(),
+		WhitesID:    m.WhitesID.String(),
+		BlacksID:    m.BlacksID.String(),
 		Status:      m.Status,
 		OwnerWhite:  m.OwnerWhite,
 		MoveHistory: nil,
@@ -114,20 +114,17 @@ func (r *PostgresRepository) SetStatusAndOpponent(ctx context.Context, matchID, 
 		return err
 	}
 	return r.db.SetMatchStatusAndOpponent(ctx, generated.SetMatchStatusAndOpponentParams{
-		ID: id,
-		OpponentID: pgtype.UUID{ // ? Should be uuid.UUID
-			Bytes: opponent,
-			Valid: true,
-		},
-		Status: status,
+		ID:       id,
+		BlacksID: opponent,
+		Status:   status,
 	})
 }
 
 func ParseMatchDB(m *generated.Match) *Match {
 	return &Match{
 		ID:          m.ID.String(),
-		OwnerID:     m.OwnerID.String(),
-		OpponentID:  m.OpponentID.String(),
+		WhitesID:    m.WhitesID.String(),
+		BlacksID:    m.BlacksID.String(),
 		Status:      m.Status,
 		OwnerWhite:  m.OwnerWhite,
 		FEN:         m.Fen.String,

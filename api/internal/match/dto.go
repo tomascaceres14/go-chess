@@ -45,8 +45,8 @@ type MatchDTO struct {
 func MatchToDTO(m *Match) *MatchDTO {
 	return &MatchDTO{
 		ID:          m.ID,
-		OwnerID:     m.OwnerID,
-		OpponentID:  m.OpponentID,
+		OwnerID:     m.WhitesID,
+		OpponentID:  m.BlacksID,
 		Status:      m.Status,
 		OwnerWhite:  m.OwnerWhite,
 		FEN:         m.FEN,

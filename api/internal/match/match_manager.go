@@ -74,7 +74,7 @@ func (mm *MatchManager) SetOpponentID(id, userID string) error {
 		return err
 	}
 
-	match.OpponentID = userID
+	match.BlacksID = userID
 
 	mm.matches[id] = match
 	return nil

@@ -20,8 +20,8 @@ var (
 
 type Match struct {
 	ID          string
-	OwnerID     string
-	OpponentID  string
+	WhitesID    string
+	BlacksID    string
 	Status      string
 	OwnerWhite  bool
 	listeners   map[string]chan GameResponse
@@ -42,8 +42,8 @@ type Repository interface {
 
 func NewMatch(userID string, color bool) *Match {
 	return &Match{
-		OwnerID:     userID,
-		OpponentID:  "",
+		WhitesID:    userID,
+		BlacksID:    "",
 		OwnerWhite:  color,
 		Status:      StatusPending,
 		listeners:   make(map[string]chan GameResponse),
@@ -67,12 +67,12 @@ func (m *Match) RemoveListener(userID string) {
 
 func (m *Match) Start() {
 
-	white := m.OwnerID
-	black := m.OpponentID
+	white := m.WhitesID
+	black := m.BlacksID
 
 	if !m.OwnerWhite {
-		white = m.OpponentID
-		black = m.OwnerID
+		white = m.BlacksID
+		black = m.WhitesID
 	}
 
 	// Ignoring error until refactoring. No need to provide white and black ids or names

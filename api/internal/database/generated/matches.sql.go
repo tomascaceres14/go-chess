@@ -14,14 +14,14 @@ import (
 
 const createMatch = `-- name: CreateMatch :one
 INSERT INTO matches (
-    owner_id, status, owner_white, move_history
+    whites_id, status, owner_white, move_history
 ) VALUES (
     $1, $2, $3, $4
 ) RETURNING id
 `
 
 type CreateMatchParams struct {
-	OwnerID     uuid.UUID `json:"owner_id"`
+	WhitesID    uuid.UUID `json:"whites_id"`
 	Status      string    `json:"status"`
 	OwnerWhite  bool      `json:"owner_white"`
 	MoveHistory []string  `json:"move_history"`
@@ -29,7 +29,7 @@ type CreateMatchParams struct {
 
 func (q *Queries) CreateMatch(ctx context.Context, arg CreateMatchParams) (uuid.UUID, error) {
 	row := q.db.QueryRow(ctx, createMatch,
-		arg.OwnerID,
+		arg.WhitesID,
 		arg.Status,
 		arg.OwnerWhite,
 		arg.MoveHistory,
@@ -40,7 +40,7 @@ func (q *Queries) CreateMatch(ctx context.Context, arg CreateMatchParams) (uuid.
 }
 
 const getMatchByID = `-- name: GetMatchByID :one
-SELECT id, owner_id, opponent_id, status, owner_white, move_history, created_at, fen FROM matches WHERE id = $1 LIMIT 1
+SELECT id, whites_id, blacks_id, status, owner_white, move_history, created_at, fen FROM matches WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetMatchByID(ctx context.Context, id uuid.UUID) (Match, error) {
@@ -48,8 +48,8 @@ func (q *Queries) GetMatchByID(ctx context.Context, id uuid.UUID) (Match, error)
 	var i Match
 	err := row.Scan(
 		&i.ID,
-		&i.OwnerID,
-		&i.OpponentID,
+		&i.WhitesID,
+		&i.BlacksID,
 		&i.Status,
 		&i.OwnerWhite,
 		&i.MoveHistory,
@@ -60,11 +60,11 @@ func (q *Queries) GetMatchByID(ctx context.Context, id uuid.UUID) (Match, error)
 }
 
 const getMatchesByUser = `-- name: GetMatchesByUser :many
-select id, owner_id, opponent_id, status, owner_white, move_history, created_at, fen FROM matches WHERE owner_id = $1 OR opponent_id = $1
+select id, whites_id, blacks_id, status, owner_white, move_history, created_at, fen FROM matches WHERE whites_id = $1 OR blacks_id = $1
 `
 
-func (q *Queries) GetMatchesByUser(ctx context.Context, ownerID uuid.UUID) ([]Match, error) {
-	rows, err := q.db.Query(ctx, getMatchesByUser, ownerID)
+func (q *Queries) GetMatchesByUser(ctx context.Context, whitesID uuid.UUID) ([]Match, error) {
+	rows, err := q.db.Query(ctx, getMatchesByUser, whitesID)
 	if err != nil {
 		return nil, err
 	}
@@ -74,8 +74,8 @@ func (q *Queries) GetMatchesByUser(ctx context.Context, ownerID uuid.UUID) ([]Ma
 		var i Match
 		if err := rows.Scan(
 			&i.ID,
-			&i.OwnerID,
-			&i.OpponentID,
+			&i.WhitesID,
+			&i.BlacksID,
 			&i.Status,
 			&i.OwnerWhite,
 			&i.MoveHistory,
@@ -107,17 +107,17 @@ func (q *Queries) SetMatchStatus(ctx context.Context, arg SetMatchStatusParams) 
 }
 
 const setMatchStatusAndOpponent = `-- name: SetMatchStatusAndOpponent :exec
-UPDATE matches SET status = $2, opponent_id = $3 WHERE id = $1
+UPDATE matches SET status = $2, blacks_id = $3 WHERE id = $1
 `
 
 type SetMatchStatusAndOpponentParams struct {
-	ID         uuid.UUID   `json:"id"`
-	Status     string      `json:"status"`
-	OpponentID pgtype.UUID `json:"opponent_id"`
+	ID       uuid.UUID `json:"id"`
+	Status   string    `json:"status"`
+	BlacksID uuid.UUID `json:"blacks_id"`
 }
 
 func (q *Queries) SetMatchStatusAndOpponent(ctx context.Context, arg SetMatchStatusAndOpponentParams) error {
-	_, err := q.db.Exec(ctx, setMatchStatusAndOpponent, arg.ID, arg.Status, arg.OpponentID)
+	_, err := q.db.Exec(ctx, setMatchStatusAndOpponent, arg.ID, arg.Status, arg.BlacksID)
 	return err
 }
 

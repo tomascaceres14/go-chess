@@ -11,8 +11,8 @@ import (
 
 type Match struct {
 	ID          uuid.UUID          `json:"id"`
-	OwnerID     uuid.UUID          `json:"owner_id"`
-	OpponentID  pgtype.UUID        `json:"opponent_id"`
+	WhitesID    uuid.UUID          `json:"whites_id"`
+	BlacksID    uuid.UUID          `json:"blacks_id"`
 	Status      string             `json:"status"`
 	OwnerWhite  bool               `json:"owner_white"`
 	MoveHistory []string           `json:"move_history"`
