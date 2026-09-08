@@ -13,6 +13,7 @@ var (
 	ErrUsernameTooShort   = errors.New("Username must be at least 6 characters long")
 	ErrPasswordTooShort   = errors.New("Password must be at least 8 characters long")
 	ErrPasswordsDontMatch = errors.New("Passwords do not match")
+	ErrWrongPassword      = errors.New("Wrong password")
 )
 
 type Handler struct {
@@ -63,15 +64,24 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.svc.userSvc.GetByUsername(r.Context(), credentials.Username)
 	if err != nil {
-		utils.HTTPJsonError(w, r, err.Error(), err, http.StatusBadRequest)
+		utils.HTTPJsonError(w, r, err.Error(), err, http.StatusUnauthorized)
+		return
+	}
+
+	if !CheckPasswordHash(credentials.Password, user.HashedPassword) {
+		utils.HTTPJsonError(w, r, ErrWrongPassword.Error(), ErrWrongPassword, http.StatusUnauthorized)
 		return
 	}
 
 	token, err := h.tokenProvider.NewUserCredentials(user.ID)
 	if err != nil {
-		utils.HTTPJsonError(w, r, "Error signing token", err, http.StatusBadRequest)
+		utils.HTTPJsonError(w, r, "Error signing token", err, http.StatusUnauthorized)
 		return
 	}
 
 	utils.HTTPJsonResponse(w, token, http.StatusCreated)
+}
+
+func (h *Handler) HandleRefresh(w http.ResponseWriter, r *http.Request) {
+
 }

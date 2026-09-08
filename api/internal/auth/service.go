@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/tomascaceres14/go-chess/api/internal/user"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Service struct {
@@ -26,10 +27,25 @@ func (s *Service) Register(ctx context.Context, register UserRegister) (*user.Us
 		return nil, ErrPasswordsDontMatch
 	}
 
-	user, err := s.userSvc.CreateUser(ctx, register.Username, register.Password)
+	hashedPassword, err := HashPassword(register.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.userSvc.CreateUser(ctx, register.Username, hashedPassword)
 	if err != nil {
 		return nil, err
 	}
 
 	return user, nil
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }

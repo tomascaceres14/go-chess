@@ -1,6 +1,6 @@
 module github.com/tomascaceres14/go-chess
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
@@ -8,6 +8,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/joho/godotenv v1.5.1
+	golang.org/x/crypto v0.56.0
 )
 
 require (
