@@ -6,7 +6,7 @@ type UserRegister struct {
 	RepeatPassword string `json:"repeat_password"`
 }
 
-type UserCredentials struct {
+type UserLogin struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }

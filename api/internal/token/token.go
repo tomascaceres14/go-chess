@@ -13,7 +13,7 @@ type AccessCredentials struct {
 
 // Interfaced for future integrations with OAuth / third-party auth provider
 type TokenProvider interface {
-	NewUserCredentials(id string) (*AccessCredentials, error)
+	NewAccessCredentials(id string) (*AccessCredentials, error)
 	ValidateToken(token string) (*jwt.Token, error)
 }
 

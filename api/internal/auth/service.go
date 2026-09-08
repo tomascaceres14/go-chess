@@ -3,12 +3,14 @@ package auth
 import (
 	"context"
 
+	"github.com/tomascaceres14/go-chess/api/internal/token"
 	"github.com/tomascaceres14/go-chess/api/internal/user"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service struct {
-	userSvc *user.Service
+	userSvc       *user.Service
+	tokenProvider token.TokenProvider
 }
 
 func NewService(userService *user.Service) *Service {
@@ -17,7 +19,7 @@ func NewService(userService *user.Service) *Service {
 	}
 }
 
-func (s *Service) Register(ctx context.Context, register UserRegister) (*user.User, error) {
+func (s *Service) Register(ctx context.Context, register UserRegister) (*token.AccessCredentials, error) {
 
 	if err := register.Validate(); err != nil {
 		return nil, err
@@ -37,7 +39,31 @@ func (s *Service) Register(ctx context.Context, register UserRegister) (*user.Us
 		return nil, err
 	}
 
-	return user, nil
+	credentials, err := s.tokenProvider.NewAccessCredentials(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return credentials, nil
+}
+
+func (s *Service) Login(ctx context.Context, login UserLogin) (*token.AccessCredentials, error) {
+
+	user, err := s.userSvc.GetByUsername(ctx, login.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	if !CheckPasswordHash(login.Password, user.HashedPassword) {
+		return nil, err
+	}
+
+	credentials, err := s.tokenProvider.NewAccessCredentials(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return credentials, nil
 }
 
 func HashPassword(password string) (string, error) {

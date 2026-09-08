@@ -35,7 +35,7 @@ func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.svc.Register(r.Context(), register)
+	creds, err := h.svc.Register(r.Context(), register)
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrPasswordTooShort), errors.Is(err, ErrPasswordsDontMatch), errors.Is(err, ErrUsernameTooShort):
@@ -46,40 +46,23 @@ func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.tokenProvider.NewUserCredentials(user.ID)
-	if err != nil {
-		utils.HTTPJsonError(w, r, "Error signing token", err, http.StatusBadRequest)
-		return
-	}
-
-	utils.HTTPJsonResponse(w, token, http.StatusCreated)
+	utils.HTTPJsonResponse(w, creds, http.StatusCreated)
 }
 
 func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
-	var credentials UserCredentials
-	if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
+	var login UserLogin
+	if err := json.NewDecoder(r.Body).Decode(&login); err != nil {
 		utils.HTTPJsonError(w, r, "Error processing request", err, http.StatusBadRequest)
 		return
 	}
 
-	user, err := h.svc.userSvc.GetByUsername(r.Context(), credentials.Username)
+	creds, err := h.svc.Login(r.Context(), login)
 	if err != nil {
 		utils.HTTPJsonError(w, r, err.Error(), err, http.StatusUnauthorized)
 		return
 	}
 
-	if !CheckPasswordHash(credentials.Password, user.HashedPassword) {
-		utils.HTTPJsonError(w, r, ErrWrongPassword.Error(), ErrWrongPassword, http.StatusUnauthorized)
-		return
-	}
-
-	token, err := h.tokenProvider.NewUserCredentials(user.ID)
-	if err != nil {
-		utils.HTTPJsonError(w, r, "Error signing token", err, http.StatusUnauthorized)
-		return
-	}
-
-	utils.HTTPJsonResponse(w, token, http.StatusCreated)
+	utils.HTTPJsonResponse(w, creds, http.StatusCreated)
 }
 
 func (h *Handler) HandleRefresh(w http.ResponseWriter, r *http.Request) {
