@@ -54,11 +54,11 @@ func main() {
 	//userRepository := user.NewMemoryRepository()
 	userRepository := user.NewPostgresRepository(queries)
 	userService := user.NewService(userRepository, matchService)
-	userHandler := user.NewHandler(userService, tokenProvider)
+	userHandler := user.NewHandler(userService)
 
 	// Auth
-	authService := auth.NewService(userService)
-	authHandler := auth.NewHandler(authService, tokenProvider)
+	authService := auth.NewService(userService, tokenProvider)
+	authHandler := auth.NewHandler(authService)
 
 	// Middleware
 	mw := middleware.Middleware{

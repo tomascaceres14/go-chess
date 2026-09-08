@@ -13,9 +13,10 @@ type Service struct {
 	tokenProvider token.TokenProvider
 }
 
-func NewService(userService *user.Service) *Service {
+func NewService(userService *user.Service, tokenProvider token.TokenProvider) *Service {
 	return &Service{
-		userSvc: userService,
+		userSvc:       userService,
+		tokenProvider: tokenProvider,
 	}
 }
 
@@ -39,7 +40,7 @@ func (s *Service) Register(ctx context.Context, register UserRegister) (*token.A
 		return nil, err
 	}
 
-	credentials, err := s.tokenProvider.NewAccessCredentials(user.ID)
+	credentials, err := s.tokenProvider.NewUserCredentials(user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,7 @@ func (s *Service) Login(ctx context.Context, login UserLogin) (*token.AccessCred
 		return nil, err
 	}
 
-	credentials, err := s.tokenProvider.NewAccessCredentials(user.ID)
+	credentials, err := s.tokenProvider.NewUserCredentials(user.ID)
 	if err != nil {
 		return nil, err
 	}

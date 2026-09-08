@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/tomascaceres14/go-chess/api/internal/token"
 	"github.com/tomascaceres14/go-chess/api/utils"
 )
 
@@ -13,14 +12,12 @@ var (
 )
 
 type Handler struct {
-	svc           *Service
-	tokenProvider token.TokenProvider
+	svc *Service
 }
 
-func NewHandler(svc *Service, tokenProvider token.TokenProvider) *Handler {
+func NewHandler(svc *Service) *Handler {
 	return &Handler{
-		svc:           svc,
-		tokenProvider: tokenProvider,
+		svc: svc,
 	}
 }
 
