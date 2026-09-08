@@ -18,7 +18,7 @@ var (
 
 func (m *Middleware) JWTAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("[AUTH CHECK] %s: In progress", r.Pattern)
+		log.Printf("[AUTH MW] %s: In progress", r.Pattern)
 
 		// Get Authorization header
 		authHeader := r.Header.Get("Authorization")
@@ -45,7 +45,7 @@ func (m *Middleware) JWTAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if !m.UserService.ExistsByID(r.Context(), id) {
-			utils.HTTPJsonError(w, r, fmt.Sprintf("User ID: %s not found or banned", id), err, http.StatusForbidden)
+			utils.HTTPJsonError(w, r, fmt.Sprintf("[AUTH MW] User ID: %s not found or banned", id), err, http.StatusForbidden)
 			return
 		}
 
@@ -56,7 +56,7 @@ func (m *Middleware) JWTAuth(next http.HandlerFunc) http.HandlerFunc {
 			id,
 		)
 
-		log.Printf("[AUTH CHECK] %s: OK. UserID: %s", r.Pattern, id)
+		log.Printf("[AUTH MW] %s: OK. UserID: %s", r.Pattern, id)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }

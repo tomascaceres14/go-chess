@@ -20,6 +20,30 @@ func NewHandler(svc *Service) *Handler {
 	}
 }
 
+func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(string)
+	if userID == "" {
+		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
+		return
+	}
+
+	var params NewMatchParams
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		utils.HTTPJsonError(w, r, "Error decoding body", err, http.StatusBadRequest)
+		return
+	}
+
+	match, err := h.svc.StartNewMatch(r.Context(), userID, params.Whites)
+	if err != nil {
+		utils.HTTPJsonError(w, r, "Error creating match", err, http.StatusInternalServerError)
+		return
+	}
+
+	utils.HTTPJsonResponse(w, map[string]string{
+		"match_id": match.ID,
+	}, http.StatusCreated)
+}
+
 func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -91,30 +115,6 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 		command.UserID = userID
 		commandsCh <- command
 	}
-}
-
-func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(string)
-	if userID == "" {
-		utils.HTTPJsonError(w, r, "User ID not found", nil, http.StatusBadRequest)
-		return
-	}
-
-	var params NewMatchParams
-	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
-		utils.HTTPJsonError(w, r, "Error decoding body", err, http.StatusBadRequest)
-		return
-	}
-
-	match, err := h.svc.StartNewMatch(r.Context(), userID, params.Whites)
-	if err != nil {
-		utils.HTTPJsonError(w, r, "Error creating match", err, http.StatusInternalServerError)
-		return
-	}
-
-	utils.HTTPJsonResponse(w, map[string]string{
-		"match_id": match.ID,
-	}, http.StatusCreated)
 }
 
 func (h *Handler) HandleGetMatchesByUser(w http.ResponseWriter, r *http.Request) {

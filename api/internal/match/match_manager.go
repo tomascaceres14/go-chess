@@ -49,11 +49,8 @@ func (mm *MatchManager) GetStatus(id string) (string, error) {
 		return "", err
 	}
 
-	log.Println("read locked")
-	defer log.Println("read unlocked")
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	log.Println("reading")
 	return m.Status, nil
 }
 
@@ -65,11 +62,9 @@ func (mm *MatchManager) SetStatus(id string, status string) error {
 	}
 	mm.mu.RUnlock()
 
-	log.Println("locking set")
 	match.mu.Lock()
 	match.Status = status
 	match.mu.Unlock()
-	log.Println("unlocking set")
 	return nil
 }
 
@@ -92,7 +87,6 @@ func (mm *MatchManager) GetListener(matchID, userID string) (chan GameResponse, 
 		return nil, err
 	}
 	ch, ok := match.listeners[userID]
-	log.Println("GetListener listener ch", ch, ok, userID)
 	if !ok {
 		return nil, ErrUserAlreadyConnected
 	}

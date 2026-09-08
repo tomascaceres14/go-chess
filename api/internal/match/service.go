@@ -98,8 +98,6 @@ func (s *Service) AddUserToMatch(ctx context.Context, matchID, userID string) (c
 		return nil, err
 	}
 
-	log.Println(status)
-
 	switch status {
 	case StatusPending:
 		if err := s.AssignOwner(ctx, matchID, userID); err != nil {
