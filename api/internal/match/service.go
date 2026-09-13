@@ -26,12 +26,8 @@ func NewService(r Repository) *Service {
 	}
 }
 
-func (s *Service) StartNewMatch(ctx context.Context, userID string, whites bool) (*Match, error) {
-
-	match, err := s.repo.Save(ctx, NewMatch(userID, whites))
-	if err != nil {
-		return nil, err
-	}
+func (s *Service) NewMatch(ctx context.Context, userID string, whites bool) (*Match, error) {
+	match := NewMatch(userID, whites)
 
 	if err := s.matchManager.AddMatch(match); err != nil {
 		return nil, err
@@ -61,11 +57,9 @@ func (s *Service) AssignOwner(ctx context.Context, matchID, userID string) error
 		return err
 	}
 
-	m.mu.RLock()
-	if userID != m.WhitesID {
+	if userID != m.GetOwner() {
 		return ErrOwnerNotConnected
 	}
-	m.mu.RUnlock()
 
 	log.Printf("Owner for match %s connected. Changing status", matchID)
 	if err := s.SetStatus(ctx, matchID, StatusMatchmaking); err != nil {
@@ -150,12 +144,19 @@ func (s *Service) GetMatchesByUserID(ctx context.Context, userID string) ([]*Mat
 func (s *Service) FinalizeMatch(ctx context.Context, matchID, status, FEN string) error {
 
 	// Retrieve match
-	m, err := s.matchManager.GetMatch(matchID)
+	m, err := s.matchManager.PopMatch(matchID)
 	if err != nil {
 		return err
 	}
 
-	return s.repo.FinalizeMatch(ctx, matchID, status, FEN, m.MoveHistory)
+	m.FEN = FEN
+	m.Status = status
+
+	if _, err = s.repo.Save(ctx, m); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *Service) GetLiveMatches(ctx context.Context) []*Match {

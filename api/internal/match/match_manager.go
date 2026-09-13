@@ -127,3 +127,17 @@ func (mm *MatchManager) GetMatches() []*Match {
 
 	return slices.Collect(maps.Values(mm.matches))
 }
+
+func (mm *MatchManager) PopMatch(id string) (*Match, error) {
+	m, err := mm.GetMatch(id)
+	if err != nil {
+		return nil, err
+	}
+
+	mm.mu.Lock()
+	defer mm.mu.Unlock()
+
+	delete(mm.matches, id)
+
+	return m, nil
+}

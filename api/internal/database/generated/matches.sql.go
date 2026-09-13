@@ -12,33 +12,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createMatch = `-- name: CreateMatch :one
-INSERT INTO matches (
-    whites_id, status, owner_white, move_history
-) VALUES (
-    $1, $2, $3, $4
-) RETURNING id
-`
-
-type CreateMatchParams struct {
-	WhitesID    uuid.UUID `json:"whites_id"`
-	Status      string    `json:"status"`
-	OwnerWhite  bool      `json:"owner_white"`
-	MoveHistory []string  `json:"move_history"`
-}
-
-func (q *Queries) CreateMatch(ctx context.Context, arg CreateMatchParams) (uuid.UUID, error) {
-	row := q.db.QueryRow(ctx, createMatch,
-		arg.WhitesID,
-		arg.Status,
-		arg.OwnerWhite,
-		arg.MoveHistory,
-	)
-	var id uuid.UUID
-	err := row.Scan(&id)
-	return id, err
-}
-
 const getMatchByID = `-- name: GetMatchByID :one
 SELECT id, whites_id, blacks_id, status, owner_white, move_history, created_at, fen FROM matches WHERE id = $1 LIMIT 1
 `
@@ -92,6 +65,37 @@ func (q *Queries) GetMatchesByUser(ctx context.Context, whitesID uuid.UUID) ([]M
 	return items, nil
 }
 
+const saveMatch = `-- name: SaveMatch :exec
+INSERT INTO matches (
+    id, whites_id, blacks_id, status, owner_white, fen, move_history
+) VALUES (
+    $1, $2, $3, $4, $5, $6, $7
+)
+`
+
+type SaveMatchParams struct {
+	ID          uuid.UUID   `json:"id"`
+	WhitesID    uuid.UUID   `json:"whites_id"`
+	BlacksID    uuid.UUID   `json:"blacks_id"`
+	Status      string      `json:"status"`
+	OwnerWhite  bool        `json:"owner_white"`
+	Fen         pgtype.Text `json:"fen"`
+	MoveHistory []string    `json:"move_history"`
+}
+
+func (q *Queries) SaveMatch(ctx context.Context, arg SaveMatchParams) error {
+	_, err := q.db.Exec(ctx, saveMatch,
+		arg.ID,
+		arg.WhitesID,
+		arg.BlacksID,
+		arg.Status,
+		arg.OwnerWhite,
+		arg.Fen,
+		arg.MoveHistory,
+	)
+	return err
+}
+
 const setMatchStatus = `-- name: SetMatchStatus :exec
 UPDATE matches SET status = $2 WHERE id = $1
 `
@@ -118,26 +122,5 @@ type SetMatchStatusAndOpponentParams struct {
 
 func (q *Queries) SetMatchStatusAndOpponent(ctx context.Context, arg SetMatchStatusAndOpponentParams) error {
 	_, err := q.db.Exec(ctx, setMatchStatusAndOpponent, arg.ID, arg.Status, arg.BlacksID)
-	return err
-}
-
-const updateGameFinalState = `-- name: UpdateGameFinalState :exec
-UPDATE matches SET status = $2, fen = $3, move_history = $4 WHERE id = $1
-`
-
-type UpdateGameFinalStateParams struct {
-	ID          uuid.UUID   `json:"id"`
-	Status      string      `json:"status"`
-	Fen         pgtype.Text `json:"fen"`
-	MoveHistory []string    `json:"move_history"`
-}
-
-func (q *Queries) UpdateGameFinalState(ctx context.Context, arg UpdateGameFinalStateParams) error {
-	_, err := q.db.Exec(ctx, updateGameFinalState,
-		arg.ID,
-		arg.Status,
-		arg.Fen,
-		arg.MoveHistory,
-	)
 	return err
 }

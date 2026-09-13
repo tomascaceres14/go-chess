@@ -5,6 +5,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/google/uuid"
 	gochess "github.com/tomascaceres14/go-chess/engine"
 )
 
@@ -35,15 +36,23 @@ type Repository interface {
 	Save(ctx context.Context, match *Match) (*Match, error)
 	GetByID(ctx context.Context, id string) (*Match, error)
 	GetMatchesByUserID(ctx context.Context, id string) ([]*Match, error)
-	FinalizeMatch(ctx context.Context, matchID, status, FEN string, moveHistory []string) error
 	SetStatus(ctx context.Context, matchID, status string) error
 	SetStatusAndOpponent(ctx context.Context, matchID, opponentID, status string) error
 }
 
 func NewMatch(userID string, color bool) *Match {
+	whitesID := userID
+	blacksID := ""
+
+	if !color {
+		whitesID = ""
+		blacksID = userID
+	}
+
 	return &Match{
-		WhitesID:    userID,
-		BlacksID:    "",
+		ID:          uuid.NewString(),
+		WhitesID:    whitesID,
+		BlacksID:    blacksID,
 		OwnerWhite:  color,
 		Status:      StatusPending,
 		listeners:   make(map[string]chan GameResponse),
@@ -78,6 +87,7 @@ func (m *Match) Start() {
 	// Ignoring error until refactoring. No need to provide white and black ids or names
 	//game, _ := gochess.NewGameClassic(white, black)
 	game, _ := gochess.NewGameFENString("rnbqkbnr/pppp1ppp/8/4p3/5PP1/8/PPPPP2P/RNBQKBNR b KQkq g3 0 2", white, black)
+	println(game)
 	m.FEN = game.GetFENString()
 
 	defer m.CloseChannels()
@@ -154,4 +164,15 @@ func (m *Match) CloseChannels() {
 	for _, ch := range m.listeners {
 		close(ch)
 	}
+}
+
+func (m *Match) GetOwner() string {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	owner := m.WhitesID
+	if !m.OwnerWhite {
+		owner = m.BlacksID
+	}
+	return owner
 }

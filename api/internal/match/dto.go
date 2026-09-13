@@ -34,8 +34,8 @@ type GameResponse struct {
 
 type MatchDTO struct {
 	ID          string   `json:"id"`
-	OwnerID     string   `json:"owner_id"`
-	OpponentID  string   `json:"opponent_id"`
+	WhitesID    string   `json:"whites_id"`
+	BlacksID    string   `json:"blacks_id"`
 	Status      string   `json:"status"`
 	OwnerWhite  bool     `json:"owner_white"`
 	FEN         string   `json:"fen"`
@@ -45,8 +45,8 @@ type MatchDTO struct {
 func MatchToDTO(m *Match) *MatchDTO {
 	return &MatchDTO{
 		ID:          m.ID,
-		OwnerID:     m.WhitesID,
-		OpponentID:  m.BlacksID,
+		WhitesID:    m.WhitesID,
+		BlacksID:    m.BlacksID,
 		Status:      m.Status,
 		OwnerWhite:  m.OwnerWhite,
 		FEN:         m.FEN,

@@ -9,9 +9,6 @@ CREATE TABLE matches (
     move_history TEXT[] NOT NULL DEFAULT '{}',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
-CREATE INDEX idx_matches_whites_id ON matches(whites_id);
-CREATE INDEX idx_matches_blacks_id ON matches(blacks_id);
 -- +goose StatementEnd
 
 -- +goose Down

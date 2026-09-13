@@ -23,23 +23,35 @@ func NewPostgresRepository(db *generated.Queries) *PostgresRepository {
 
 func (r *PostgresRepository) Save(ctx context.Context, m *Match) (*Match, error) {
 
+	id, err := uuid.Parse(m.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	whitesID, err := uuid.Parse(m.WhitesID)
 	if err != nil {
 		return nil, err
 	}
 
-	id, err := r.db.CreateMatch(ctx, generated.CreateMatchParams{
-		WhitesID:    whitesID,
-		Status:      m.Status,
-		OwnerWhite:  m.OwnerWhite,
-		MoveHistory: m.MoveHistory,
-	})
-
+	blacksID, err := uuid.Parse(m.BlacksID)
 	if err != nil {
 		return nil, err
 	}
 
-	m.ID = id.String()
+	if err := r.db.SaveMatch(ctx, generated.SaveMatchParams{
+		ID:         id,
+		WhitesID:   whitesID,
+		BlacksID:   blacksID,
+		Status:     m.Status,
+		OwnerWhite: m.OwnerWhite,
+		Fen: pgtype.Text{
+			String: m.FEN,
+			Valid:  true,
+		},
+		MoveHistory: m.MoveHistory,
+	}); err != nil {
+		return nil, err
+	}
 
 	return m, nil
 }
@@ -74,23 +86,6 @@ func (r *PostgresRepository) GetMatchesByUserID(ctx context.Context, id string) 
 		return nil, err
 	}
 	return ParseMatchDBList(matchesDB), nil
-}
-
-func (r *PostgresRepository) FinalizeMatch(ctx context.Context, matchID, status, FEN string, moveHistory []string) error {
-	id, err := uuid.Parse(matchID)
-	if err != nil {
-		return err
-	}
-
-	return r.db.UpdateGameFinalState(ctx, generated.UpdateGameFinalStateParams{
-		ID:     id,
-		Status: status,
-		Fen: pgtype.Text{
-			String: FEN,
-			Valid:  true,
-		},
-		MoveHistory: moveHistory,
-	})
 }
 
 func (r *PostgresRepository) SetStatus(ctx context.Context, matchID, status string) error {

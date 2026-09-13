@@ -33,7 +33,7 @@ func (h *Handler) HandleNewMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	match, err := h.svc.StartNewMatch(r.Context(), userID, params.Whites)
+	match, err := h.svc.NewMatch(r.Context(), userID, params.Whites)
 	if err != nil {
 		utils.HTTPJsonError(w, r, "Error creating match", err, http.StatusInternalServerError)
 		return
@@ -80,6 +80,11 @@ func (h *Handler) HandleGameWebSocket(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
+	conn.SetCloseHandler(func(code int, text string) error {
+		log.Printf("User %s disconnected from match id %s", userID, matchID)
+		h.svc.FinalizeMatch(ctx, matchID, StatusAborted, "")
+		return nil
+	})
 	defer conn.Close()
 
 	conn.WriteJSON(GameResponse{
