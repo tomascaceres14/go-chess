@@ -99,22 +99,6 @@ func (r *PostgresRepository) SetStatus(ctx context.Context, matchID, status stri
 	})
 }
 
-func (r *PostgresRepository) SetStatusAndOpponent(ctx context.Context, matchID, opponentID, status string) error {
-	id, err := uuid.Parse(matchID)
-	if err != nil {
-		return err
-	}
-	opponent, err := uuid.Parse(opponentID)
-	if err != nil {
-		return err
-	}
-	return r.db.SetMatchStatusAndOpponent(ctx, generated.SetMatchStatusAndOpponentParams{
-		ID:       id,
-		BlacksID: opponent,
-		Status:   status,
-	})
-}
-
 func ParseMatchDB(m *generated.Match) *Match {
 	return &Match{
 		ID:          m.ID.String(),

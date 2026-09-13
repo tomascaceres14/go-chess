@@ -70,10 +70,6 @@ func (s *Service) AssignOwner(ctx context.Context, matchID, userID string) error
 }
 
 func (s *Service) AssignOpponent(ctx context.Context, matchID, userID string) error {
-	if err := s.repo.SetStatusAndOpponent(ctx, matchID, userID, StatusPlaying); err != nil {
-		return err
-	}
-
 	if err := s.matchManager.SetOpponentID(matchID, userID); err != nil {
 		return err
 	}

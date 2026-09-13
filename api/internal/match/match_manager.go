@@ -74,7 +74,17 @@ func (mm *MatchManager) SetOpponentID(id, userID string) error {
 		return err
 	}
 
-	match.BlacksID = userID
+	match.mu.Lock()
+	defer match.mu.Unlock()
+
+	if match.OwnerWhite {
+		match.BlacksID = userID
+	} else {
+		match.WhitesID = userID
+	}
+
+	mm.mu.Lock()
+	defer mm.mu.Unlock()
 
 	mm.matches[id] = match
 	return nil

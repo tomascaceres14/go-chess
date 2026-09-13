@@ -37,7 +37,6 @@ type Repository interface {
 	GetByID(ctx context.Context, id string) (*Match, error)
 	GetMatchesByUserID(ctx context.Context, id string) ([]*Match, error)
 	SetStatus(ctx context.Context, matchID, status string) error
-	SetStatusAndOpponent(ctx context.Context, matchID, opponentID, status string) error
 }
 
 func NewMatch(userID string, color bool) *Match {
@@ -76,18 +75,11 @@ func (m *Match) RemoveListener(userID string) {
 
 func (m *Match) Start() {
 
-	white := m.WhitesID
-	black := m.BlacksID
-
-	if !m.OwnerWhite {
-		white = m.BlacksID
-		black = m.WhitesID
-	}
-
-	// Ignoring error until refactoring. No need to provide white and black ids or names
 	//game, _ := gochess.NewGameClassic(white, black)
-	game, _ := gochess.NewGameFENString("rnbqkbnr/pppp1ppp/8/4p3/5PP1/8/PPPPP2P/RNBQKBNR b KQkq g3 0 2", white, black)
-	println(game)
+	game, err := gochess.NewGameFENString("rnbqkbnr/pppp1ppp/8/4p3/5PP1/8/PPPPP2P/RNBQKBNR b KQkq g3 0 2", m.WhitesID, m.BlacksID)
+	if err != nil {
+		log.Fatal(err)
+	}
 	m.FEN = game.GetFENString()
 
 	defer m.CloseChannels()
