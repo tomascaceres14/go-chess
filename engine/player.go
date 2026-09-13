@@ -1,7 +1,6 @@
 package gochess
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -20,7 +19,7 @@ func newPlayer(name string, isWhite bool) (*player, error) {
 	name = strings.TrimSpace(name)
 
 	if len(name) <= 0 {
-		return nil, errors.New("Player name should include at least one character.")
+		return nil, fmt.Errorf("Player whites: %v name should include at least one character.", isWhite)
 	}
 	return &player{
 		name:    name,
