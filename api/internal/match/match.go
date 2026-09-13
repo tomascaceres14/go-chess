@@ -134,6 +134,7 @@ func (m *Match) Start() {
 					response.Command = MatchEndCmd
 					response.Status = game.Status()
 					m.MoveHistory = game.MoveHistory()
+					m.FEN = game.GetFENString()
 					m.sendMessage(response)
 					return
 				}

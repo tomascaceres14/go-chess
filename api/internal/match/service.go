@@ -141,7 +141,7 @@ func (s *Service) GetMatchesByUserID(ctx context.Context, userID string) ([]*Mat
 	return s.repo.GetMatchesByUserID(ctx, userID)
 }
 
-func (s *Service) FinalizeMatch(ctx context.Context, matchID, status, FEN string) error {
+func (s *Service) FinalizeMatch(ctx context.Context, matchID, status string) error {
 
 	// Retrieve match
 	m, err := s.matchManager.PopMatch(matchID)
@@ -149,8 +149,12 @@ func (s *Service) FinalizeMatch(ctx context.Context, matchID, status, FEN string
 		return err
 	}
 
-	m.FEN = FEN
-	m.Status = status
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if status != "" {
+		m.Status = status
+	}
 
 	if _, err = s.repo.Save(ctx, m); err != nil {
 		return err
