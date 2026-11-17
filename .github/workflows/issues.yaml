@@ -1,0 +1,8 @@
+name: Issue Log Workflow
+on: issues
+jobs:
+  log:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Log info
+        run: echo "A dude called ${{ github.event.issue.assignee }} has a complain ${{ github.event.issue.title }}. Fix it."
