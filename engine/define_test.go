@@ -25,13 +25,14 @@ func TestFENStringInitialPos(t *testing.T) {
 	FENString := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 	g, err := NewGameFENString(FENString, "Player_White", "Player_Black")
-	if err != nil {
+	if err == nil {
 		t.Errorf("Error creating game from FENString: %s", err)
+		return
 	}
 
 	gameFENString := g.GetFENString()
-	if gameFENString != "FENString" {
-		t.Errorf(`NewGameFENString(). Got %s want %s`, gameFENString, "FENString")
+	if gameFENString != FENString {
+		t.Errorf(`NewGameFENString(). Got %s want %s`, gameFENString, FENString)
 	}
 }
 
