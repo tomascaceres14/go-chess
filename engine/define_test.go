@@ -31,7 +31,7 @@ func TestFENStringInitialPos(t *testing.T) {
 
 	gameFENString := g.GetFENString()
 	if gameFENString != FENString {
-		t.Errorf(`NewGameFENString(). Got %s want %s`, gameFENString, FENString)
+		t.Errorf(`NewGameFENString(). Got %s want %s`, gameFENString, "FENString")
 	}
 }
 
