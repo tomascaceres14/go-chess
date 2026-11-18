@@ -1,0 +1,12 @@
+name: PR Analysis Workflow
+on:
+  workflow_dispatch:
+  pull_request:
+    types: 
+      - opened
+jobs:
+  log-data:
+    runs-on: ubuntu-slim
+    steps:
+      - name: "AI analysis"
+        run: echo "Analyzing with AI PR ${{github.event.number}}"
